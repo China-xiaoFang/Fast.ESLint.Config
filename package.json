@@ -1,7 +1,7 @@
 {
   "name": "@fast-china/eslint-config",
   "author": "小方",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Fast ESLint 规则库.",
   "keywords": [
     "fast",
@@ -20,12 +20,6 @@
     "url": "https://gitee.com/China-xiaoFang/fast.eslint.config/issues"
   },
   "main": "src/index-v8.x.js",
-  "exports": {
-    "./flat": {
-      "import": "./src/index-v9.x.js",
-      "require": "./src/index-v9.x.js"
-    }
-  },
   "files": [
     "./Fast.png",
     "./LICENSE",
