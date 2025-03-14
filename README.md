@@ -35,12 +35,20 @@ pnpm install fast-eslint-config --save-dev
 ## Use
 
 ```typescript
-// The following '.eslintrc.cjs' is an example
+// < v9.x version. The following is an example of '.eslintrc.cjs'.
 const { defineConfig } = require("eslint-define-config");
 
 module.exports = defineConfig({
   root: true,
   extends: ["fast-eslint-config"],
+});
+
+// >= v9.x version. The following is an example of 'eslint.config.mjs'.
+import tseslint from "typescript-eslint";
+import fastESLingConfigFlat from "fast-eslint-config/flat";
+
+export default tseslint.config({
+  extends: [fastESLingConfigFlat],
 });
 ```
 

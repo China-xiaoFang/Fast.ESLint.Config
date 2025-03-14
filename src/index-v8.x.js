@@ -13,8 +13,8 @@ module.exports = defineConfig({
     "eslint:recommended",
     "plugin:import/recommended",
     "plugin:jsonc/recommended-with-jsonc",
-    "plugin:markdown/recommended",
-    "plugin:vue/vue3-recommended",
+    "plugin:markdown/recommended-legacy",
+    "plugin:vue/recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier",
   ],
@@ -304,11 +304,14 @@ module.exports = defineConfig({
     // 强制 HTML 属性使用 camelCase 风格
     "vue/attribute-hyphenation": [
       "error",
+      "always",
       {
-        // 忽略 Element-Plus 加载文案
-        "element-loading-text": "ignore",
+        ignore: [
+          // 忽略 Element-Plus 加载文案"element-loading-text"
+        ],
       },
     ],
+
     // 禁止重复的字段名
     "vue/no-dupe-keys": "error",
     // 禁止直接修改 props 的值
@@ -393,6 +396,26 @@ module.exports = defineConfig({
             group: "external",
             position: "before",
           },
+          {
+            pattern: "element-plus",
+            group: "external",
+            position: "before",
+          },
+          {
+            pattern: "@element-plus/**",
+            group: "external",
+            position: "before",
+          },
+          {
+            pattern: "fast-element-plus",
+            group: "external",
+            position: "before",
+          },
+          {
+            pattern: "@fast-china/**",
+            group: "external",
+            position: "before",
+          },
         ],
         pathGroupsExcludedImportTypes: ["type"],
         // 禁止不同组之间进行换行
@@ -421,16 +444,28 @@ module.exports = defineConfig({
       "error",
       {
         paths: [
-          { name: "lodash-es", message: "Use lodash instead." },
-          { name: "lodash-unified", message: "Use lodash instead." },
+          { name: "lodash", message: "Use lodash-unified instead." },
+          { name: "lodash-es", message: "Use lodash-unified instead." },
         ],
         patterns: [
           {
-            group: ["lodash-es/*", "lodash-unified/*"],
-            message: "Use lodash instead.",
+            group: ["lodash/*", "lodash-es/*"],
+            message: "Use lodash-unified instead.",
           },
         ],
       },
+      // {
+      // 	paths: [
+      // 		{ name: "lodash-es", message: "Use lodash instead." },
+      // 		{ name: "lodash-unified", message: "Use lodash instead." },
+      // 	],
+      // 	patterns: [
+      // 		{
+      // 			group: ["lodash-es/*", "lodash-unified/*"],
+      // 			message: "Use lodash instead.",
+      // 		},
+      // 	],
+      // },
     ],
   },
 });
