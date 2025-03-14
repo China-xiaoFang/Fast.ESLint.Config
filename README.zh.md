@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/fast-eslint-config">
-    <img src="https://img.shields.io/npm/v/fast-eslint-config?color=orange&label=" alt="version" />
+  <a href="https://www.npmjs.com/package/@fast-china/eslint-config">
+    <img src="https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange&label=" alt="version" />
   </a>
   <a href="https://gitee.com/China-xiaoFang/fast.eslint.config/blob/master/LICENSE">
-    <img src="https://img.shields.io/npm/l/fast-eslint-config" alt="license" />
+    <img src="https://img.shields.io/npm/l/@fast-china/eslint-config" alt="license" />
   </a>
 </p>
 
@@ -23,13 +23,13 @@
 # 选择一个你喜欢的包管理器
 
 # NPM
-npm install fast-eslint-config --save-dev
+npm install @fast-china/eslint-config --save-dev
 
 # Yarn
-yarn add fast-eslint-config --dev
+yarn add @fast-china/eslint-config --dev
 
 # pnpm（推荐）
-pnpm install fast-eslint-config --save-dev
+pnpm install @fast-china/eslint-config --save-dev
 ```
 
 ## 使用
@@ -40,15 +40,15 @@ const { defineConfig } = require("eslint-define-config");
 
 module.exports = defineConfig({
   root: true,
-  extends: ["fast-eslint-config"],
+  extends: ["@fast-china/eslint-config"],
 });
 
 // >= v9.x 版本。以下已 ‘eslint.config.mjs’ 未实例。
 import tseslint from "typescript-eslint";
-import fastESLingConfigFlat from "fast-eslint-config/flat";
+import fastChinaFlat from "@fast-china/eslint-config/flat";
 
 export default tseslint.config({
-  extends: [fastESLingConfigFlat],
+  extends: [...fastChinaFlat],
 });
 ```
 
