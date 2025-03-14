@@ -1,7 +1,7 @@
 {
   "name": "fast-eslint-config",
   "author": "小方",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Fast ESLint 规则库.",
   "keywords": [
     "fast",
@@ -19,9 +19,16 @@
   "bugs": {
     "url": "https://gitee.com/China-xiaoFang/fast.eslint.config/issues"
   },
-  "scripts": {
-    "build": "tsup",
-    "publish": "cd fast-eslint-config && npm publish"
+  "main": "index.js",
+  "files": [
+    "./Fast.png",
+    "./LICENSE",
+    "./README.md",
+    "./README.zh.md",
+    "./dist"
+  ],
+  "peerDependencies": {
+    "eslint": "^8.0.0"
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^8.26.0",
@@ -39,8 +46,7 @@
     "vue-eslint-parser": "^10.1.1"
   },
   "devDependencies": {
-    "eslint": "^8.57.1",
-    "tsup": "^8.4.0"
+    "eslint": "^8.57.1"
   },
   "engines": {
     "node": ">=20.0.0"
