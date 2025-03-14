@@ -1,7 +1,7 @@
 {
   "name": "fast-eslint-config",
   "author": "小方",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Fast ESLint 规则库.",
   "keywords": [
     "fast",
@@ -21,6 +21,7 @@
   },
   "main": "index.js",
   "files": [
+    "./index.js",
     "./Fast.png",
     "./LICENSE",
     "./README.md",
