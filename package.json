@@ -1,7 +1,7 @@
 {
   "name": "@fast-china/eslint-config",
   "author": "小方",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Fast ESLint 规则库.",
   "keywords": [
     "fast",
@@ -19,12 +19,24 @@
   "bugs": {
     "url": "https://gitee.com/China-xiaoFang/fast.eslint.config/issues"
   },
-  "main": "src/index-v8.x.js",
+  "main": "src/index.js",
+  "exports": {
+    "./flat": {
+      "default": "./src/flat-index.js"
+    },
+    "./use-lodash-unified": {
+      "default": "./src/rules/use-lodash-unified.js"
+    },
+    "./use-lodash": {
+      "default": "./src/rules/use-lodash.js"
+    }
+  },
   "files": [
     "./Fast.png",
     "./LICENSE",
     "./README.md",
-    "./README.zh.md"
+    "./README.zh.md",
+    "./src"
   ],
   "peerDependencies": {
     "eslint": "^8 || ^9"
