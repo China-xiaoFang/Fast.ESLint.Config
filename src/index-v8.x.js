@@ -321,7 +321,7 @@ module.exports = defineConfig({
     // 禁止在自定义组件上使用 v-text 或 v-html 指令
     "vue/no-v-text-v-html-on-component": "off",
     // 防止<script setup>使用的变量<template>被标记为未使用，此规则仅在启用该no-unused-vars规则时有效。
-    "vue/script-setup-uses-vars": "error",
+    // "vue/script-setup-uses-vars": "error",
     // 强制自定义事件名称使用 camelCase 风格命名
     "vue/custom-event-name-casing": ["error", "camelCase"],
     // 强制每个 Vue 文件中只包含一个 Vue 组件
