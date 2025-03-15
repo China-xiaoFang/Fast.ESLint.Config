@@ -1,7 +1,7 @@
 {
   "name": "@fast-china/eslint-config",
   "author": "小方",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Fast ESLint 规则库.",
   "keywords": [
     "fast",
@@ -38,7 +38,8 @@
     "./Fast.png",
     "./LICENSE",
     "./README.md",
-    "./README.zh.md"
+    "./README.zh.md",
+    "./src"
   ],
   "peerDependencies": {
     "eslint": "^8 || ^9"
