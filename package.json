@@ -1,7 +1,7 @@
 {
 	"name": "@fast-china/eslint-config",
 	"author": "小方",
-	"version": "1.0.9",
+	"version": "1.0.10",
 	"description": "Fast ESLint 规则库.",
 	"type": "module",
 	"keywords": [
@@ -29,14 +29,14 @@
 		"lint:prettier": "prettier --write \"src/**/*.{vue,js,ts,jsx,tsx,md,json,css,scss,less,html}\"",
 		"lint": "pnpm lint:eslint && pnpm lint:prettier"
 	},
-	"main": "dist/index.js",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"main": "dist/index.cjs",
+	"module": "dist/index.cjs",
+	"types": "dist/index.d.cts",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.js"
+			"types": "./dist/index.d.cts",
+			"import": "./dist/index.cjs",
+			"require": "./dist/index.cjs"
 		},
 		"./flat": {
 			"types": "./dist/flat/index.d.ts",
