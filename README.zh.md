@@ -36,6 +36,14 @@ pnpm install @fast-china/eslint-config --save-dev
 
 ```typescript
 // < v9.x 版本。以下已 ‘.eslintrc.cjs’ 为示例。
+
+// 简洁。
+module.exports = {
+  root: true,
+  extends: ["@fast-china"],
+};
+
+// 带 TypeScript 类型提示。
 const { defineConfig } = require("eslint-define-config");
 
 module.exports = defineConfig({
@@ -44,6 +52,13 @@ module.exports = defineConfig({
 });
 
 // >= v9.x 版本。以下已 ‘eslint.config.mjs’ 未实例。
+
+// 简洁。
+import fastChinaFlat from "@fast-china/eslint-config/flat";
+
+export default [...fastChinaFlat];
+
+// 带 TypeScript 类型提示。
 import tseslint from "typescript-eslint";
 import fastChinaFlat from "@fast-china/eslint-config/flat";
 
