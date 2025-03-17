@@ -2465,6 +2465,10 @@ export interface RuleOptions {
    */
   'prefer-template'?: Linter.RuleEntry<[]>
   /**
+   * @see https://github.com/prettier/eslint-plugin-prettier#options
+   */
+  'prettier/prettier'?: Linter.RuleEntry<PrettierPrettier>
+  /**
    * Require quotes around object literal property names
    * @see https://eslint.org/docs/latest/rules/quote-props
    * @deprecated
@@ -7263,6 +7267,18 @@ type PreferReflect = []|[{
 type PreferRegexLiterals = []|[{
   disallowRedundantWrapping?: boolean
 }]
+// ----- prettier/prettier -----
+type PrettierPrettier = []|[{
+  [k: string]: unknown | undefined
+}]|[{
+  [k: string]: unknown | undefined
+}, {
+  usePrettierrc?: boolean
+  fileInfoOptions?: {
+    [k: string]: unknown | undefined
+  }
+  [k: string]: unknown | undefined
+}]
 // ----- quote-props -----
 type QuoteProps = ([]|[("always" | "as-needed" | "consistent" | "consistent-as-needed")] | []|[("always" | "as-needed" | "consistent" | "consistent-as-needed")]|[("always" | "as-needed" | "consistent" | "consistent-as-needed"), {
   keywords?: boolean
@@ -8694,4 +8710,4 @@ type Yoda = []|[("always" | "never")]|[("always" | "never"), {
   onlyEquality?: boolean
 }]
 // Names of all the configs
-export type ConfigNames = '@fast-china/ignores/global' | 'gitignore' | '@fast-china/common' | '@fast-china/regexp' | '@fast-china/javascript' | '@fast-china/javascript' | '@fast-china/javascript/jsx' | '@fast-china/javascript/md/js' | '@fast-china/javascript/script' | '@fast-china/typescript__typescript-eslint/base' | '@fast-china/typescript__typescript-eslint/eslint-recommended' | '@fast-china/typescript__typescript-eslint/recommended' | '@fast-china/typescript' | '@fast-china/typescript/dts' | '@fast-china/typescript/tsx' | '@fast-china/typescript/cjs' | '@fast-china/typescript/md/js' | '@fast-china/import__import/recommended' | '@fast-china/import' | '@fast-china/prettier__eslint-plugin-prettier/recommended' | '@fast-china/prettier' | '@fast-china/sort/package' | '@fast-china/sort/tsconfig' | '@fast-china/vue__vue/base/setup' | '@fast-china/vue__vue/base/setup-for-vue' | '@fast-china/vue__vue/essential/rules' | '@fast-china/vue__vue/strongly-recommended/rules' | '@fast-china/vue__vue/recommended/rules' | '@fast-china/vue' | '@fast-china/vue/ts__@fast-china/typescript__typescript-eslint/base' | '@fast-china/vue/ts__@fast-china/typescript__typescript-eslint/eslint-recommended' | '@fast-china/vue/ts__@fast-china/typescript__typescript-eslint/recommended' | '@fast-china/vue/ts__@fast-china/typescript' | '@fast-china/vue/ts' | '@fast-china/reactivity' | '@fast-china/json' | '@fast-china/json' | '@fast-china/json' | '@fast-china/json' | '@fast-china/markdown' | '@fast-china/markdown/recommended/plugin' | '@fast-china/markdown/recommended/processor' | '@fast-china/markdown/recommended/code-blocks'
+export type ConfigNames = '@fast-china/ignores/global' | 'gitignore' | '@fast-china/common' | '@fast-china/regexp' | '@fast-china/javascript' | '@fast-china/javascript' | '@fast-china/javascript/jsx' | '@fast-china/javascript/md/js' | '@fast-china/javascript/script' | '@fast-china/typescript__typescript-eslint/base' | '@fast-china/typescript__typescript-eslint/eslint-recommended' | '@fast-china/typescript__typescript-eslint/recommended' | '@fast-china/typescript' | '@fast-china/typescript/dts' | '@fast-china/typescript/tsx' | '@fast-china/typescript/cjs' | '@fast-china/typescript/md/js' | '@fast-china/import__import/recommended' | '@fast-china/import' | '@fast-china/prettier__config-prettier' | '@fast-china/prettier__eslint-plugin-prettier/recommended' | '@fast-china/prettier' | '@fast-china/sort/package' | '@fast-china/sort/tsconfig' | '@fast-china/vue__vue/base/setup' | '@fast-china/vue__vue/base/setup-for-vue' | '@fast-china/vue__vue/essential/rules' | '@fast-china/vue__vue/strongly-recommended/rules' | '@fast-china/vue__vue/recommended/rules' | '@fast-china/vue' | '@fast-china/vue/ts__@fast-china/typescript__typescript-eslint/base' | '@fast-china/vue/ts__@fast-china/typescript__typescript-eslint/eslint-recommended' | '@fast-china/vue/ts__@fast-china/typescript__typescript-eslint/recommended' | '@fast-china/vue/ts__@fast-china/typescript' | '@fast-china/vue/ts' | '@fast-china/reactivity' | '@fast-china/json' | '@fast-china/json' | '@fast-china/json' | '@fast-china/json' | '@fast-china/markdown' | '@fast-china/markdown/recommended/plugin' | '@fast-china/markdown/recommended/processor' | '@fast-china/markdown/recommended/code-blocks'

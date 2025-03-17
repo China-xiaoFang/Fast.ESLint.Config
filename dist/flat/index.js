@@ -431,16 +431,13 @@ var markdownConfigs = tseslint6.config([
 
 // src/configs/prettier.ts
 import tseslint7 from "typescript-eslint";
-import eslintConfigPrettier from "eslint-config-prettier";
+import eslintConfigPrettierFlat from "eslint-config-prettier/flat";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 var prettierConfigs = tseslint7.config([
   {
     name: "@fast-china/prettier",
     // 继承某些已有的规则
-    extends: [eslintPluginPrettierRecommended],
-    plugins: {
-      prettier: eslintConfigPrettier
-    },
+    extends: [eslintConfigPrettierFlat, eslintPluginPrettierRecommended],
     rules: {
       // 确保 Prettier 错误被 ESLint 捕获
       "prettier/prettier": "error"
