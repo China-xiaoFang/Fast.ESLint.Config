@@ -787,10 +787,11 @@ var vueRules = {
   // 强制 HTML 属性使用 camelCase 风格
   "vue/attribute-hyphenation": [
     "error",
-    "always",
+    "never",
     {
       ignore: [
         // 忽略 Element-Plus 加载文案"element-loading-text"
+        "element-loading-text"
       ]
     }
   ],
