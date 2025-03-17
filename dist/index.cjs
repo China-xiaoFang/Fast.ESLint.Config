@@ -1,4 +1,5 @@
 const { defineConfig } = require("eslint-define-config");
+const { isVue3 } = require("./env/index.ts");
 
 // @see: http://eslint.cn
 module.exports = defineConfig({
@@ -15,7 +16,7 @@ module.exports = defineConfig({
 		"plugin:jsonc/recommended-with-jsonc",
 		"plugin:markdown/recommended-legacy",
 		"plugin:regexp/recommended",
-		"plugin:vue/vue3-recommended",
+		isVue3 ? "plugin:vue/recommended" : "plugin:vue/vue2-recommended",
 		"plugin:@typescript-eslint/recommended",
 		"prettier",
 	],

@@ -7,7 +7,7 @@ export default defineConfig([
 		// 输出目录
 		outDir: "dist/flat",
 		// 输出格式
-		format: ["esm"],
+		format: ["cjs"],
 		// 编译版本
 		target: "node18.18",
 		// 生成类型定义文件
