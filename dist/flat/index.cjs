@@ -48,12 +48,10 @@ __export(index_exports, {
   CONST_YAML: () => CONST_YAML,
   commonConfigs: () => commonConfigs,
   default: () => index_default,
-  hasVue: () => hasVue,
   ignoresConfigs: () => ignoresConfigs,
   importConfigs: () => importConfigs,
   importUseLodashRules: () => importUseLodashRules,
   importUseLodashUnifiedRules: () => importUseLodashUnifiedRules,
-  isVue3: () => isVue3,
   javascriptConfigs: () => javascriptConfigs,
   jsonConfigs: () => jsonConfigs,
   markdownConfigs: () => markdownConfigs,
@@ -134,12 +132,7 @@ var CONST_VUE = "**/*.vue";
 var CONST_YAML = "**/*.y?(a)ml";
 var CONST_NODE_MODULES = "**/node_modules";
 var CONST_DIST = "**/dist";
-var CONST_LOCKFILE = [
-  "**/package-lock.json",
-  "**/yarn.lock",
-  "**/pnpm-lock.yaml",
-  "**/bun.lockb"
-];
+var CONST_LOCKFILE = ["**/package-lock.json", "**/yarn.lock", "**/pnpm-lock.yaml", "**/bun.lockb"];
 var CONST_PUBLIC = "**/public";
 var CONST_TSCONFIG = ["**/tsconfig.json", "**/tsconfig.*.json"];
 
@@ -622,14 +615,7 @@ var tsconfigJsonSortConfigs = import_typescript_eslint10.default.config([
       "jsonc/sort-keys": [
         "error",
         {
-          order: [
-            "extends",
-            "compilerOptions",
-            "references",
-            "files",
-            "include",
-            "exclude"
-          ],
+          order: ["extends", "compilerOptions", "references", "files", "include", "exclude"],
           pathPattern: "^$"
         },
         {
@@ -849,11 +835,8 @@ var typescriptConfigs = import_typescript_eslint11.default.config([
 var import_typescript_eslint12 = __toESM(require("typescript-eslint"), 1);
 var import_eslint_plugin_vue = __toESM(require("eslint-plugin-vue"), 1);
 var import_vue_eslint_parser = __toESM(require("vue-eslint-parser"), 1);
-
-// src/env/index.ts
 var import_node_process = __toESM(require("process"), 1);
 var import_local_pkg = require("local-pkg");
-var import_local_pkg2 = require("local-pkg");
 var getVueVersion = () => {
   const pkg = (0, import_local_pkg.getPackageInfoSync)("vue", { paths: [import_node_process.default.cwd()] });
   if (pkg && typeof pkg.version === "string" && !Number.isNaN(+pkg.version[0])) {
@@ -861,18 +844,13 @@ var getVueVersion = () => {
   }
   return 3;
 };
-var hasVue = (0, import_local_pkg2.isPackageExists)("vue") || (0, import_local_pkg2.isPackageExists)("nuxt");
 var isVue3 = getVueVersion() === 3;
-
-// src/configs/vue.ts
 var vueConfigs = import_typescript_eslint12.default.config([
   {
     name: "@fast-china/vue",
     files: [CONST_VUE],
     // 继承某些已有的规则
-    extends: [
-      ...isVue3 ? import_eslint_plugin_vue.default.configs["flat/recommended"] : import_eslint_plugin_vue.default.configs["flat/vue2-recommended"]
-    ],
+    extends: [...isVue3 ? import_eslint_plugin_vue.default.configs["flat/recommended"] : import_eslint_plugin_vue.default.configs["flat/vue2-recommended"]],
     languageOptions: {
       parser: import_vue_eslint_parser.default,
       parserOptions: {
@@ -1021,12 +999,10 @@ var index_default = [
   CONST_VUE,
   CONST_YAML,
   commonConfigs,
-  hasVue,
   ignoresConfigs,
   importConfigs,
   importUseLodashRules,
   importUseLodashUnifiedRules,
-  isVue3,
   javascriptConfigs,
   jsonConfigs,
   markdownConfigs,

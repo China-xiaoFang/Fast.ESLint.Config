@@ -66,12 +66,7 @@ export const CONST_DIST = "**/dist";
 /**
  * 包管理 lock 文件
  */
-export const CONST_LOCKFILE = [
-  "**/package-lock.json",
-  "**/yarn.lock",
-  "**/pnpm-lock.yaml",
-  "**/bun.lockb",
-];
+export const CONST_LOCKFILE = ["**/package-lock.json", "**/yarn.lock", "**/pnpm-lock.yaml", "**/bun.lockb"];
 
 /**
  * public

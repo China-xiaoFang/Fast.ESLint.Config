@@ -25,7 +25,6 @@ export * from "../configs/typescript";
 export * from "../configs/vue";
 
 export * from "../constants";
-export * from "../env";
 
 export default [
 	...ignoresConfigs,

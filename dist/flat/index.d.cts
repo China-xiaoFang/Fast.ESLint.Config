@@ -139,15 +139,6 @@ declare const CONST_PUBLIC = "**/public";
  */
 declare const CONST_TSCONFIG: string[];
 
-/**
- * 是否包含 vue
- */
-declare const hasVue: boolean;
-/**
- * 是否为 vue3 版本
- */
-declare const isVue3: boolean;
-
 declare const _default: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.Config[];
 
-export { CONST_DIST, CONST_JS, CONST_JSON, CONST_JSON5, CONST_JSON6, CONST_JSONC, CONST_JSX, CONST_LOCKFILE, CONST_MD, CONST_NODE_MODULES, CONST_PUBLIC, CONST_TS, CONST_TSCONFIG, CONST_TSX, CONST_VUE, CONST_YAML, commonConfigs, _default as default, hasVue, ignoresConfigs, importConfigs, importUseLodashRules, importUseLodashUnifiedRules, isVue3, javascriptConfigs, jsonConfigs, markdownConfigs, packageJsonSortConfigs, prettierConfigs, regexpConfigs, tsconfigJsonSortConfigs, typescriptConfigs, typescriptCoreConfigs, vueConfigs };
+export { CONST_DIST, CONST_JS, CONST_JSON, CONST_JSON5, CONST_JSON6, CONST_JSONC, CONST_JSX, CONST_LOCKFILE, CONST_MD, CONST_NODE_MODULES, CONST_PUBLIC, CONST_TS, CONST_TSCONFIG, CONST_TSX, CONST_VUE, CONST_YAML, commonConfigs, _default as default, ignoresConfigs, importConfigs, importUseLodashRules, importUseLodashUnifiedRules, javascriptConfigs, jsonConfigs, markdownConfigs, packageJsonSortConfigs, prettierConfigs, regexpConfigs, tsconfigJsonSortConfigs, typescriptConfigs, typescriptCoreConfigs, vueConfigs };

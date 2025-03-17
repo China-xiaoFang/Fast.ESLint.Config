@@ -1,5 +1,18 @@
 const { defineConfig } = require("eslint-define-config");
-const { isVue3 } = require("./env/index.ts");
+const { getPackageInfoSync } = require("local-pkg");
+
+const getVueVersion = () => {
+	const pkg = getPackageInfoSync("vue", { paths: [process.cwd()] });
+	if (pkg && typeof pkg.version === "string" && !Number.isNaN(+pkg.version[0])) {
+		return +pkg.version[0];
+	}
+	return 3;
+};
+
+/**
+ * 是否为 vue3 版本
+ */
+const isVue3 = getVueVersion() === 3;
 
 // @see: http://eslint.cn
 module.exports = defineConfig({
