@@ -1,5 +1,6 @@
 const { defineConfig } = require("eslint-define-config");
 
+// @see: http://eslint.cn
 module.exports = defineConfig({
 	env: {
 		es6: true,
