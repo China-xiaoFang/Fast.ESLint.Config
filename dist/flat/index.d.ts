@@ -1,5 +1,4 @@
 import * as _typescript_eslint_utils_dist_ts_eslint from '@typescript-eslint/utils/dist/ts-eslint';
-import { Linter } from 'eslint';
 
 /**
  * 公共配置
@@ -12,14 +11,6 @@ declare const commonConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.
  */
 declare const ignoresConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
 
-/**
- * 导入使用 lodash-unified 模块规则
- */
-declare const importUseLodashUnifiedRules: Linter.RulesRecord;
-/**
- * 导入使用 lodash 模块规则
- */
-declare const importUseLodashRules: Linter.RulesRecord;
 /**
  * import配置
  */
@@ -91,6 +82,10 @@ declare const CONST_TS = "**/*.?([cm])ts";
  */
 declare const CONST_TSX = "**/*.?([cm])tsx";
 /**
+ * .d.ts
+ */
+declare const CONST_DTS = "**/*.d.ts";
+/**
  * JSON
  */
 declare const CONST_JSON = "**/*.json";
@@ -139,6 +134,25 @@ declare const CONST_PUBLIC = "**/public";
  */
 declare const CONST_TSCONFIG: string[];
 
+/**
+ * JavaScript 预置配置
+ *
+ * @description ignores，common，javascript，import，regexp
+ */
+declare const PresetJavascriptConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.Config[];
+/**
+ * JSON 预置配置
+ */
+declare const PresetJsonConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.Config[];
+/**
+ * 基础预置配置
+ *
+ * @description javascript，typescript，json
+ */
+declare const PresetBasicConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.Config[];
+/**
+ * 默认最全的配置
+ */
 declare const _default: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.Config[];
 
-export { CONST_DIST, CONST_JS, CONST_JSON, CONST_JSON5, CONST_JSON6, CONST_JSONC, CONST_JSX, CONST_LOCKFILE, CONST_MD, CONST_NODE_MODULES, CONST_PUBLIC, CONST_TS, CONST_TSCONFIG, CONST_TSX, CONST_VUE, CONST_YAML, commonConfigs, _default as default, ignoresConfigs, importConfigs, importUseLodashRules, importUseLodashUnifiedRules, javascriptConfigs, jsonConfigs, markdownConfigs, packageJsonSortConfigs, prettierConfigs, regexpConfigs, tsconfigJsonSortConfigs, typescriptConfigs, typescriptCoreConfigs, vueConfigs };
+export { CONST_DIST, CONST_DTS, CONST_JS, CONST_JSON, CONST_JSON5, CONST_JSON6, CONST_JSONC, CONST_JSX, CONST_LOCKFILE, CONST_MD, CONST_NODE_MODULES, CONST_PUBLIC, CONST_TS, CONST_TSCONFIG, CONST_TSX, CONST_VUE, CONST_YAML, PresetBasicConfigs, PresetJavascriptConfigs, PresetJsonConfigs, commonConfigs, _default as default, ignoresConfigs, importConfigs, javascriptConfigs, jsonConfigs, markdownConfigs, packageJsonSortConfigs, prettierConfigs, regexpConfigs, tsconfigJsonSortConfigs, typescriptConfigs, typescriptCoreConfigs, vueConfigs };

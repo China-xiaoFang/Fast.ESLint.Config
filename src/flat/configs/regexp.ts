@@ -1,5 +1,5 @@
-import tseslint from "typescript-eslint";
 import eslintPluginRegexp from "eslint-plugin-regexp";
+import tseslint from "typescript-eslint";
 
 /**
  * regexp配置

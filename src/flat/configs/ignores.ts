@@ -1,6 +1,6 @@
-import tseslint from "typescript-eslint";
-import { CONST_DIST, CONST_LOCKFILE, CONST_NODE_MODULES, CONST_PUBLIC } from "../constants";
 import eslintConfigFlatGitignore from "eslint-config-flat-gitignore";
+import tseslint from "typescript-eslint";
+import { CONST_DIST, CONST_LOCKFILE, CONST_NODE_MODULES, CONST_PUBLIC } from "../../constants";
 
 /**
  * 忽略配置

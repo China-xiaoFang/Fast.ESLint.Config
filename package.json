@@ -1,7 +1,6 @@
 {
 	"name": "@fast-china/eslint-config",
-	"author": "小方",
-	"version": "1.0.16",
+	"version": "1.0.17",
 	"description": "Fast ESLint 规则库.",
 	"type": "module",
 	"keywords": [
@@ -9,37 +8,15 @@
 		"ESLint"
 	],
 	"license": "Apache-2.0",
-	"publishConfig": {
-		"access": "public"
-	},
 	"homepage": "https://fastdotnet.com",
+	"bugs": {
+		"url": "https://gitee.com/China-xiaoFang/fast.eslint.config/issues"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://gitee.com/China-xiaoFang/fast.eslint.config"
 	},
-	"bugs": {
-		"url": "https://gitee.com/China-xiaoFang/fast.eslint.config/issues"
-	},
-	"scripts": {
-		"dev": "eslint-config-inspector --config src/eslint-inspector.config.ts",
-		"build:dev": "eslint-config-inspector build --config src/eslint-inspector.config.ts",
-		"typegen": "tsx scripts/typegen.ts",
-		"build": "pnpm run typegen && tsup && @powershell copy './src/index.cjs' './dist'",
-		"lint:eslint": "eslint --max-warnings 0 \"src/**/*.{vue,js,ts,tsx}\" --fix",
-		"lint:prettier": "prettier --write \"src/**/*.{vue,js,ts,jsx,tsx,md,json,css,scss,less,html}\"",
-		"lint": "pnpm lint:eslint && pnpm lint:prettier"
-	},
-	"main": "dist/index.cjs",
-	"exports": {
-		".": {
-			"default": "./dist/index.cjs"
-		},
-		"./flat": {
-			"types": "./dist/flat/index.d.ts",
-			"import": "./dist/flat/index.js",
-			"require": "./dist/flat/index.js"
-		}
-	},
+	"author": "小方",
 	"files": [
 		"./Fast.png",
 		"./LICENSE",
@@ -47,6 +24,29 @@
 		"./README.zh.md",
 		"./dist"
 	],
+	"main": "dist/v8/index.cjs",
+	"exports": {
+		".": {
+			"default": "./dist/v8/index.cjs"
+		},
+		"./flat": {
+			"types": "./dist/flat/index.d.ts",
+			"require": "./dist/flat/index.js",
+			"import": "./dist/flat/index.js"
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"dev": "eslint-config-inspector --config src/eslint-inspector.config.ts",
+		"build:dev": "eslint-config-inspector build --config src/eslint-inspector.config.ts",
+		"typegen": "tsx scripts/typegen.ts",
+		"build": "pnpm run typegen && tsup",
+		"lint:eslint": "eslint --max-warnings 0 \"src/**/*.{vue,js,ts,tsx}\" --fix",
+		"lint:prettier": "prettier --write \"src/**/*.{vue,js,ts,jsx,tsx,md,json,css,scss,less,html}\"",
+		"lint": "pnpm lint:eslint && pnpm lint:prettier"
+	},
 	"peerDependencies": {
 		"eslint": "^8 || ^9",
 		"prettier": "^3"

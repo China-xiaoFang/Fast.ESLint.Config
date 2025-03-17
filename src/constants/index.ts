@@ -19,6 +19,11 @@ export const CONST_TS = "**/*.?([cm])ts";
 export const CONST_TSX = "**/*.?([cm])tsx";
 
 /**
+ * .d.ts
+ */
+export const CONST_DTS = "**/*.d.ts";
+
+/**
  * JSON
  */
 export const CONST_JSON = "**/*.json";

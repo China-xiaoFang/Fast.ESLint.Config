@@ -23,4 +23,26 @@ export default defineConfig([
 		// 去除未使用的代码
 		treeshake: false,
 	},
+	{
+		// 入口文件
+		entry: ["src/v8/index.cjs"],
+		// 输出目录
+		outDir: "dist/v8",
+		// 输出格式
+		format: ["cjs"],
+		// 编译版本
+		target: "node18.18",
+		// 生成类型定义文件
+		dts: false,
+		// 启用代码拆分
+		splitting: false,
+		// 生成 source map
+		sourcemap: true,
+		// 清理输出目录
+		clean: false,
+		// 压缩输出文件
+		minify: false,
+		// 去除未使用的代码
+		treeshake: false,
+	},
 ]);
