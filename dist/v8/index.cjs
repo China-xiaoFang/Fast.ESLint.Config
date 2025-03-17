@@ -599,7 +599,12 @@ var init_typescript = __esm({
     typescriptRules = {
       // TS (https://typescript-eslint.io/rules)
       // 要求在导出函数和类的公共方法上显式声明返回类型
-      "@typescript-eslint/explicit-module-boundary-types": "error",
+      "@typescript-eslint/explicit-module-boundary-types": [
+        "error",
+        {
+          allowArgumentsExplicitlyTypedAsAny: "true"
+        }
+      ],
       // 要求在 TypeScript 函数和方法中显式地指定返回类型
       "@typescript-eslint/explicit-function-return-type": "error",
       // 禁止在同一作用域中重新声明 TypeScript 变量
