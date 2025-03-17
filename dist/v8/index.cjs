@@ -602,7 +602,7 @@ var init_typescript = __esm({
       "@typescript-eslint/explicit-module-boundary-types": [
         "error",
         {
-          allowArgumentsExplicitlyTypedAsAny: "true"
+          allowArgumentsExplicitlyTypedAsAny: true
         }
       ],
       // 要求在 TypeScript 函数和方法中显式地指定返回类型
