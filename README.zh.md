@@ -64,7 +64,7 @@ export default [...fastChinaFlat];
 import fastChinaFlat from "@fast-china/eslint-config/flat";
 import { defineConfig } from "eslint/config";
 
-export default defineConfig([...fastChinaFlat]);
+export default defineConfig(...fastChinaFlat);
 ```
 
 ```typescript
