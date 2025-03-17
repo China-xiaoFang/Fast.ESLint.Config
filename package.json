@@ -1,6 +1,6 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "1.0.17",
+	"version": "1.0.18",
 	"description": "Fast ESLint 规则库.",
 	"type": "module",
 	"keywords": [
