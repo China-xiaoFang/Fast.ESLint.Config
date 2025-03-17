@@ -48,9 +48,7 @@ export const vueConfigs = tseslint.config([
 		},
 		plugins: {
 			"@typescript-eslint": tseslint.plugin,
-			vue: vueEslintParser,
 		},
-		processor: eslintPluginVue.processors[".vue"],
 		rules: {
 			// vue (https://eslint.vuejs.org/rules)
 

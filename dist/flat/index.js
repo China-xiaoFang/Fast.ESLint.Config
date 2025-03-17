@@ -799,10 +799,8 @@ var vueConfigs = tseslint12.config([
       }
     },
     plugins: {
-      "@typescript-eslint": tseslint12.plugin,
-      vue: vueEslintParser
+      "@typescript-eslint": tseslint12.plugin
     },
-    processor: eslintPluginVue.processors[".vue"],
     rules: {
       // vue (https://eslint.vuejs.org/rules)
       // 关闭 - 禁止使用未声明的变量，以避免在 .vue 文件中出现关于未定义变量的警告，这在 Vue 单文件组件中可能不适用或会导致不必要的警告
