@@ -1,73 +1,6 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/flat/index.ts
-var index_exports = {};
-__export(index_exports, {
-  CONST_DIST: () => CONST_DIST,
-  CONST_JS: () => CONST_JS,
-  CONST_JSON: () => CONST_JSON,
-  CONST_JSON5: () => CONST_JSON5,
-  CONST_JSON6: () => CONST_JSON6,
-  CONST_JSONC: () => CONST_JSONC,
-  CONST_JSX: () => CONST_JSX,
-  CONST_LOCKFILE: () => CONST_LOCKFILE,
-  CONST_MD: () => CONST_MD,
-  CONST_NODE_MODULES: () => CONST_NODE_MODULES,
-  CONST_PUBLIC: () => CONST_PUBLIC,
-  CONST_TS: () => CONST_TS,
-  CONST_TSCONFIG: () => CONST_TSCONFIG,
-  CONST_TSX: () => CONST_TSX,
-  CONST_VUE: () => CONST_VUE,
-  CONST_YAML: () => CONST_YAML,
-  commonConfigs: () => commonConfigs,
-  default: () => index_default,
-  ignoresConfigs: () => ignoresConfigs,
-  importConfigs: () => importConfigs,
-  importUseLodashRules: () => importUseLodashRules,
-  importUseLodashUnifiedRules: () => importUseLodashUnifiedRules,
-  javascriptConfigs: () => javascriptConfigs,
-  jsonConfigs: () => jsonConfigs,
-  markdownConfigs: () => markdownConfigs,
-  packageJsonSortConfigs: () => packageJsonSortConfigs,
-  prettierConfigs: () => prettierConfigs,
-  regexpConfigs: () => regexpConfigs,
-  tsconfigJsonSortConfigs: () => tsconfigJsonSortConfigs,
-  typescriptConfigs: () => typescriptConfigs,
-  typescriptCoreConfigs: () => typescriptCoreConfigs,
-  vueConfigs: () => vueConfigs
-});
-module.exports = __toCommonJS(index_exports);
-
 // src/configs/common.ts
-var import_typescript_eslint = __toESM(require("typescript-eslint"), 1);
-var commonConfigs = import_typescript_eslint.default.config([
+import tseslint from "typescript-eslint";
+var commonConfigs = tseslint.config([
   {
     name: "@fast-china/common",
     rules: {
@@ -116,7 +49,7 @@ var commonConfigs = import_typescript_eslint.default.config([
 ]);
 
 // src/configs/ignores.ts
-var import_typescript_eslint2 = __toESM(require("typescript-eslint"), 1);
+import tseslint2 from "typescript-eslint";
 
 // src/constants/index.ts
 var CONST_JS = "**/*.?([cm])js";
@@ -137,8 +70,8 @@ var CONST_PUBLIC = "**/public";
 var CONST_TSCONFIG = ["**/tsconfig.json", "**/tsconfig.*.json"];
 
 // src/configs/ignores.ts
-var import_eslint_config_flat_gitignore = __toESM(require("eslint-config-flat-gitignore"), 1);
-var ignoresConfigs = import_typescript_eslint2.default.config([
+import eslintConfigFlatGitignore from "eslint-config-flat-gitignore";
+var ignoresConfigs = tseslint2.config([
   {
     name: "@fast-china/ignores/global",
     ignores: [
@@ -168,13 +101,13 @@ var ignoresConfigs = import_typescript_eslint2.default.config([
   },
   {
     name: "@fast-china/ignores/git",
-    ...(0, import_eslint_config_flat_gitignore.default)({ strict: false })
+    ...eslintConfigFlatGitignore({ strict: false })
   }
 ]);
 
 // src/configs/import.ts
-var import_typescript_eslint3 = __toESM(require("typescript-eslint"), 1);
-var import_eslint_plugin_import = __toESM(require("eslint-plugin-import"), 1);
+import tseslint3 from "typescript-eslint";
+import eslintPluginImport from "eslint-plugin-import";
 var importUseLodashUnifiedRules = {
   // 限制某些模块导入
   "no-restricted-imports": [
@@ -211,11 +144,11 @@ var importUseLodashRules = {
     }
   ]
 };
-var importConfigs = import_typescript_eslint3.default.config([
+var importConfigs = tseslint3.config([
   {
     name: "@fast-china/import",
     // 继承某些已有的规则
-    extends: [import_eslint_plugin_import.default.flatConfigs.recommended],
+    extends: [eslintPluginImport.flatConfigs.recommended],
     settings: {
       // 确保 ESLint 和 eslint-plugin-import 能够正确解析项目中的所有相关文件类型
       "import/resolver": {
@@ -316,21 +249,21 @@ var importConfigs = import_typescript_eslint3.default.config([
 ]);
 
 // src/configs/javascript.ts
-var import_typescript_eslint4 = __toESM(require("typescript-eslint"), 1);
-var import_globals = __toESM(require("globals"), 1);
-var import_js = __toESM(require("@eslint/js"), 1);
-var javascriptConfigs = import_typescript_eslint4.default.config([
+import tseslint4 from "typescript-eslint";
+import globals from "globals";
+import eslint from "@eslint/js";
+var javascriptConfigs = tseslint4.config([
   {
     name: "@fast-china/javascript",
     // 继承某些已有的规则
-    extends: [import_js.default.configs.recommended],
+    extends: [eslint.configs.recommended],
     languageOptions: {
       //  允许使用最新的 ECMAScript 语法特性
       ecmaVersion: "latest",
       globals: {
-        ...import_globals.default.browser,
-        ...import_globals.default.es2022,
-        ...import_globals.default.node
+        ...globals.browser,
+        ...globals.es2022,
+        ...globals.node
       },
       parserOptions: {
         // 允许使用 JSX 语法，适用于 Vue 组件中的 JSX 代码。
@@ -462,51 +395,51 @@ var javascriptConfigs = import_typescript_eslint4.default.config([
 ]);
 
 // src/configs/json.ts
-var import_typescript_eslint5 = __toESM(require("typescript-eslint"), 1);
-var import_eslint_plugin_jsonc = __toESM(require("eslint-plugin-jsonc"), 1);
-var import_jsonc_eslint_parser = __toESM(require("jsonc-eslint-parser"), 1);
-var jsonConfigs = import_typescript_eslint5.default.config([
+import tseslint5 from "typescript-eslint";
+import eslintPluginJsonc from "eslint-plugin-jsonc";
+import jsoncEslintParser from "jsonc-eslint-parser";
+var jsonConfigs = tseslint5.config([
   {
     name: "@fast-china/json",
     files: [CONST_JSON, CONST_JSONC, CONST_JSON5, CONST_JSON6],
     // 继承某些已有的规则
-    extends: [...import_eslint_plugin_jsonc.default.configs["flat/recommended-with-jsonc"]],
+    extends: [...eslintPluginJsonc.configs["flat/recommended-with-jsonc"]],
     languageOptions: {
-      parser: import_jsonc_eslint_parser.default
+      parser: jsoncEslintParser
     },
     plugins: {
-      jsonc: import_eslint_plugin_jsonc.default
+      jsonc: eslintPluginJsonc
     },
     rules: {}
   }
 ]);
 
 // src/configs/markdown.ts
-var import_typescript_eslint6 = __toESM(require("typescript-eslint"), 1);
-var import_eslint_plugin_markdown = __toESM(require("eslint-plugin-markdown"), 1);
-var markdownConfigs = import_typescript_eslint6.default.config([
+import tseslint6 from "typescript-eslint";
+import eslintPluginMarkdown from "eslint-plugin-markdown";
+var markdownConfigs = tseslint6.config([
   {
     name: "@fast-china/markdown",
     files: [CONST_MD],
     rules: {}
   },
-  ...import_eslint_plugin_markdown.default.configs.recommended.map((config) => ({
+  ...eslintPluginMarkdown.configs.recommended.map((config) => ({
     ...config,
     name: `@fast-china/${config.name || "markdown/anonymous"}`
   }))
 ]);
 
 // src/configs/prettier.ts
-var import_typescript_eslint7 = __toESM(require("typescript-eslint"), 1);
-var import_eslint_config_prettier = __toESM(require("eslint-config-prettier"), 1);
-var import_recommended = __toESM(require("eslint-plugin-prettier/recommended"), 1);
-var prettierConfigs = import_typescript_eslint7.default.config([
+import tseslint7 from "typescript-eslint";
+import eslintConfigPrettier from "eslint-config-prettier";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+var prettierConfigs = tseslint7.config([
   {
     name: "@fast-china/prettier",
     // 继承某些已有的规则
-    extends: [import_recommended.default],
+    extends: [eslintPluginPrettierRecommended],
     plugins: {
-      prettier: import_eslint_config_prettier.default
+      prettier: eslintConfigPrettier
     },
     rules: {
       // 确保 Prettier 错误被 ESLint 捕获
@@ -516,18 +449,18 @@ var prettierConfigs = import_typescript_eslint7.default.config([
 ]);
 
 // src/configs/regexp.ts
-var import_typescript_eslint8 = __toESM(require("typescript-eslint"), 1);
-var import_eslint_plugin_regexp = __toESM(require("eslint-plugin-regexp"), 1);
-var regexpConfigs = import_typescript_eslint8.default.config([
+import tseslint8 from "typescript-eslint";
+import eslintPluginRegexp from "eslint-plugin-regexp";
+var regexpConfigs = tseslint8.config([
   {
     name: "@fast-china/regexp",
-    ...import_eslint_plugin_regexp.default.configs["flat/recommended"]
+    ...eslintPluginRegexp.configs["flat/recommended"]
   }
 ]);
 
 // src/configs/sort-package.ts
-var import_typescript_eslint9 = __toESM(require("typescript-eslint"), 1);
-var packageJsonSortConfigs = import_typescript_eslint9.default.config([
+import tseslint9 from "typescript-eslint";
+var packageJsonSortConfigs = tseslint9.config([
   {
     name: "@fast-china/sort/package",
     files: ["**/package.json"],
@@ -606,8 +539,8 @@ var packageJsonSortConfigs = import_typescript_eslint9.default.config([
 ]);
 
 // src/configs/sort-tsconfig.ts
-var import_typescript_eslint10 = __toESM(require("typescript-eslint"), 1);
-var tsconfigJsonSortConfigs = import_typescript_eslint10.default.config([
+import tseslint10 from "typescript-eslint";
+var tsconfigJsonSortConfigs = tseslint10.config([
   {
     name: "@fast-china/sort/tsconfig",
     files: [CONST_TSCONFIG],
@@ -726,17 +659,17 @@ var tsconfigJsonSortConfigs = import_typescript_eslint10.default.config([
 ]);
 
 // src/configs/typescript.ts
-var import_typescript_eslint11 = __toESM(require("typescript-eslint"), 1);
-var typescriptCoreConfigs = import_typescript_eslint11.default.config([
+import tseslint11 from "typescript-eslint";
+var typescriptCoreConfigs = tseslint11.config([
   {
     name: "@fast-china/typescript",
     files: [CONST_TS, CONST_TSX],
     // 继承某些已有的规则
-    extends: [import_typescript_eslint11.default.configs.recommended],
+    extends: [tseslint11.configs.recommended],
     languageOptions: {
       //  允许使用最新的 ECMAScript 语法特性
       ecmaVersion: "latest",
-      parser: import_typescript_eslint11.default.parser,
+      parser: tseslint11.parser,
       parserOptions: {
         // 允许使用 TSX 语法，适用于 Vue 组件中的 TSX 代码。
         ecmaFeatures: {
@@ -792,7 +725,7 @@ var typescriptCoreConfigs = import_typescript_eslint11.default.config([
     }
   }
 ]);
-var typescriptConfigs = import_typescript_eslint11.default.config([
+var typescriptConfigs = tseslint11.config([
   ...typescriptCoreConfigs,
   {
     name: "@fast-china/typescript/dts",
@@ -832,27 +765,27 @@ var typescriptConfigs = import_typescript_eslint11.default.config([
 ]);
 
 // src/configs/vue.ts
-var import_typescript_eslint12 = __toESM(require("typescript-eslint"), 1);
-var import_eslint_plugin_vue = __toESM(require("eslint-plugin-vue"), 1);
-var import_vue_eslint_parser = __toESM(require("vue-eslint-parser"), 1);
-var import_node_process = __toESM(require("process"), 1);
-var import_local_pkg = require("local-pkg");
+import tseslint12 from "typescript-eslint";
+import eslintPluginVue from "eslint-plugin-vue";
+import vueEslintParser from "vue-eslint-parser";
+import process from "node:process";
+import { getPackageInfoSync } from "local-pkg";
 var getVueVersion = () => {
-  const pkg = (0, import_local_pkg.getPackageInfoSync)("vue", { paths: [import_node_process.default.cwd()] });
+  const pkg = getPackageInfoSync("vue", { paths: [process.cwd()] });
   if (pkg && typeof pkg.version === "string" && !Number.isNaN(+pkg.version[0])) {
     return +pkg.version[0];
   }
   return 3;
 };
 var isVue3 = getVueVersion() === 3;
-var vueConfigs = import_typescript_eslint12.default.config([
+var vueConfigs = tseslint12.config([
   {
     name: "@fast-china/vue",
     files: [CONST_VUE],
     // 继承某些已有的规则
-    extends: [...isVue3 ? import_eslint_plugin_vue.default.configs["flat/recommended"] : import_eslint_plugin_vue.default.configs["flat/vue2-recommended"]],
+    extends: [...isVue3 ? eslintPluginVue.configs["flat/recommended"] : eslintPluginVue.configs["flat/vue2-recommended"]],
     languageOptions: {
-      parser: import_vue_eslint_parser.default,
+      parser: vueEslintParser,
       parserOptions: {
         // 允许在 Vue 文件中的脚本部分使用 TypeScript 语法
         parser: "@typescript-eslint/parser",
@@ -869,10 +802,10 @@ var vueConfigs = import_typescript_eslint12.default.config([
       }
     },
     plugins: {
-      "@typescript-eslint": import_typescript_eslint12.default.plugin,
-      vue: import_vue_eslint_parser.default
+      "@typescript-eslint": tseslint12.plugin,
+      vue: vueEslintParser
     },
-    processor: import_eslint_plugin_vue.default.processors[".vue"],
+    processor: eslintPluginVue.processors[".vue"],
     rules: {
       // vue (https://eslint.vuejs.org/rules)
       // 关闭 - 禁止使用未声明的变量，以避免在 .vue 文件中出现关于未定义变量的警告，这在 Vue 单文件组件中可能不适用或会导致不必要的警告
@@ -960,7 +893,7 @@ var vueConfigs = import_typescript_eslint12.default.config([
       }
     },
     plugins: {
-      vue: import_eslint_plugin_vue.default
+      vue: eslintPluginVue
     }
   }
 ]);
@@ -980,8 +913,7 @@ var index_default = [
   ...jsonConfigs,
   ...markdownConfigs
 ];
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
+export {
   CONST_DIST,
   CONST_JS,
   CONST_JSON,
@@ -999,6 +931,7 @@ var index_default = [
   CONST_VUE,
   CONST_YAML,
   commonConfigs,
+  index_default as default,
   ignoresConfigs,
   importConfigs,
   importUseLodashRules,
@@ -1013,5 +946,5 @@ var index_default = [
   typescriptConfigs,
   typescriptCoreConfigs,
   vueConfigs
-});
-//# sourceMappingURL=index.cjs.map
+};
+//# sourceMappingURL=index.js.map
