@@ -8,7 +8,7 @@ import { tsconfigJsonSortRules } from "../../rules/sort-tsconfig";
 export const tsconfigJsonSortConfigs = tseslint.config([
 	{
 		name: "@fast-china/sort/tsconfig",
-		files: [CONST_TSCONFIG],
+		files: CONST_TSCONFIG,
 		rules: tsconfigJsonSortRules,
 	},
 ]);

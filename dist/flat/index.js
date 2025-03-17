@@ -658,7 +658,7 @@ var tsconfigJsonSortRules = {
 var tsconfigJsonSortConfigs = tseslint10.config([
   {
     name: "@fast-china/sort/tsconfig",
-    files: [CONST_TSCONFIG],
+    files: CONST_TSCONFIG,
     rules: tsconfigJsonSortRules
   }
 ]);

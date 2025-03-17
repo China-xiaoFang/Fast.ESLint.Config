@@ -830,7 +830,7 @@ module.exports = defineConfig({
       rules: packageJsonSortRules2
     },
     {
-      files: [CONST_TSCONFIG2],
+      files: CONST_TSCONFIG2,
       rules: tsconfigJsonSortRules2
     },
     {
