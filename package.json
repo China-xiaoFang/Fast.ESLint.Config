@@ -1,7 +1,7 @@
 {
 	"name": "@fast-china/eslint-config",
 	"author": "小方",
-	"version": "1.0.10",
+	"version": "1.0.11",
 	"description": "Fast ESLint 规则库.",
 	"type": "module",
 	"keywords": [
@@ -24,19 +24,15 @@
 		"dev": "eslint-config-inspector --config src/eslint-inspector.config.ts",
 		"build:dev": "eslint-config-inspector build --config src/eslint-inspector.config.ts",
 		"typegen": "tsx scripts/typegen.ts",
-		"build": "pnpm run typegen && tsup",
+		"build": "pnpm run typegen && tsup && @powershell copy './src/index.js' './dist'",
 		"lint:eslint": "eslint --max-warnings 0 \"src/**/*.{vue,js,ts,tsx}\" --fix",
 		"lint:prettier": "prettier --write \"src/**/*.{vue,js,ts,jsx,tsx,md,json,css,scss,less,html}\"",
 		"lint": "pnpm lint:eslint && pnpm lint:prettier"
 	},
-	"main": "dist/index.cjs",
-	"module": "dist/index.cjs",
-	"types": "dist/index.d.cts",
+	"main": "dist/index.js",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.cts",
-			"import": "./dist/index.cjs",
-			"require": "./dist/index.cjs"
+			"default": "./dist/index.js"
 		},
 		"./flat": {
 			"types": "./dist/flat/index.d.ts",
