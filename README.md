@@ -39,16 +39,16 @@ pnpm install @fast-china/eslint-config --save-dev
 
 // Simple.
 module.exports = {
-  root: true,
-  extends: ["@fast-china"],
+	root: true,
+	extends: ["@fast-china"],
 };
 
 // With TypeScript type hints.
 const { defineConfig } = require("eslint-define-config");
 
 module.exports = defineConfig({
-  root: true,
-  extends: ["@fast-china/eslint-config"],
+	root: true,
+	extends: ["@fast-china/eslint-config"],
 });
 
 // >= v9.x version. The following is an example of 'eslint.config.mjs'.
@@ -58,12 +58,17 @@ import fastChinaFlat from "@fast-china/eslint-config/flat";
 
 export default [...fastChinaFlat];
 
+// No third-party references.
+import { defineConfig } from "eslint/config";
+
+export default defineConfig([...fastChinaFlat]);
+
 // With TypeScript type hints.
 import tseslint from "typescript-eslint";
 import fastChinaFlat from "@fast-china/eslint-config/flat";
 
 export default tseslint.config({
-  extends: [...fastChinaFlat],
+	extends: [...fastChinaFlat],
 });
 ```
 
