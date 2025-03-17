@@ -41,6 +41,14 @@ export const typescriptConfigs = tseslint.config([
 		},
 	},
 	{
+		name: "@fast-china/typescript/vite",
+		files: ["**/vite.config.*"],
+		rules: {
+			// 关闭 - 要求在 TypeScript 函数和方法中显式地指定返回类型
+			"@typescript-eslint/explicit-function-return-type": "off",
+		},
+	},
+	{
 		name: "@fast-china/typescript/md/js",
 		files: ["**/*.md/*.ts"],
 		rules: {

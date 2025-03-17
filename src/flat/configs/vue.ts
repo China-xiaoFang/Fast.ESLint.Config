@@ -48,7 +48,7 @@ export const vueConfigs = tseslint.config([
 			// 关闭 - 禁止使用未声明的变量，以避免在 .vue 文件中出现关于未定义变量的警告，这在 Vue 单文件组件中可能不适用或会导致不必要的警告
 			"no-undef": "off",
 
-			// 要求在 TypeScript 函数和方法中显式地指定返回类型
+			// 关闭 - 要求在 TypeScript 函数和方法中显式地指定返回类型
 			"@typescript-eslint/explicit-function-return-type": "off",
 		},
 	},
