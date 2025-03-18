@@ -7,7 +7,7 @@ export default defineConfig([
 		// 输出目录
 		outDir: "dist/flat",
 		// 输出格式
-		format: ["cjs", "esm"],
+		format: ["esm"],
 		// 编译版本
 		target: "node18",
 		// 生成类型定义文件
@@ -29,11 +29,11 @@ export default defineConfig([
 		// 输出目录
 		outDir: "dist/v8",
 		// 输出格式
-		format: ["cjs", "esm"],
+		format: ["cjs"],
 		// 编译版本
 		target: "node18",
 		// 生成类型定义文件
-		dts: true,
+		dts: false,
 		// 启用代码拆分
 		splitting: false,
 		// 生成 source map
