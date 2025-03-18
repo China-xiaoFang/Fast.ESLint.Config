@@ -1,6 +1,6 @@
 import tseslint from "typescript-eslint";
 import { CONST_TSCONFIG } from "../../constants";
-import { tsconfigJsonSortRules } from "../../rules/sort-tsconfig";
+import { tsconfigJsonSortRules } from "../../rules";
 
 /**
  * tsconfig.json 属性排序

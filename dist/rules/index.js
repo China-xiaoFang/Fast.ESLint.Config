@@ -1,6 +1,3 @@
-// src/flat/configs/common.ts
-import tseslint from "typescript-eslint";
-
 // src/rules/common.ts
 var commonRules = {
   // 确保数组的回调函数（如 Array.prototype.map、Array.prototype.filter、Array.prototype.reduce 等）总是有一个返回值
@@ -59,6 +56,24 @@ var importUseLodashUnifiedRules = {
         {
           group: ["lodash/*", "lodash-es/*"],
           message: "Use lodash-unified instead."
+        }
+      ]
+    }
+  ]
+};
+var importUseLodashRules = {
+  // 限制某些模块导入
+  "no-restricted-imports": [
+    "error",
+    {
+      paths: [
+        { name: "lodash-es", message: "Use lodash instead." },
+        { name: "lodash-unified", message: "Use lodash instead." }
+      ],
+      patterns: [
+        {
+          group: ["lodash-es/*", "lodash-unified/*"],
+          message: "Use lodash instead."
         }
       ]
     }
@@ -540,397 +555,15 @@ var vueRules = {
     }
   ]
 };
-
-// src/flat/configs/common.ts
-var commonConfigs = tseslint.config([
-  {
-    name: "@fast-china/common",
-    rules: commonRules
-  }
-]);
-
-// src/flat/configs/ignores.ts
-import eslintConfigFlatGitignore from "eslint-config-flat-gitignore";
-import tseslint2 from "typescript-eslint";
-
-// src/constants/index.ts
-var CONST_JS = "**/*.?([cm])js";
-var CONST_JSX = "**/*.?([cm])jsx";
-var CONST_TS = "**/*.?([cm])ts";
-var CONST_TSX = "**/*.?([cm])tsx";
-var CONST_DTS = "**/*.d.ts";
-var CONST_JSON = "**/*.json";
-var CONST_JSONC = "**/*.jsonc";
-var CONST_JSON5 = "**/*.json5";
-var CONST_JSON6 = "**/*.json6";
-var CONST_MD = "**/*.md";
-var CONST_VUE = "**/*.vue";
-var CONST_YAML = "**/*.y?(a)ml";
-var CONST_NODE_MODULES = "**/node_modules";
-var CONST_DIST = "**/dist";
-var CONST_LOCKFILE = ["**/package-lock.json", "**/yarn.lock", "**/pnpm-lock.yaml", "**/bun.lockb"];
-var CONST_PUBLIC = "**/public";
-var CONST_TSCONFIG = ["**/tsconfig.json", "**/tsconfig.*.json"];
-
-// src/flat/configs/ignores.ts
-var ignoresConfigs = tseslint2.config([
-  {
-    name: "@fast-china/ignores/global",
-    ignores: [
-      CONST_NODE_MODULES,
-      CONST_DIST,
-      CONST_PUBLIC,
-      ...CONST_LOCKFILE,
-      "**/output",
-      "**/coverage",
-      "**/temp",
-      "**/fixtures",
-      "**/.vitepress/cache",
-      "**/.nuxt",
-      "**/.vercel",
-      "**/.changeset",
-      "**/.idea",
-      "**/.output",
-      "**/.vite-inspect",
-      "**/.nitro",
-      "**/CHANGELOG*.md",
-      "**/*.min.*",
-      "**/LICENSE*",
-      "**/__snapshots__",
-      "**/auto-import?(s).d.ts",
-      "**/components.d.ts"
-    ]
-  },
-  {
-    name: "@fast-china/ignores/git",
-    ...eslintConfigFlatGitignore({ strict: false })
-  }
-]);
-
-// src/flat/configs/import.ts
-import eslintPluginImport from "eslint-plugin-import";
-import tseslint3 from "typescript-eslint";
-var importConfigs = tseslint3.config([
-  {
-    name: "@fast-china/import",
-    // 继承某些已有的规则
-    extends: [eslintPluginImport.flatConfigs.recommended],
-    settings: {
-      // 确保 ESLint 和 eslint-plugin-import 能够正确解析项目中的所有相关文件类型
-      "import/resolver": {
-        node: {
-          extensions: [CONST_JS, CONST_JSX, CONST_TS, CONST_TSX, CONST_DTS]
-        }
-      }
-    },
-    rules: {
-      ...importRules,
-      ...importUseLodashUnifiedRules
-    }
-  }
-]);
-
-// src/flat/configs/javascript.ts
-import eslint from "@eslint/js";
-import globals from "globals";
-import tseslint4 from "typescript-eslint";
-var javascriptConfigs = tseslint4.config([
-  {
-    name: "@fast-china/javascript",
-    // 继承某些已有的规则
-    extends: [eslint.configs.recommended],
-    languageOptions: {
-      //  允许使用最新的 ECMAScript 语法特性
-      ecmaVersion: "latest",
-      globals: {
-        ...globals.browser,
-        ...globals.es2022,
-        ...globals.node
-      },
-      parserOptions: {
-        ecmaFeatures: {
-          // 允许使用 JSX 语法，适用于 Vue 组件中的 JSX 代码。
-          jsx: true
-        },
-        sourceType: "module"
-      }
-    },
-    rules: javascriptRules
-  },
-  {
-    name: "@fast-china/javascript/md/js",
-    files: ["**/*.md/*.js"],
-    rules: {
-      // 使用使用控制台
-      "no-console": "off",
-      // 关闭 - 禁止使用未声明的变量，除非/*global *\/注释中提到
-      "no-undef": "off",
-      // 关闭 - 禁用对无法解析的模块导入的检查
-      "import/no-unresolved": "off",
-      // 关闭 - 禁止在文件中重复导入相同的模块
-      "import/no-duplicates": "off"
-    }
-  },
-  {
-    name: "@fast-china/javascript/script",
-    files: ["**/scripts/*", "**/cli.*"],
-    rules: {
-      // 使用使用控制台
-      "no-console": "off"
-    }
-  }
-]);
-
-// src/flat/configs/json.ts
-import eslintPluginJsonc from "eslint-plugin-jsonc";
-import jsoncEslintParser from "jsonc-eslint-parser";
-import tseslint5 from "typescript-eslint";
-var jsonConfigs = tseslint5.config([
-  {
-    name: "@fast-china/json",
-    files: [CONST_JSON, CONST_JSONC, CONST_JSON5, CONST_JSON6],
-    // 继承某些已有的规则
-    extends: [...eslintPluginJsonc.configs["flat/recommended-with-jsonc"]],
-    languageOptions: {
-      parser: jsoncEslintParser
-    },
-    plugins: {
-      jsonc: eslintPluginJsonc
-    }
-  }
-]);
-
-// src/flat/configs/markdown.ts
-import eslintPluginMarkdown from "eslint-plugin-markdown";
-import tseslint6 from "typescript-eslint";
-var markdownConfigs = tseslint6.config([
-  {
-    name: "@fast-china/markdown",
-    files: [CONST_MD]
-  },
-  ...eslintPluginMarkdown.configs.recommended.map((config) => ({
-    ...config,
-    name: `@fast-china/${config.name || "markdown/anonymous"}`
-  }))
-]);
-
-// src/flat/configs/prettier.ts
-import eslintConfigPrettierFlat from "eslint-config-prettier/flat";
-import eslintPluginPrettier from "eslint-plugin-prettier";
-import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
-import tseslint7 from "typescript-eslint";
-var prettierConfigs = tseslint7.config([
-  {
-    name: "@fast-china/prettier",
-    // 继承某些已有的规则
-    extends: [eslintConfigPrettierFlat, eslintPluginPrettierRecommended],
-    plugins: {
-      prettier: eslintPluginPrettier
-    },
-    rules: {
-      // 确保 Prettier 错误被 ESLint 捕获
-      "prettier/prettier": "error"
-    }
-  }
-]);
-
-// src/flat/configs/regexp.ts
-import eslintPluginRegexp from "eslint-plugin-regexp";
-import tseslint8 from "typescript-eslint";
-var regexpConfigs = tseslint8.config([
-  {
-    name: "@fast-china/regexp",
-    ...eslintPluginRegexp.configs["flat/recommended"]
-  }
-]);
-
-// src/flat/configs/sort-package.ts
-import tseslint9 from "typescript-eslint";
-var packageJsonSortConfigs = tseslint9.config([
-  {
-    name: "@fast-china/sort/package",
-    files: ["**/package.json"],
-    rules: packageJsonSortRules
-  }
-]);
-
-// src/flat/configs/sort-tsconfig.ts
-import tseslint10 from "typescript-eslint";
-var tsconfigJsonSortConfigs = tseslint10.config([
-  {
-    name: "@fast-china/sort/tsconfig",
-    files: CONST_TSCONFIG,
-    rules: tsconfigJsonSortRules
-  }
-]);
-
-// src/flat/configs/typescript.ts
-import tseslint11 from "typescript-eslint";
-var typescriptCoreConfigs = tseslint11.config([
-  {
-    name: "@fast-china/typescript",
-    files: [CONST_TS, CONST_TSX],
-    // 继承某些已有的规则
-    extends: [tseslint11.configs.recommended],
-    languageOptions: {
-      //  允许使用最新的 ECMAScript 语法特性
-      ecmaVersion: "latest",
-      parser: tseslint11.parser,
-      parserOptions: {
-        ecmaFeatures: {
-          // 允许使用 TSX 语法，适用于 Vue 组件中的 TSX 代码。
-          tsx: true
-        },
-        sourceType: "module"
-      }
-    },
-    rules: typescriptRules
-  }
-]);
-var typescriptConfigs = tseslint11.config([
-  ...typescriptCoreConfigs,
-  {
-    name: "@fast-china/typescript/dts",
-    files: [CONST_DTS],
-    rules: {
-      // 关闭 - 一致地使用 TypeScript 类型导入
-      "@typescript-eslint/consistent-type-imports": "off"
-    }
-  },
-  {
-    name: "@fast-china/typescript/vite",
-    files: ["**/vite.config.*"],
-    rules: {
-      // 关闭 - 要求在 TypeScript 函数和方法中显式地指定返回类型
-      "@typescript-eslint/explicit-function-return-type": "off"
-    }
-  },
-  {
-    name: "@fast-china/typescript/md/js",
-    files: ["**/*.md/*.ts"],
-    rules: {
-      // 允许定义未使用的变量
-      "@typescript-eslint/no-unused-vars": "off"
-    }
-  }
-]);
-
-// src/flat/configs/vue.ts
-import eslintPluginVue from "eslint-plugin-vue";
-import tseslint12 from "typescript-eslint";
-import vueEslintParser from "vue-eslint-parser";
-
-// src/env/index.ts
-import { getPackageInfoSync } from "local-pkg";
-var getVueVersion = () => {
-  const pkg = getPackageInfoSync("vue", { paths: [process.cwd()] });
-  if (pkg && typeof pkg.version === "string" && !Number.isNaN(+pkg.version[0])) {
-    return +pkg.version[0];
-  }
-  return 3;
-};
-var isVue3 = getVueVersion() === 3;
-
-// src/flat/configs/vue.ts
-var vueConfigs = tseslint12.config([
-  {
-    name: "@fast-china/vue/ts",
-    files: [CONST_VUE],
-    // 继承某些已有的规则
-    extends: [...typescriptCoreConfigs]
-  },
-  {
-    name: "@fast-china/vue",
-    files: [CONST_VUE],
-    // 继承某些已有的规则
-    extends: [...isVue3 ? eslintPluginVue.configs["flat/recommended"] : eslintPluginVue.configs["flat/vue2-recommended"]],
-    languageOptions: {
-      //  允许使用最新的 ECMAScript 语法特性
-      ecmaVersion: "latest",
-      // 允许 ESLint 处理 Vue 文件中的模板和脚本
-      parser: vueEslintParser,
-      parserOptions: {
-        // 允许在 Vue 文件中的脚本部分使用 TypeScript 语法
-        parser: "@typescript-eslint/parser",
-        // 指定额外的文件扩展名，告诉解析器 .vue 文件也需要处理
-        extraFileExtensions: [".vue"],
-        // 允许使用 JSX/TSX 语法，适用于 Vue 组件中的 JSX/TSX 代码。
-        ecmaFeatures: {
-          jsx: true,
-          tsx: true
-        },
-        sourceType: "module"
-      }
-    },
-    plugins: {
-      "@typescript-eslint": tseslint12.plugin
-    },
-    rules: {
-      ...vueRules,
-      // 关闭 - 禁止使用未声明的变量，以避免在 .vue 文件中出现关于未定义变量的警告，这在 Vue 单文件组件中可能不适用或会导致不必要的警告
-      "no-undef": "off",
-      // 关闭 - 要求在 TypeScript 函数和方法中显式地指定返回类型
-      "@typescript-eslint/explicit-function-return-type": "off"
-    }
-  },
-  {
-    name: "@fast-china/reactivity",
-    languageOptions: {
-      globals: {
-        $: "readonly",
-        $$: "readonly",
-        $computed: "readonly",
-        $customRef: "readonly",
-        $ref: "readonly",
-        $shallowRef: "readonly",
-        $toRef: "readonly"
-      }
-    },
-    plugins: {
-      vue: eslintPluginVue
-    }
-  }
-]);
-
-// src/flat/index.ts
-var PresetJavascriptConfigs = [...ignoresConfigs, ...commonConfigs, ...javascriptConfigs, ...importConfigs, ...regexpConfigs];
-var PresetJsonConfigs = [...jsonConfigs, ...packageJsonSortConfigs, ...tsconfigJsonSortConfigs];
-var PresetBasicConfigs = [...PresetJavascriptConfigs, ...typescriptConfigs, ...PresetJsonConfigs];
-var index_default = [...PresetBasicConfigs, ...vueConfigs, ...prettierConfigs, ...markdownConfigs];
 export {
-  CONST_DIST,
-  CONST_DTS,
-  CONST_JS,
-  CONST_JSON,
-  CONST_JSON5,
-  CONST_JSON6,
-  CONST_JSONC,
-  CONST_JSX,
-  CONST_LOCKFILE,
-  CONST_MD,
-  CONST_NODE_MODULES,
-  CONST_PUBLIC,
-  CONST_TS,
-  CONST_TSCONFIG,
-  CONST_TSX,
-  CONST_VUE,
-  CONST_YAML,
-  PresetBasicConfigs,
-  PresetJavascriptConfigs,
-  PresetJsonConfigs,
-  commonConfigs,
-  index_default as default,
-  ignoresConfigs,
-  importConfigs,
-  javascriptConfigs,
-  jsonConfigs,
-  markdownConfigs,
-  packageJsonSortConfigs,
-  prettierConfigs,
-  regexpConfigs,
-  tsconfigJsonSortConfigs,
-  typescriptConfigs,
-  typescriptCoreConfigs,
-  vueConfigs
+  commonRules,
+  importRules,
+  importUseLodashRules,
+  importUseLodashUnifiedRules,
+  javascriptRules,
+  packageJsonSortRules,
+  tsconfigJsonSortRules,
+  typescriptRules,
+  vueRules
 };
 //# sourceMappingURL=index.js.map

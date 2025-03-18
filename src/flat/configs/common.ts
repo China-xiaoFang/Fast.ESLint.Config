@@ -1,5 +1,5 @@
 import tseslint from "typescript-eslint";
-import { commonRules } from "../../rules/common";
+import { commonRules } from "../../rules";
 
 /**
  * 公共配置

@@ -1,5 +1,5 @@
 import tseslint from "typescript-eslint";
-import { packageJsonSortRules } from "../../rules/sort-package";
+import { packageJsonSortRules } from "../../rules";
 
 /**
  * package.json 属性排序

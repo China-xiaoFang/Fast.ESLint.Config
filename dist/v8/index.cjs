@@ -87,10 +87,6 @@ var init_env = __esm({
 });
 
 // src/rules/common.ts
-var common_exports = {};
-__export(common_exports, {
-  commonRules: () => commonRules
-});
 var commonRules;
 var init_common = __esm({
   "src/rules/common.ts"() {
@@ -141,12 +137,6 @@ var init_common = __esm({
 });
 
 // src/rules/import.ts
-var import_exports = {};
-__export(import_exports, {
-  importRules: () => importRules,
-  importUseLodashRules: () => importUseLodashRules,
-  importUseLodashUnifiedRules: () => importUseLodashUnifiedRules
-});
 var importUseLodashUnifiedRules, importUseLodashRules, importRules;
 var init_import = __esm({
   "src/rules/import.ts"() {
@@ -278,10 +268,6 @@ var init_import = __esm({
 });
 
 // src/rules/javascript.ts
-var javascript_exports = {};
-__export(javascript_exports, {
-  javascriptRules: () => javascriptRules
-});
 var javascriptRules;
 var init_javascript = __esm({
   "src/rules/javascript.ts"() {
@@ -382,10 +368,6 @@ var init_javascript = __esm({
 });
 
 // src/rules/sort-package.ts
-var sort_package_exports = {};
-__export(sort_package_exports, {
-  packageJsonSortRules: () => packageJsonSortRules
-});
 var packageJsonSortRules;
 var init_sort_package = __esm({
   "src/rules/sort-package.ts"() {
@@ -465,10 +447,6 @@ var init_sort_package = __esm({
 });
 
 // src/rules/sort-tsconfig.ts
-var sort_tsconfig_exports = {};
-__export(sort_tsconfig_exports, {
-  tsconfigJsonSortRules: () => tsconfigJsonSortRules
-});
 var tsconfigJsonSortRules;
 var init_sort_tsconfig = __esm({
   "src/rules/sort-tsconfig.ts"() {
@@ -588,10 +566,6 @@ var init_sort_tsconfig = __esm({
 });
 
 // src/rules/typescript.ts
-var typescript_exports = {};
-__export(typescript_exports, {
-  typescriptRules: () => typescriptRules
-});
 var typescriptRules;
 var init_typescript = __esm({
   "src/rules/typescript.ts"() {
@@ -650,10 +624,6 @@ var init_typescript = __esm({
 });
 
 // src/rules/vue.ts
-var vue_exports = {};
-__export(vue_exports, {
-  vueRules: () => vueRules
-});
 var vueRules;
 var init_vue = __esm({
   "src/rules/vue.ts"() {
@@ -716,6 +686,32 @@ var init_vue = __esm({
   }
 });
 
+// src/rules/index.ts
+var rules_exports = {};
+__export(rules_exports, {
+  commonRules: () => commonRules,
+  importRules: () => importRules,
+  importUseLodashRules: () => importUseLodashRules,
+  importUseLodashUnifiedRules: () => importUseLodashUnifiedRules,
+  javascriptRules: () => javascriptRules,
+  packageJsonSortRules: () => packageJsonSortRules,
+  tsconfigJsonSortRules: () => tsconfigJsonSortRules,
+  typescriptRules: () => typescriptRules,
+  vueRules: () => vueRules
+});
+var init_rules = __esm({
+  "src/rules/index.ts"() {
+    "use strict";
+    init_common();
+    init_import();
+    init_javascript();
+    init_sort_package();
+    init_sort_tsconfig();
+    init_typescript();
+    init_vue();
+  }
+});
+
 // src/v8/index.cjs
 var { defineConfig } = require("eslint-define-config");
 var {
@@ -732,13 +728,16 @@ var {
   CONST_JSON6: CONST_JSON62
 } = (init_constants(), __toCommonJS(constants_exports));
 var { isVue3: isVue32 } = (init_env(), __toCommonJS(env_exports));
-var { commonRules: commonRules2 } = (init_common(), __toCommonJS(common_exports));
-var { importRules: importRules2, importUseLodashUnifiedRules: importUseLodashUnifiedRules2 } = (init_import(), __toCommonJS(import_exports));
-var { javascriptRules: javascriptRules2 } = (init_javascript(), __toCommonJS(javascript_exports));
-var { packageJsonSortRules: packageJsonSortRules2 } = (init_sort_package(), __toCommonJS(sort_package_exports));
-var { tsconfigJsonSortRules: tsconfigJsonSortRules2 } = (init_sort_tsconfig(), __toCommonJS(sort_tsconfig_exports));
-var { typescriptRules: typescriptRules2 } = (init_typescript(), __toCommonJS(typescript_exports));
-var { vueRules: vueRules2 } = (init_vue(), __toCommonJS(vue_exports));
+var {
+  commonRules: commonRules2,
+  importRules: importRules2,
+  importUseLodashUnifiedRules: importUseLodashUnifiedRules2,
+  javascriptRules: javascriptRules2,
+  packageJsonSortRules: packageJsonSortRules2,
+  tsconfigJsonSortRules: tsconfigJsonSortRules2,
+  typescriptRules: typescriptRules2,
+  vueRules: vueRules2
+} = (init_rules(), __toCommonJS(rules_exports));
 module.exports = defineConfig({
   env: {
     es6: true,

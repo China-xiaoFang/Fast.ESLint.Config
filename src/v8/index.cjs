@@ -13,13 +13,16 @@ const {
 	CONST_JSON6,
 } = require("../constants/index");
 const { isVue3 } = require("../env/index");
-const { commonRules } = require("../rules/common");
-const { importRules, importUseLodashUnifiedRules } = require("../rules/import");
-const { javascriptRules } = require("../rules/javascript");
-const { packageJsonSortRules } = require("../rules/sort-package");
-const { tsconfigJsonSortRules } = require("../rules/sort-tsconfig");
-const { typescriptRules } = require("../rules/typescript");
-const { vueRules } = require("../rules/vue");
+const {
+	commonRules,
+	importRules,
+	importUseLodashUnifiedRules,
+	javascriptRules,
+	packageJsonSortRules,
+	tsconfigJsonSortRules,
+	typescriptRules,
+	vueRules,
+} = require("../rules");
 
 // @see: http://eslint.cn
 module.exports = defineConfig({

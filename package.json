@@ -1,6 +1,6 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "1.0.25",
+	"version": "1.0.26",
 	"description": "Fast ESLint 规则库.",
 	"type": "module",
 	"keywords": [
@@ -28,6 +28,11 @@
 	"exports": {
 		".": {
 			"default": "./dist/v8/index.cjs"
+		},
+		"./rules": {
+			"types": "./dist/rules/index.d.ts",
+			"require": "./dist/rules/index.js",
+			"import": "./dist/rules/index.js"
 		},
 		"./flat": {
 			"types": "./dist/flat/index.d.ts",

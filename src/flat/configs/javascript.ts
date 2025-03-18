@@ -1,7 +1,7 @@
 import eslint from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";
-import { javascriptRules } from "../../rules/javascript";
+import { javascriptRules } from "../../rules";
 
 /**
  * JavaScript配置

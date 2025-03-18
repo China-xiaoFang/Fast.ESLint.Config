@@ -3,7 +3,7 @@ import tseslint from "typescript-eslint";
 import vueEslintParser from "vue-eslint-parser";
 import { CONST_VUE } from "../../constants";
 import { isVue3 } from "../../env";
-import { vueRules } from "../../rules/vue";
+import { vueRules } from "../../rules";
 import { typescriptCoreConfigs } from "./typescript";
 
 /**
