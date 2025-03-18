@@ -1,6 +1,6 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "1.0.23",
+	"version": "1.0.24",
 	"description": "Fast ESLint 规则库.",
 	"type": "module",
 	"keywords": [
@@ -24,15 +24,19 @@
 		"./README.zh.md",
 		"./dist"
 	],
-	"main": "dist/v8/index.cjs",
+	"main": "dist/v8/index.js",
+	"module": "dist/v8/index.cjs",
+	"types": "dist/v8/index.d.ts",
 	"exports": {
 		".": {
-			"default": "./dist/v8/index.cjs"
+			"types": "./dist/v8/index.d.ts",
+			"require": "./dist/v8/index.js",
+			"import": "./dist/v8/index.cjs"
 		},
 		"./flat": {
 			"types": "./dist/flat/index.d.ts",
 			"require": "./dist/flat/index.js",
-			"import": "./dist/flat/index.js"
+			"import": "./dist/flat/index.cjs"
 		}
 	},
 	"publishConfig": {
