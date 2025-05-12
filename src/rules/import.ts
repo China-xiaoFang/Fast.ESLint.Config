@@ -76,6 +76,11 @@ export const importRules: Linter.RulesRecord = {
 			],
 			pathGroups: [
 				{
+					pattern: "@dcloudio/*",
+					group: "external",
+					position: "before",
+				},
+				{
 					pattern: "vue",
 					group: "external",
 					position: "before",

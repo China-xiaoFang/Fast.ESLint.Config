@@ -108,6 +108,11 @@ var importRules = {
       ],
       pathGroups: [
         {
+          pattern: "@dcloudio/*",
+          group: "external",
+          position: "before"
+        },
+        {
           pattern: "vue",
           group: "external",
           position: "before"

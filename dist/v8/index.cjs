@@ -206,6 +206,11 @@ var init_import = __esm({
           ],
           pathGroups: [
             {
+              pattern: "@dcloudio/*",
+              group: "external",
+              position: "before"
+            },
+            {
               pattern: "vue",
               group: "external",
               position: "before"

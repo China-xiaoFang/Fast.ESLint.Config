@@ -93,6 +93,11 @@ var importRules = {
       ],
       pathGroups: [
         {
+          pattern: "@dcloudio/*",
+          group: "external",
+          position: "before"
+        },
+        {
           pattern: "vue",
           group: "external",
           position: "before"
@@ -863,7 +868,8 @@ var vueConfigs = tseslint12.config([
       }
     },
     plugins: {
-      "@typescript-eslint": tseslint12.plugin
+      "@typescript-eslint": tseslint12.plugin,
+      vue: eslintPluginVue
     },
     rules: {
       ...vueRules,
@@ -885,9 +891,6 @@ var vueConfigs = tseslint12.config([
         $shallowRef: "readonly",
         $toRef: "readonly"
       }
-    },
-    plugins: {
-      vue: eslintPluginVue
     }
   }
 ]);

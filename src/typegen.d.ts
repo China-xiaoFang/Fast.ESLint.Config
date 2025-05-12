@@ -382,6 +382,11 @@ export interface RuleOptions {
    */
   '@typescript-eslint/no-unnecessary-type-constraint'?: Linter.RuleEntry<[]>
   /**
+   * Disallow conversion idioms when they do not change the type or value of the expression
+   * @see https://typescript-eslint.io/rules/no-unnecessary-type-conversion
+   */
+  '@typescript-eslint/no-unnecessary-type-conversion'?: Linter.RuleEntry<[]>
+  /**
    * Disallow type parameters that aren't used multiple times
    * @see https://typescript-eslint.io/rules/no-unnecessary-type-parameters
    */
@@ -2119,7 +2124,7 @@ export interface RuleOptions {
    * Disallow identifiers from shadowing restricted names
    * @see https://eslint.org/docs/latest/rules/no-shadow-restricted-names
    */
-  'no-shadow-restricted-names'?: Linter.RuleEntry<[]>
+  'no-shadow-restricted-names'?: Linter.RuleEntry<NoShadowRestrictedNames>
   /**
    * Disallow spacing between function identifiers and their applications (deprecated)
    * @see https://eslint.org/docs/latest/rules/no-spaced-func
@@ -3159,6 +3164,11 @@ export interface RuleOptions {
    */
   'vue/define-props-declaration'?: Linter.RuleEntry<VueDefinePropsDeclaration>
   /**
+   * enforce consistent style for props destructuring
+   * @see https://eslint.vuejs.org/rules/define-props-destructuring.html
+   */
+  'vue/define-props-destructuring'?: Linter.RuleEntry<VueDefinePropsDestructuring>
+  /**
    * Enforce consistent newlines before and after dots in `<template>`
    * @see https://eslint.vuejs.org/rules/dot-location.html
    */
@@ -3562,7 +3572,7 @@ export interface RuleOptions {
    * disallow adding multiple root nodes to the template
    * @see https://eslint.vuejs.org/rules/no-multiple-template-root.html
    */
-  'vue/no-multiple-template-root'?: Linter.RuleEntry<[]>
+  'vue/no-multiple-template-root'?: Linter.RuleEntry<VueNoMultipleTemplateRoot>
   /**
    * disallow mutation of component props
    * @see https://eslint.vuejs.org/rules/no-mutating-props.html
@@ -5102,6 +5112,8 @@ type TypescriptEslintNoUnnecessaryCondition = []|[{
 // ----- @typescript-eslint/no-unnecessary-type-assertion -----
 type TypescriptEslintNoUnnecessaryTypeAssertion = []|[{
   
+  checkLiteralConstAssertions?: boolean
+  
   typesToIgnore?: string[]
 }]
 // ----- @typescript-eslint/no-unused-expressions -----
@@ -5110,6 +5122,7 @@ type TypescriptEslintNoUnusedExpressions = []|[{
   allowTernary?: boolean
   allowTaggedTemplates?: boolean
   enforceForJSX?: boolean
+  ignoreDirectives?: boolean
 }]
 // ----- @typescript-eslint/no-unused-vars -----
 type TypescriptEslintNoUnusedVars = []|[(("all" | "local") | {
@@ -5172,6 +5185,8 @@ type TypescriptEslintOnlyThrowError = []|[{
     package: string
   })[]
   
+  allowRethrowing?: boolean
+  
   allowThrowingAny?: boolean
   
   allowThrowingUnknown?: boolean
@@ -5228,6 +5243,8 @@ type TypescriptEslintPreferNullishCoalescing = []|[{
   ignoreBooleanCoercion?: boolean
   
   ignoreConditionalTests?: boolean
+  
+  ignoreIfStatements?: boolean
   
   ignoreMixedLogicalExpressions?: boolean
   
@@ -5538,6 +5555,8 @@ type CapitalizedComments = []|[("always" | "never")]|[("always" | "never"), ({
 type ClassMethodsUseThis = []|[{
   exceptMethods?: string[]
   enforceForClassFields?: boolean
+  ignoreOverrideMethods?: boolean
+  ignoreClassesWithImplements?: ("all" | "public-fields")
 }]
 // ----- comma-dangle -----
 type CommaDangle = []|[(_CommaDangleValue | {
@@ -6796,7 +6815,7 @@ type NoEmpty = []|[{
 }]
 // ----- no-empty-function -----
 type NoEmptyFunction = []|[{
-  allow?: ("functions" | "arrowFunctions" | "generatorFunctions" | "methods" | "generatorMethods" | "getters" | "setters" | "constructors" | "asyncFunctions" | "asyncMethods")[]
+  allow?: ("functions" | "arrowFunctions" | "generatorFunctions" | "methods" | "generatorMethods" | "getters" | "setters" | "constructors" | "asyncFunctions" | "asyncMethods" | "privateConstructors" | "protectedConstructors" | "decoratedFunctions" | "overrideMethods")[]
 }]
 // ----- no-empty-pattern -----
 type NoEmptyPattern = []|[{
@@ -6998,13 +7017,9 @@ type NoRestrictedModules = ((string | {
 }[])
 // ----- no-restricted-properties -----
 type NoRestrictedProperties = ({
-  object: string
-  property?: string
-  message?: string
+  [k: string]: unknown | undefined
 } | {
-  object?: string
-  property: string
-  message?: string
+  [k: string]: unknown | undefined
 })[]
 // ----- no-restricted-syntax -----
 type NoRestrictedSyntax = (string | {
@@ -7027,6 +7042,10 @@ type NoShadow = []|[{
   hoist?: ("all" | "functions" | "never")
   allow?: string[]
   ignoreOnInitialization?: boolean
+}]
+// ----- no-shadow-restricted-names -----
+type NoShadowRestrictedNames = []|[{
+  reportGlobalThis?: boolean
 }]
 // ----- no-sync -----
 type NoSync = []|[{
@@ -7079,6 +7098,7 @@ type NoUnusedExpressions = []|[{
   allowTernary?: boolean
   allowTaggedTemplates?: boolean
   enforceForJSX?: boolean
+  ignoreDirectives?: boolean
 }]
 // ----- no-unused-vars -----
 type NoUnusedVars = []|[(("all" | "local") | {
@@ -7647,6 +7667,10 @@ type VueDefineMacrosOrder = []|[{
 }]
 // ----- vue/define-props-declaration -----
 type VueDefinePropsDeclaration = []|[("type-based" | "runtime")]
+// ----- vue/define-props-destructuring -----
+type VueDefinePropsDestructuring = []|[{
+  destructure?: ("always" | "never")
+}]
 // ----- vue/dot-location -----
 type VueDotLocation = []|[("object" | "property")]
 // ----- vue/dot-notation -----
@@ -8292,6 +8316,10 @@ type VueNoLoneTemplate = []|[{
 // ----- vue/no-multi-spaces -----
 type VueNoMultiSpaces = []|[{
   ignoreProperties?: boolean
+}]
+// ----- vue/no-multiple-template-root -----
+type VueNoMultipleTemplateRoot = []|[{
+  disallowComments?: boolean
 }]
 // ----- vue/no-mutating-props -----
 type VueNoMutatingProps = []|[{
