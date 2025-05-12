@@ -41,6 +41,7 @@ export const vueConfigs = tseslint.config([
 		},
 		plugins: {
 			"@typescript-eslint": tseslint.plugin,
+			vue: eslintPluginVue,
 		},
 		rules: {
 			...vueRules,
@@ -64,9 +65,6 @@ export const vueConfigs = tseslint.config([
 				$shallowRef: "readonly",
 				$toRef: "readonly",
 			},
-		},
-		plugins: {
-			vue: eslintPluginVue,
 		},
 	},
 ]);
