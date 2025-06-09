@@ -652,7 +652,12 @@ var init_vue = __esm({
         {
           ignore: [
             // 忽略 Element-Plus 加载文案"element-loading-text"
-            "element-loading-text"
+            "element-loading-text",
+            // 忽略 UniApp view 标签的一些属性
+            "hover-class",
+            "hover-stop-propagation",
+            "hover-start-time",
+            "hover-stay-time"
           ]
         }
       ],
