@@ -1,4 +1,4 @@
-[中](https://gitee.com/China-xiaoFang/fast.eslint.config) | **En**
+[中](https://gitee.com/FastDotnet/Fast.ESLint.Config) | **En**
 
 <h1 align="center">Fast.ESLint.Config</h1>
 

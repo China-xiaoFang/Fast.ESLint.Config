@@ -1,4 +1,4 @@
-**中** | [En](https://github.com/China-xiaoFang/fast.eslint.config)
+**中** | [En](https://github.com/China-xiaoFang/Fast.ESLint.Config)
 
 <h1 align="center">Fast.ESLint.Config</h1>
 
