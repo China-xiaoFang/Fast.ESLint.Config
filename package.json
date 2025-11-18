@@ -10,11 +10,11 @@
 	"license": "Apache-2.0",
 	"homepage": "https://fastdotnet.com",
 	"bugs": {
-		"url": "https://gitee.com/China-xiaoFang/fast.eslint.config/issues"
+		"url": "https://gitee.com/FastDotnet/fast.eslint.config/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://gitee.com/China-xiaoFang/fast.eslint.config"
+		"url": "https://gitee.com/FastDotnet/fast.eslint.config"
 	},
 	"author": "小方",
 	"files": [
