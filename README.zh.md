@@ -10,7 +10,7 @@
   <a href="https://www.npmjs.com/package/@fast-china/eslint-config">
     <img src="https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange&label=" alt="version" />
   </a>
-  <a href="https://gitee.com/China-xiaoFang/fast.eslint.config/blob/master/LICENSE">
+  <a href="https://gitee.com/FastDotnet/Fast.ESLint.Config/blob/master/LICENSE">
     <img src="https://img.shields.io/npm/l/@fast-china/eslint-config" alt="license" />
   </a>
 </p>
@@ -78,11 +78,11 @@ export default tseslint.config({
 
 ## 更新日志
 
-更新日志 [点击查看](https://gitee.com/China-xiaoFang/fast.eslint.config/commits/master)
+更新日志 [点击查看](https://gitee.com/FastDotnet/Fast.ESLint.Config/commits/master)
 
 ## 协议
 
-[Fast.ESLint.Config](https://gitee.com/China-xiaoFang/fast.eslint.config) 遵循 [Apache-2.0](https://gitee.com/China-xiaoFang/fast.eslint.config/blob/master/LICENSE) 开源协议，欢迎大家提交 `PR` 或 `Issue`。
+[Fast.ESLint.Config](https://gitee.com/FastDotnet/Fast.ESLint.Config) 遵循 [Apache-2.0](https://gitee.com/FastDotnet/Fast.ESLint.Config/blob/master/LICENSE) 开源协议，欢迎大家提交 `PR` 或 `Issue`。
 
 ```
 Apache开源许可证

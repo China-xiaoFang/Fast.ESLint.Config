@@ -10,7 +10,7 @@
   <a href="https://www.npmjs.com/package/@fast-china/eslint-config">
     <img src="https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange&label=" alt="version" />
   </a>
-  <a href="https://gitee.com/China-xiaoFang/fast.eslint.config/blob/master/LICENSE">
+  <a href="https://gitee.com/FastDotnet/Fast.ESLint.Config/blob/master/LICENSE">
     <img src="https://img.shields.io/npm/l/@fast-china/eslint-config" alt="license" />
   </a>
 </p>
@@ -78,11 +78,11 @@ export default tseslint.config({
 
 ## Update log
 
-Update log [Click to view](https://gitee.com/China-xiaoFang/fast.eslint.config/commits/master)
+Update log [Click to view](https://gitee.com/FastDotnet/Fast.ESLint.Config/commits/master)
 
 ## Protocol
 
-[Fast.ESLint.Config](https://gitee.com/China-xiaoFang/fast.eslint.config) complies with the [Apache-2.0](https://gitee.com/China-xiaoFang/fast.eslint.config/blob/master/LICENSE) open source agreement. Welcome to submit `PR` or `Issue`.
+[Fast.ESLint.Config](https://gitee.com/FastDotnet/Fast.ESLint.Config) complies with the [Apache-2.0](https://gitee.com/FastDotnet/Fast.ESLint.Config/blob/master/LICENSE) open source agreement. Welcome to submit `PR` or `Issue`.
 
 ```
 Apache Open Source License
