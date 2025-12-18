@@ -58,35 +58,34 @@
 	},
 	"dependencies": {
 		"@eslint/js": "^9",
+		"@eslint/markdown": "^7",
 		"@typescript-eslint/eslint-plugin": "^8",
 		"@typescript-eslint/parser": "^8",
 		"eslint-config-flat-gitignore": "^2",
 		"eslint-config-prettier": "^10",
-		"eslint-define-config": "^2",
 		"eslint-plugin-import": "^2",
 		"eslint-plugin-jsonc": "^2",
 		"eslint-plugin-markdown": "^5",
 		"eslint-plugin-prettier": "^5",
 		"eslint-plugin-regexp": "^2",
 		"eslint-plugin-vue": "^10",
-		"eslint-typegen": "^2",
 		"globals": "^16",
-		"jsonc-eslint-parser": "^2.4",
+		"jsonc-eslint-parser": "^2",
 		"local-pkg": "^1",
 		"typescript-eslint": "^8",
 		"vue-eslint-parser": "^10"
 	},
 	"devDependencies": {
 		"@eslint/config-inspector": "latest",
-		"@types/eslint": "latest",
-		"@types/eslint-config-prettier": "latest",
-		"@types/node": "latest",
+		"@types/eslint": "^8 || ^9",
+		"@types/node": "^24",
 		"eslint": "^8 || ^9",
+		"eslint-typegen": "^2",
 		"prettier": "^3",
 		"tsup": "^8",
 		"typescript": "^5"
 	},
 	"engines": {
-		"node": ">=20.0.0"
+		"node": ">=14.0.0"
 	}
 }
