@@ -34,45 +34,27 @@ pnpm install @fast-china/eslint-config --save-dev
 
 ## 使用
 
-#### .eslintrc.cjs 示例
-
-```javascript
-module.exports = {
-	root: true,
-	extends: ["@fast-china"],
-};
-```
-
-```javascript
-const { defineConfig } = require("eslint-define-config");
-
-module.exports = defineConfig({
-	root: true,
-	extends: ["@fast-china/eslint-config"],
-});
-```
-
 #### eslint.config.mjs 示例
 
 ```typescript
-import fastChinaFlat from "@fast-china/eslint-config/flat";
+import fastChina from "@fast-china/eslint-config";
 
-export default [...fastChinaFlat];
+export default [...fastChina];
 ```
 
 ```typescript
-import fastChinaFlat from "@fast-china/eslint-config/flat";
+import fastChina from "@fast-china/eslint-config";
 import { defineConfig } from "eslint/config";
 
-export default defineConfig(...fastChinaFlat);
+export default defineConfig(...fastChina);
 ```
 
 ```typescript
-import fastChinaFlat from "@fast-china/eslint-config/flat";
+import fastChina from "@fast-china/eslint-config";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config({
-	extends: [...fastChinaFlat],
+  extends: [...fastChina],
 });
 ```
 

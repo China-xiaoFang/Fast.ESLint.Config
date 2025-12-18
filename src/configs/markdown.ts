@@ -1,6 +1,6 @@
-import { defineConfig } from "eslint/config";
 import eslintMarkdown from "@eslint/markdown";
-import { CONST_MD } from "../../constants";
+import { defineConfig } from "eslint/config";
+import { CONST_MD } from "../constants";
 
 /**
  * markdown配置

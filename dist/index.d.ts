@@ -1,69 +1,69 @@
-import * as _typescript_eslint_utils_dist_ts_eslint from '@typescript-eslint/utils/dist/ts-eslint';
+import * as eslint_config from 'eslint/config';
 
 /**
  * 公共配置
  * @description 最佳实践
  */
-declare const commonConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const commonConfigs: eslint_config.Config[];
 
 /**
  * 忽略配置
  */
-declare const ignoresConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const ignoresConfigs: eslint_config.Config[];
 
 /**
  * import配置
  */
-declare const importConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const importConfigs: eslint_config.Config[];
 
 /**
  * JavaScript配置
  */
-declare const javascriptConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const javascriptConfigs: eslint_config.Config[];
 
 /**
  * Json配置
  */
-declare const jsonConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const jsonConfigs: eslint_config.Config[];
 
 /**
  * markdown配置
  */
-declare const markdownConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const markdownConfigs: eslint_config.Config[];
 
 /**
  * prettier配置
  */
-declare const prettierConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const prettierConfigs: eslint_config.Config[];
 
 /**
  * regexp配置
  */
-declare const regexpConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const regexpConfigs: eslint_config.Config[];
 
 /**
  * package.json 属性排序
  */
-declare const packageJsonSortConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const packageJsonSortConfigs: eslint_config.Config[];
 
 /**
  * tsconfig.json 属性排序
  */
-declare const tsconfigJsonSortConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const tsconfigJsonSortConfigs: eslint_config.Config[];
 
 /**
  * TypeScript 核心配置
  */
-declare const typescriptCoreConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const typescriptCoreConfigs: eslint_config.Config[];
 /**
  * TypeScript配置
  */
-declare const typescriptConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const typescriptConfigs: eslint_config.Config[];
 
 /**
  * vue配置
  */
-declare const vueConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.ConfigArray;
+declare const vueConfigs: eslint_config.Config[];
 
 /**
  * JS
@@ -139,20 +139,20 @@ declare const CONST_TSCONFIG: string[];
  *
  * @description ignores，common，javascript，import，regexp
  */
-declare const PresetJavascriptConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.Config[];
+declare const PresetJavascriptConfigs: eslint_config.Config[];
 /**
  * JSON 预置配置
  */
-declare const PresetJsonConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.Config[];
+declare const PresetJsonConfigs: eslint_config.Config[];
 /**
  * 基础预置配置
  *
  * @description javascript，typescript，json
  */
-declare const PresetBasicConfigs: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.Config[];
+declare const PresetBasicConfigs: eslint_config.Config[];
 /**
  * 默认最全的配置
  */
-declare const _default: _typescript_eslint_utils_dist_ts_eslint.FlatConfig.Config[];
+declare const _default: eslint_config.Config[];
 
 export { CONST_DIST, CONST_DTS, CONST_JS, CONST_JSON, CONST_JSON5, CONST_JSON6, CONST_JSONC, CONST_JSX, CONST_LOCKFILE, CONST_MD, CONST_NODE_MODULES, CONST_PUBLIC, CONST_TS, CONST_TSCONFIG, CONST_TSX, CONST_VUE, CONST_YAML, PresetBasicConfigs, PresetJavascriptConfigs, PresetJsonConfigs, commonConfigs, _default as default, ignoresConfigs, importConfigs, javascriptConfigs, jsonConfigs, markdownConfigs, packageJsonSortConfigs, prettierConfigs, regexpConfigs, tsconfigJsonSortConfigs, typescriptConfigs, typescriptCoreConfigs, vueConfigs };

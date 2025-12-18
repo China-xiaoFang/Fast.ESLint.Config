@@ -1,5 +1,5 @@
 import { defineConfig } from "eslint/config";
-import { commonRules } from "../../rules";
+import { commonRules } from "../rules";
 
 /**
  * 公共配置

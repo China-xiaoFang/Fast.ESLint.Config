@@ -24,7 +24,7 @@ export * from "./configs/sort-tsconfig";
 export * from "./configs/typescript";
 export * from "./configs/vue";
 
-export * from "../constants";
+export * from "./constants";
 
 /**
  * JavaScript 预置配置

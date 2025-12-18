@@ -1,7 +1,7 @@
 import { defineConfig } from "eslint/config";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import jsoncEslintParser from "jsonc-eslint-parser";
-import { CONST_JSON, CONST_JSON5, CONST_JSON6, CONST_JSONC } from "../../constants";
+import { CONST_JSON, CONST_JSON5, CONST_JSON6, CONST_JSONC } from "../constants";
 
 /**
  * Json配置

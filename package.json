@@ -1,7 +1,7 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "1.0.32",
-	"description": "Fast ESLint 规则库.",
+	"version": "1.0.33",
+	"description": "Fast ESLint Flat 规则库.",
 	"type": "module",
 	"keywords": [
 		"fast",
@@ -24,20 +24,17 @@
 		"./README.zh.md",
 		"./dist"
 	],
-	"main": "dist/v8/index.cjs",
+	"main": "dist/dist/index.js",
 	"exports": {
 		".": {
-			"default": "./dist/v8/index.cjs"
+			"types": "./dist/index.d.ts",
+			"require": "./dist/index.js",
+			"import": "./dist/index.js"
 		},
 		"./rules": {
 			"types": "./dist/rules/index.d.ts",
 			"require": "./dist/rules/index.js",
 			"import": "./dist/rules/index.js"
-		},
-		"./flat": {
-			"types": "./dist/flat/index.d.ts",
-			"require": "./dist/flat/index.js",
-			"import": "./dist/flat/index.js"
 		}
 	},
 	"publishConfig": {
@@ -47,13 +44,13 @@
 		"dev": "eslint-config-inspector --config src/eslint-inspector.config.ts",
 		"build:dev": "eslint-config-inspector build --config src/eslint-inspector.config.ts",
 		"typegen": "tsx scripts/typegen.ts",
-		"build": "pnpm run typegen && tsup",
+		"build": "tsup && pnpm run typegen ",
 		"lint:eslint": "eslint --max-warnings 0 \"src/**/*.{vue,js,ts,tsx}\" --fix",
 		"lint:prettier": "prettier --write \"src/**/*.{vue,js,ts,jsx,tsx,md,json,css,scss,less,html}\"",
 		"lint": "pnpm lint:eslint && pnpm lint:prettier"
 	},
 	"peerDependencies": {
-		"eslint": "^8 || ^9",
+		"eslint": "^9",
 		"prettier": "^3"
 	},
 	"dependencies": {
@@ -65,7 +62,6 @@
 		"eslint-config-prettier": "^10",
 		"eslint-plugin-import": "^2",
 		"eslint-plugin-jsonc": "^2",
-		"eslint-plugin-markdown": "^5",
 		"eslint-plugin-prettier": "^5",
 		"eslint-plugin-regexp": "^2",
 		"eslint-plugin-vue": "^10",
@@ -76,16 +72,15 @@
 		"vue-eslint-parser": "^10"
 	},
 	"devDependencies": {
-		"@eslint/config-inspector": "latest",
-		"@types/eslint": "^8 || ^9",
+		"@eslint/config-inspector": "^1",
 		"@types/node": "^24",
-		"eslint": "^8 || ^9",
+		"eslint": "^9",
 		"eslint-typegen": "^2",
 		"prettier": "^3",
 		"tsup": "^8",
 		"typescript": "^5"
 	},
 	"engines": {
-		"node": ">=14.0.0"
+		"node": ">=18.18.0"
 	}
 }

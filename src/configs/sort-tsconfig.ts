@@ -1,6 +1,6 @@
 import { defineConfig } from "eslint/config";
-import { CONST_TSCONFIG } from "../../constants";
-import { tsconfigJsonSortRules } from "../../rules";
+import { CONST_TSCONFIG } from "../constants";
+import { tsconfigJsonSortRules } from "../rules";
 
 /**
  * tsconfig.json 属性排序

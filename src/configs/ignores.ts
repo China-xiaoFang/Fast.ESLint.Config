@@ -1,6 +1,6 @@
 import { defineConfig } from "eslint/config";
 import eslintConfigFlatGitignore from "eslint-config-flat-gitignore";
-import { CONST_DIST, CONST_LOCKFILE, CONST_NODE_MODULES, CONST_PUBLIC } from "../../constants";
+import { CONST_DIST, CONST_LOCKFILE, CONST_NODE_MODULES, CONST_PUBLIC } from "../constants";
 
 /**
  * 忽略配置

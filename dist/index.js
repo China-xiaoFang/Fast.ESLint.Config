@@ -1,5 +1,5 @@
-// src/flat/configs/common.ts
-import tseslint from "typescript-eslint";
+// src/configs/common.ts
+import { defineConfig } from "eslint/config";
 
 // src/rules/common.ts
 var commonRules = {
@@ -551,17 +551,17 @@ var vueRules = {
   ]
 };
 
-// src/flat/configs/common.ts
-var commonConfigs = tseslint.config([
+// src/configs/common.ts
+var commonConfigs = defineConfig([
   {
     name: "@fast-china/common",
     rules: commonRules
   }
 ]);
 
-// src/flat/configs/ignores.ts
+// src/configs/ignores.ts
+import { defineConfig as defineConfig2 } from "eslint/config";
 import eslintConfigFlatGitignore from "eslint-config-flat-gitignore";
-import tseslint2 from "typescript-eslint";
 
 // src/constants/index.ts
 var CONST_JS = "**/*.?([cm])js";
@@ -582,8 +582,8 @@ var CONST_LOCKFILE = ["**/package-lock.json", "**/yarn.lock", "**/pnpm-lock.yaml
 var CONST_PUBLIC = "**/public";
 var CONST_TSCONFIG = ["**/tsconfig.json", "**/tsconfig.*.json"];
 
-// src/flat/configs/ignores.ts
-var ignoresConfigs = tseslint2.config([
+// src/configs/ignores.ts
+var ignoresConfigs = defineConfig2([
   {
     name: "@fast-china/ignores/global",
     ignores: [
@@ -617,10 +617,10 @@ var ignoresConfigs = tseslint2.config([
   }
 ]);
 
-// src/flat/configs/import.ts
+// src/configs/import.ts
+import { defineConfig as defineConfig3 } from "eslint/config";
 import eslintPluginImport from "eslint-plugin-import";
-import tseslint3 from "typescript-eslint";
-var importConfigs = tseslint3.config([
+var importConfigs = defineConfig3([
   {
     name: "@fast-china/import",
     // 继承某些已有的规则
@@ -640,11 +640,11 @@ var importConfigs = tseslint3.config([
   }
 ]);
 
-// src/flat/configs/javascript.ts
+// src/configs/javascript.ts
 import eslint from "@eslint/js";
+import { defineConfig as defineConfig4 } from "eslint/config";
 import globals from "globals";
-import tseslint4 from "typescript-eslint";
-var javascriptConfigs = tseslint4.config([
+var javascriptConfigs = defineConfig4([
   {
     name: "@fast-china/javascript",
     // 继承某些已有的规则
@@ -691,11 +691,11 @@ var javascriptConfigs = tseslint4.config([
   }
 ]);
 
-// src/flat/configs/json.ts
+// src/configs/json.ts
+import { defineConfig as defineConfig5 } from "eslint/config";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import jsoncEslintParser from "jsonc-eslint-parser";
-import tseslint5 from "typescript-eslint";
-var jsonConfigs = tseslint5.config([
+var jsonConfigs = defineConfig5([
   {
     name: "@fast-china/json",
     files: [CONST_JSON, CONST_JSONC, CONST_JSON5, CONST_JSON6],
@@ -705,31 +705,34 @@ var jsonConfigs = tseslint5.config([
       parser: jsoncEslintParser
     },
     plugins: {
-      jsonc: eslintPluginJsonc
+      jsonc: {
+        rules: eslintPluginJsonc.rules
+      }
     }
   }
 ]);
 
-// src/flat/configs/markdown.ts
-import eslintPluginMarkdown from "eslint-plugin-markdown";
-import tseslint6 from "typescript-eslint";
-var markdownConfigs = tseslint6.config([
+// src/configs/markdown.ts
+import eslintMarkdown from "@eslint/markdown";
+import { defineConfig as defineConfig6 } from "eslint/config";
+var markdownConfigs = defineConfig6([
   {
     name: "@fast-china/markdown",
-    files: [CONST_MD]
-  },
-  ...eslintPluginMarkdown.configs.recommended.map((config) => ({
-    ...config,
-    name: `@fast-china/${config.name || "markdown/anonymous"}`
-  }))
+    files: [CONST_MD],
+    // 继承某些已有的规则
+    extends: [...eslintMarkdown.configs["recommended"]],
+    plugins: {
+      markdown: eslintMarkdown
+    }
+  }
 ]);
 
-// src/flat/configs/prettier.ts
+// src/configs/prettier.ts
+import { defineConfig as defineConfig7 } from "eslint/config";
 import eslintConfigPrettierFlat from "eslint-config-prettier/flat";
 import eslintPluginPrettier from "eslint-plugin-prettier";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
-import tseslint7 from "typescript-eslint";
-var prettierConfigs = tseslint7.config([
+var prettierConfigs = defineConfig7([
   {
     name: "@fast-china/prettier",
     // 继承某些已有的规则
@@ -744,19 +747,19 @@ var prettierConfigs = tseslint7.config([
   }
 ]);
 
-// src/flat/configs/regexp.ts
+// src/configs/regexp.ts
+import { defineConfig as defineConfig8 } from "eslint/config";
 import eslintPluginRegexp from "eslint-plugin-regexp";
-import tseslint8 from "typescript-eslint";
-var regexpConfigs = tseslint8.config([
+var regexpConfigs = defineConfig8([
   {
     name: "@fast-china/regexp",
     ...eslintPluginRegexp.configs["flat/recommended"]
   }
 ]);
 
-// src/flat/configs/sort-package.ts
-import tseslint9 from "typescript-eslint";
-var packageJsonSortConfigs = tseslint9.config([
+// src/configs/sort-package.ts
+import { defineConfig as defineConfig9 } from "eslint/config";
+var packageJsonSortConfigs = defineConfig9([
   {
     name: "@fast-china/sort/package",
     files: ["**/package.json"],
@@ -764,9 +767,9 @@ var packageJsonSortConfigs = tseslint9.config([
   }
 ]);
 
-// src/flat/configs/sort-tsconfig.ts
-import tseslint10 from "typescript-eslint";
-var tsconfigJsonSortConfigs = tseslint10.config([
+// src/configs/sort-tsconfig.ts
+import { defineConfig as defineConfig10 } from "eslint/config";
+var tsconfigJsonSortConfigs = defineConfig10([
   {
     name: "@fast-china/sort/tsconfig",
     files: CONST_TSCONFIG,
@@ -774,18 +777,19 @@ var tsconfigJsonSortConfigs = tseslint10.config([
   }
 ]);
 
-// src/flat/configs/typescript.ts
-import tseslint11 from "typescript-eslint";
-var typescriptCoreConfigs = tseslint11.config([
+// src/configs/typescript.ts
+import { defineConfig as defineConfig11 } from "eslint/config";
+import tseslint from "typescript-eslint";
+var typescriptCoreConfigs = defineConfig11([
   {
     name: "@fast-china/typescript",
     files: [CONST_TS, CONST_TSX],
     // 继承某些已有的规则
-    extends: [tseslint11.configs.recommended],
+    extends: [tseslint.configs.recommended],
     languageOptions: {
       //  允许使用最新的 ECMAScript 语法特性
       ecmaVersion: "latest",
-      parser: tseslint11.parser,
+      parser: tseslint.parser,
       parserOptions: {
         ecmaFeatures: {
           // 允许使用 TSX 语法，适用于 Vue 组件中的 TSX 代码。
@@ -797,7 +801,7 @@ var typescriptCoreConfigs = tseslint11.config([
     rules: typescriptRules
   }
 ]);
-var typescriptConfigs = tseslint11.config([
+var typescriptConfigs = defineConfig11([
   ...typescriptCoreConfigs,
   {
     name: "@fast-china/typescript/dts",
@@ -825,9 +829,10 @@ var typescriptConfigs = tseslint11.config([
   }
 ]);
 
-// src/flat/configs/vue.ts
+// src/configs/vue.ts
+import { defineConfig as defineConfig12 } from "eslint/config";
 import eslintPluginVue from "eslint-plugin-vue";
-import tseslint12 from "typescript-eslint";
+import tseslint2 from "typescript-eslint";
 import vueEslintParser from "vue-eslint-parser";
 
 // src/env/index.ts
@@ -841,8 +846,8 @@ var getVueVersion = () => {
 };
 var isVue3 = getVueVersion() === 3;
 
-// src/flat/configs/vue.ts
-var vueConfigs = tseslint12.config([
+// src/configs/vue.ts
+var vueConfigs = defineConfig12([
   {
     name: "@fast-china/vue/ts",
     files: [CONST_VUE],
@@ -861,7 +866,8 @@ var vueConfigs = tseslint12.config([
       parser: vueEslintParser,
       parserOptions: {
         // 允许在 Vue 文件中的脚本部分使用 TypeScript 语法
-        parser: "@typescript-eslint/parser",
+        parser: tseslint2.parser,
+        // parser: "@typescript-eslint/parser",
         // 指定额外的文件扩展名，告诉解析器 .vue 文件也需要处理
         extraFileExtensions: [".vue"],
         // 允许使用 JSX/TSX 语法，适用于 Vue 组件中的 JSX/TSX 代码。
@@ -873,7 +879,7 @@ var vueConfigs = tseslint12.config([
       }
     },
     plugins: {
-      "@typescript-eslint": tseslint12.plugin,
+      "@typescript-eslint": tseslint2.plugin,
       vue: eslintPluginVue
     },
     rules: {
@@ -900,7 +906,7 @@ var vueConfigs = tseslint12.config([
   }
 ]);
 
-// src/flat/index.ts
+// src/index.ts
 var PresetJavascriptConfigs = [...ignoresConfigs, ...commonConfigs, ...javascriptConfigs, ...importConfigs, ...regexpConfigs];
 var PresetJsonConfigs = [...jsonConfigs, ...packageJsonSortConfigs, ...tsconfigJsonSortConfigs];
 var PresetBasicConfigs = [...PresetJavascriptConfigs, ...typescriptConfigs, ...PresetJsonConfigs];

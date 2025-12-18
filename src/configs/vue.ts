@@ -2,9 +2,9 @@ import { defineConfig } from "eslint/config";
 import eslintPluginVue from "eslint-plugin-vue";
 import tseslint from "typescript-eslint";
 import vueEslintParser from "vue-eslint-parser";
-import { CONST_VUE } from "../../constants";
-import { isVue3 } from "../../env";
-import { vueRules } from "../../rules";
+import { CONST_VUE } from "../constants";
+import { isVue3 } from "../env";
+import { vueRules } from "../rules";
 import { typescriptCoreConfigs } from "./typescript";
 
 /**
@@ -29,7 +29,8 @@ export const vueConfigs = defineConfig([
 			parser: vueEslintParser,
 			parserOptions: {
 				// 允许在 Vue 文件中的脚本部分使用 TypeScript 语法
-				parser: "@typescript-eslint/parser",
+				parser: tseslint.parser,
+				// parser: "@typescript-eslint/parser",
 				// 指定额外的文件扩展名，告诉解析器 .vue 文件也需要处理
 				extraFileExtensions: [".vue"],
 				// 允许使用 JSX/TSX 语法，适用于 Vue 组件中的 JSX/TSX 代码。

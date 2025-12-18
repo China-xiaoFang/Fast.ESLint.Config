@@ -2,21 +2,12 @@
  * 生成规则 ts 类型
  */
 import fs from "node:fs/promises";
+import eslint from "@eslint/js";
 import { flatConfigsToRulesDTS } from "eslint-typegen/core";
-import { builtinRules } from "eslint/use-at-your-own-risk";
-import fastChinaFlat from "../src/flat/index";
-import { Linter } from "eslint";
+import fastChinaFlat from "../src/index";
+import type { Linter } from "eslint";
 
-const configs: Linter.Config[] = [
-	...fastChinaFlat,
-	{
-		plugins: {
-			"": {
-				rules: Object.fromEntries(builtinRules.entries()),
-			},
-		},
-	},
-];
+const configs: Linter.Config[] = [...fastChinaFlat, eslint.configs.recommended];
 
 const configNames: string[] = configs.map((c) => c.name).filter(Boolean) as string[];
 
@@ -29,4 +20,4 @@ dts += `
 export type ConfigNames = ${configNames.map((i) => `'${i}'`).join(" | ")}
 `;
 
-await fs.writeFile("src/typegen.d.ts", dts);
+await fs.writeFile("dist/typegen.d.ts", dts);

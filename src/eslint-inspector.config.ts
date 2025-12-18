@@ -1,3 +1,3 @@
-import fastChinaFlat from "./flat/index";
+import fastChinaFlat from "./index";
 
 export default fastChinaFlat;

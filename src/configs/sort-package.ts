@@ -1,5 +1,5 @@
 import { defineConfig } from "eslint/config";
-import { packageJsonSortRules } from "../../rules";
+import { packageJsonSortRules } from "../rules";
 
 /**
  * package.json 属性排序
