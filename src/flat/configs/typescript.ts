@@ -1,3 +1,4 @@
+import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 import { CONST_DTS, CONST_TS, CONST_TSX } from "../../constants";
 import { typescriptRules } from "../../rules";
@@ -5,7 +6,7 @@ import { typescriptRules } from "../../rules";
 /**
  * TypeScript 核心配置
  */
-export const typescriptCoreConfigs = tseslint.config([
+export const typescriptCoreConfigs = defineConfig([
 	{
 		name: "@fast-china/typescript",
 		files: [CONST_TS, CONST_TSX],
@@ -30,7 +31,7 @@ export const typescriptCoreConfigs = tseslint.config([
 /**
  * TypeScript配置
  */
-export const typescriptConfigs = tseslint.config([
+export const typescriptConfigs = defineConfig([
 	...typescriptCoreConfigs,
 	{
 		name: "@fast-china/typescript/dts",

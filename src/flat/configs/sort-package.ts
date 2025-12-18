@@ -1,10 +1,10 @@
-import tseslint from "typescript-eslint";
+import { defineConfig } from "eslint/config";
 import { packageJsonSortRules } from "../../rules";
 
 /**
  * package.json 属性排序
  */
-export const packageJsonSortConfigs = tseslint.config([
+export const packageJsonSortConfigs = defineConfig([
 	{
 		name: "@fast-china/sort/package",
 		files: ["**/package.json"],

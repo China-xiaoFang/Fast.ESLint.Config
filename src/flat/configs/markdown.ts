@@ -1,18 +1,18 @@
-// @ts-ignore
-import eslintPluginMarkdown from "eslint-plugin-markdown";
-import tseslint from "typescript-eslint";
+import { defineConfig } from "eslint/config";
+import eslintMarkdown from "@eslint/markdown";
 import { CONST_MD } from "../../constants";
 
 /**
  * markdown配置
  */
-export const markdownConfigs = tseslint.config([
+export const markdownConfigs = defineConfig([
 	{
 		name: "@fast-china/markdown",
 		files: [CONST_MD],
+		// 继承某些已有的规则
+		extends: [...eslintMarkdown.configs["recommended"]],
+		plugins: {
+			markdown: eslintMarkdown,
+		},
 	},
-	...eslintPluginMarkdown.configs.recommended.map((config: { name: string }) => ({
-		...config,
-		name: `@fast-china/${config.name || "markdown/anonymous"}`,
-	})),
 ]);

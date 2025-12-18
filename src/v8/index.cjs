@@ -1,4 +1,3 @@
-const { defineConfig } = require("eslint-define-config");
 const {
 	CONST_JS,
 	CONST_JSX,
@@ -25,23 +24,24 @@ const {
 } = require("../rules");
 
 // @see: http://eslint.cn
-module.exports = defineConfig({
+module.exports = {
 	env: {
 		es6: true,
 		browser: true,
 		node: true,
 	},
-	plugins: ["regexp", "@typescript-eslint", "prettier"],
+	plugins: ["@typescript-eslint", "regexp", "promise", "prettier"],
 	// 继承某些已有的规则
 	extends: [
 		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
 		"plugin:import/recommended",
 		"plugin:regexp/recommended",
-		"plugin:@typescript-eslint/recommended",
+		"plugin:promise/recommended",
 		"plugin:jsonc/recommended-with-jsonc",
+		"plugin:markdown/recommended-legacy",
 		isVue3 ? "plugin:vue/recommended" : "plugin:vue/vue2-recommended",
 		"plugin:prettier/recommended",
-		"plugin:markdown/recommended-legacy",
 	],
 	globals: {
 		$: "readonly",
@@ -178,4 +178,4 @@ module.exports = defineConfig({
 		// 确保 Prettier 错误被 ESLint 捕获
 		"prettier/prettier": "error",
 	},
-});
+};

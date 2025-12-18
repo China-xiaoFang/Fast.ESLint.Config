@@ -1,11 +1,11 @@
+import { defineConfig } from "eslint/config";
 import eslintConfigFlatGitignore from "eslint-config-flat-gitignore";
-import tseslint from "typescript-eslint";
 import { CONST_DIST, CONST_LOCKFILE, CONST_NODE_MODULES, CONST_PUBLIC } from "../../constants";
 
 /**
  * 忽略配置
  */
-export const ignoresConfigs = tseslint.config([
+export const ignoresConfigs = defineConfig([
 	{
 		name: "@fast-china/ignores/global",
 		ignores: [

@@ -1,12 +1,12 @@
+import { defineConfig } from "eslint/config";
 import eslintConfigPrettierFlat from "eslint-config-prettier/flat";
 import eslintPluginPrettier from "eslint-plugin-prettier";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
-import tseslint from "typescript-eslint";
 
 /**
  * prettier配置
  */
-export const prettierConfigs = tseslint.config([
+export const prettierConfigs = defineConfig([
 	{
 		name: "@fast-china/prettier",
 		// 继承某些已有的规则

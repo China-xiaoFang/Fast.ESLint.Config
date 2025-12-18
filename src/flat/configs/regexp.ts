@@ -1,10 +1,10 @@
+import { defineConfig } from "eslint/config";
 import eslintPluginRegexp from "eslint-plugin-regexp";
-import tseslint from "typescript-eslint";
 
 /**
  * regexp配置
  */
-export const regexpConfigs = tseslint.config([
+export const regexpConfigs = defineConfig([
 	{
 		name: "@fast-china/regexp",
 		...eslintPluginRegexp.configs["flat/recommended"],

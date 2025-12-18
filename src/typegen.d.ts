@@ -467,6 +467,11 @@ export interface RuleOptions {
    */
   '@typescript-eslint/no-useless-constructor'?: Linter.RuleEntry<[]>
   /**
+   * Disallow default values that will never be used
+   * @see https://typescript-eslint.io/rules/no-useless-default-assignment
+   */
+  '@typescript-eslint/no-useless-default-assignment'?: Linter.RuleEntry<[]>
+  /**
    * Disallow empty exports that don't change anything in a module file
    * @see https://typescript-eslint.io/rules/no-useless-empty-export
    */
@@ -1457,6 +1462,106 @@ export interface RuleOptions {
    * @see https://eslint.org/docs/latest/rules/logical-assignment-operators
    */
   'logical-assignment-operators'?: Linter.RuleEntry<LogicalAssignmentOperators>
+  /**
+   * Require languages for fenced code blocks
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/fenced-code-language.md
+   */
+  'markdown/fenced-code-language'?: Linter.RuleEntry<MarkdownFencedCodeLanguage>
+  /**
+   * Enforce heading levels increment by one
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/heading-increment.md
+   */
+  'markdown/heading-increment'?: Linter.RuleEntry<MarkdownHeadingIncrement>
+  /**
+   * Disallow bare URLs
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-bare-urls.md
+   */
+  'markdown/no-bare-urls'?: Linter.RuleEntry<[]>
+  /**
+   * Disallow duplicate definitions
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-duplicate-definitions.md
+   */
+  'markdown/no-duplicate-definitions'?: Linter.RuleEntry<MarkdownNoDuplicateDefinitions>
+  /**
+   * Disallow duplicate headings in the same document
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-duplicate-headings.md
+   */
+  'markdown/no-duplicate-headings'?: Linter.RuleEntry<MarkdownNoDuplicateHeadings>
+  /**
+   * Disallow empty definitions
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-empty-definitions.md
+   */
+  'markdown/no-empty-definitions'?: Linter.RuleEntry<MarkdownNoEmptyDefinitions>
+  /**
+   * Disallow empty images
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-empty-images.md
+   */
+  'markdown/no-empty-images'?: Linter.RuleEntry<[]>
+  /**
+   * Disallow empty links
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-empty-links.md
+   */
+  'markdown/no-empty-links'?: Linter.RuleEntry<[]>
+  /**
+   * Disallow HTML tags
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-html.md
+   */
+  'markdown/no-html'?: Linter.RuleEntry<MarkdownNoHtml>
+  /**
+   * Disallow invalid label references
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-invalid-label-refs.md
+   */
+  'markdown/no-invalid-label-refs'?: Linter.RuleEntry<[]>
+  /**
+   * Disallow headings without a space after the hash characters
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-missing-atx-heading-space.md
+   */
+  'markdown/no-missing-atx-heading-space'?: Linter.RuleEntry<MarkdownNoMissingAtxHeadingSpace>
+  /**
+   * Disallow missing label references
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-missing-label-refs.md
+   */
+  'markdown/no-missing-label-refs'?: Linter.RuleEntry<MarkdownNoMissingLabelRefs>
+  /**
+   * Disallow link fragments that do not reference valid headings
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-missing-link-fragments.md
+   */
+  'markdown/no-missing-link-fragments'?: Linter.RuleEntry<MarkdownNoMissingLinkFragments>
+  /**
+   * Disallow multiple H1 headings in the same document
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-multiple-h1.md
+   */
+  'markdown/no-multiple-h1'?: Linter.RuleEntry<MarkdownNoMultipleH1>
+  /**
+   * Disallow URLs that match defined reference identifiers
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-reference-like-urls.md
+   */
+  'markdown/no-reference-like-urls'?: Linter.RuleEntry<[]>
+  /**
+   * Disallow reversed link and image syntax
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-reversed-media-syntax.md
+   */
+  'markdown/no-reversed-media-syntax'?: Linter.RuleEntry<[]>
+  /**
+   * Disallow spaces around emphasis markers
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-space-in-emphasis.md
+   */
+  'markdown/no-space-in-emphasis'?: Linter.RuleEntry<MarkdownNoSpaceInEmphasis>
+  /**
+   * Disallow unused definitions
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/no-unused-definitions.md
+   */
+  'markdown/no-unused-definitions'?: Linter.RuleEntry<MarkdownNoUnusedDefinitions>
+  /**
+   * Require alternative text for images
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/require-alt-text.md
+   */
+  'markdown/require-alt-text'?: Linter.RuleEntry<[]>
+  /**
+   * Disallow data rows in a GitHub Flavored Markdown table from having more cells than the header row
+   * @see https://github.com/eslint/markdown/blob/main/docs/rules/table-column-count.md
+   */
+  'markdown/table-column-count'?: Linter.RuleEntry<MarkdownTableColumnCount>
   /**
    * Enforce a maximum number of classes per file
    * @see https://eslint.org/docs/latest/rules/max-classes-per-file
@@ -3519,6 +3624,11 @@ export interface RuleOptions {
    * @see https://eslint.vuejs.org/rules/no-duplicate-attributes.html
    */
   'vue/no-duplicate-attributes'?: Linter.RuleEntry<VueNoDuplicateAttributes>
+  /**
+   * disallow duplication of class names in class attributes
+   * @see https://eslint.vuejs.org/rules/no-duplicate-class-names.html
+   */
+  'vue/no-duplicate-class-names'?: Linter.RuleEntry<[]>
   /**
    * disallow the `<template>` `<script>` `<style>` block to be empty
    * @see https://eslint.vuejs.org/rules/no-empty-component-block.html
@@ -6720,6 +6830,64 @@ type LinesBetweenClassMembers = []|[({
 type LogicalAssignmentOperators = (([]|["always"]|["always", {
   enforceForIfStatements?: boolean
 }] | ["never"]) & unknown[])
+// ----- markdown/fenced-code-language -----
+type MarkdownFencedCodeLanguage = []|[{
+  required?: string[]
+}]
+// ----- markdown/heading-increment -----
+type MarkdownHeadingIncrement = []|[{
+  frontmatterTitle?: string
+}]
+// ----- markdown/no-duplicate-definitions -----
+type MarkdownNoDuplicateDefinitions = []|[{
+  allowDefinitions?: string[]
+  allowFootnoteDefinitions?: string[]
+}]
+// ----- markdown/no-duplicate-headings -----
+type MarkdownNoDuplicateHeadings = []|[{
+  checkSiblingsOnly?: boolean
+}]
+// ----- markdown/no-empty-definitions -----
+type MarkdownNoEmptyDefinitions = []|[{
+  allowDefinitions?: string[]
+  allowFootnoteDefinitions?: string[]
+  checkFootnoteDefinitions?: boolean
+}]
+// ----- markdown/no-html -----
+type MarkdownNoHtml = []|[{
+  allowed?: string[]
+  allowedIgnoreCase?: boolean
+}]
+// ----- markdown/no-missing-atx-heading-space -----
+type MarkdownNoMissingAtxHeadingSpace = []|[{
+  checkClosedHeadings?: boolean
+}]
+// ----- markdown/no-missing-label-refs -----
+type MarkdownNoMissingLabelRefs = []|[{
+  allowLabels?: string[]
+}]
+// ----- markdown/no-missing-link-fragments -----
+type MarkdownNoMissingLinkFragments = []|[{
+  ignoreCase?: boolean
+  allowPattern?: string
+}]
+// ----- markdown/no-multiple-h1 -----
+type MarkdownNoMultipleH1 = []|[{
+  frontmatterTitle?: string
+}]
+// ----- markdown/no-space-in-emphasis -----
+type MarkdownNoSpaceInEmphasis = []|[{
+  checkStrikethrough?: boolean
+}]
+// ----- markdown/no-unused-definitions -----
+type MarkdownNoUnusedDefinitions = []|[{
+  allowDefinitions?: string[]
+  allowFootnoteDefinitions?: string[]
+}]
+// ----- markdown/table-column-count -----
+type MarkdownTableColumnCount = []|[{
+  checkMissingCells?: boolean
+}]
 // ----- max-classes-per-file -----
 type MaxClassesPerFile = []|[(number | {
   ignoreExpressions?: boolean
@@ -8866,4 +9034,4 @@ type Yoda = []|[("always" | "never")]|[("always" | "never"), {
   onlyEquality?: boolean
 }]
 // Names of all the configs
-export type ConfigNames = '@fast-china/ignores/global' | 'gitignore' | '@fast-china/common' | '@fast-china/javascript' | '@fast-china/javascript' | '@fast-china/javascript/md/js' | '@fast-china/javascript/script' | '@fast-china/import__import/recommended' | '@fast-china/import' | '@fast-china/regexp' | '@fast-china/typescript__typescript-eslint/base' | '@fast-china/typescript__typescript-eslint/eslint-recommended' | '@fast-china/typescript__typescript-eslint/recommended' | '@fast-china/typescript' | '@fast-china/typescript/dts' | '@fast-china/typescript/vite' | '@fast-china/typescript/md/js' | '@fast-china/json' | '@fast-china/json' | '@fast-china/json' | '@fast-china/json' | '@fast-china/sort/package' | '@fast-china/sort/tsconfig' | '@fast-china/vue/ts__@fast-china/typescript__typescript-eslint/base' | '@fast-china/vue/ts__@fast-china/typescript__typescript-eslint/eslint-recommended' | '@fast-china/vue/ts__@fast-china/typescript__typescript-eslint/recommended' | '@fast-china/vue/ts__@fast-china/typescript' | '@fast-china/vue/ts' | '@fast-china/vue__vue/base/setup' | '@fast-china/vue__vue/base/setup-for-vue' | '@fast-china/vue__vue/essential/rules' | '@fast-china/vue__vue/strongly-recommended/rules' | '@fast-china/vue__vue/recommended/rules' | '@fast-china/vue' | '@fast-china/reactivity' | '@fast-china/prettier__config-prettier' | '@fast-china/prettier__eslint-plugin-prettier/recommended' | '@fast-china/prettier' | '@fast-china/markdown' | '@fast-china/markdown/recommended/plugin' | '@fast-china/markdown/recommended/processor' | '@fast-china/markdown/recommended/code-blocks'
+export type ConfigNames = '@fast-china/ignores/global' | 'gitignore' | '@fast-china/common' | '@fast-china/javascript > ExtendedConfig[0]' | '@fast-china/javascript' | '@fast-china/javascript/md/js' | '@fast-china/javascript/script' | '@fast-china/import > import/recommended' | '@fast-china/import' | '@fast-china/regexp' | '@fast-china/typescript > typescript-eslint/base' | '@fast-china/typescript > typescript-eslint/eslint-recommended' | '@fast-china/typescript > typescript-eslint/recommended' | '@fast-china/typescript' | '@fast-china/typescript/dts' | '@fast-china/typescript/vite' | '@fast-china/typescript/md/js' | '@fast-china/json > ExtendedConfig[0]' | '@fast-china/json > ExtendedConfig[1]' | '@fast-china/json > ExtendedConfig[2]' | '@fast-china/json' | '@fast-china/sort/package' | '@fast-china/sort/tsconfig' | '@fast-china/vue/ts > @fast-china/typescript > typescript-eslint/base' | '@fast-china/vue/ts > @fast-china/typescript > typescript-eslint/eslint-recommended' | '@fast-china/vue/ts > @fast-china/typescript > typescript-eslint/recommended' | '@fast-china/vue/ts > @fast-china/typescript' | '@fast-china/vue/ts' | '@fast-china/vue > vue/base/setup' | '@fast-china/vue > vue/base/setup-for-vue' | '@fast-china/vue > vue/essential/rules' | '@fast-china/vue > vue/strongly-recommended/rules' | '@fast-china/vue > vue/recommended/rules' | '@fast-china/vue' | '@fast-china/reactivity' | '@fast-china/prettier > config-prettier' | '@fast-china/prettier > eslint-plugin-prettier/recommended' | '@fast-china/prettier' | '@fast-china/markdown > markdown/recommended' | '@fast-china/markdown'

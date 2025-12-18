@@ -1,3 +1,4 @@
+import { defineConfig } from "eslint/config";
 import eslintPluginVue from "eslint-plugin-vue";
 import tseslint from "typescript-eslint";
 import vueEslintParser from "vue-eslint-parser";
@@ -9,7 +10,7 @@ import { typescriptCoreConfigs } from "./typescript";
 /**
  * vue配置
  */
-export const vueConfigs = tseslint.config([
+export const vueConfigs = defineConfig([
 	{
 		name: "@fast-china/vue/ts",
 		files: [CONST_VUE],

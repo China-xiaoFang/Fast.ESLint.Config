@@ -1,12 +1,12 @@
+import { defineConfig } from "eslint/config";
 import eslint from "@eslint/js";
 import globals from "globals";
-import tseslint from "typescript-eslint";
 import { javascriptRules } from "../../rules";
 
 /**
  * JavaScript配置
  */
-export const javascriptConfigs = tseslint.config([
+export const javascriptConfigs = defineConfig([
 	{
 		name: "@fast-china/javascript",
 		// 继承某些已有的规则
