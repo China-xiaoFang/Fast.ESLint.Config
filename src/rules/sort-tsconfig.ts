@@ -4,6 +4,9 @@ import type { Linter } from "eslint";
  * tsconfig.json 属性排序规则
  */
 export const tsconfigJsonSortRules: Linter.RulesRecord = {
+	// 允许注释
+	"jsonc/no-comments": "off",
+
 	"jsonc/sort-keys": [
 		"error",
 		{

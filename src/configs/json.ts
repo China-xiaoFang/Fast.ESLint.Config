@@ -20,4 +20,12 @@ export const jsonConfigs = defineConfig([
 			parser: jsoncEslintParser,
 		},
 	},
+	{
+		name: "@fast-china/json/settings",
+		files: ["**/.vscode/settings.json"],
+		rules: {
+			// 允许注释
+			"jsonc/no-comments": "off",
+		},
+	},
 ]);
