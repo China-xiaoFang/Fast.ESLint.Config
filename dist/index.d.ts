@@ -98,10 +98,6 @@ declare const CONST_JSONC = "**/*.jsonc";
  */
 declare const CONST_JSON5 = "**/*.json5";
 /**
- * JSON6
- */
-declare const CONST_JSON6 = "**/*.json6";
-/**
  * MD
  */
 declare const CONST_MD = "**/*.md";
@@ -155,4 +151,4 @@ declare const PresetBasicConfigs: eslint_config.Config[];
  */
 declare const _default: eslint_config.Config[];
 
-export { CONST_DIST, CONST_DTS, CONST_JS, CONST_JSON, CONST_JSON5, CONST_JSON6, CONST_JSONC, CONST_JSX, CONST_LOCKFILE, CONST_MD, CONST_NODE_MODULES, CONST_PUBLIC, CONST_TS, CONST_TSCONFIG, CONST_TSX, CONST_VUE, CONST_YAML, PresetBasicConfigs, PresetJavascriptConfigs, PresetJsonConfigs, commonConfigs, _default as default, ignoresConfigs, importConfigs, javascriptConfigs, jsonConfigs, markdownConfigs, packageJsonSortConfigs, prettierConfigs, regexpConfigs, tsconfigJsonSortConfigs, typescriptConfigs, typescriptCoreConfigs, vueConfigs };
+export { CONST_DIST, CONST_DTS, CONST_JS, CONST_JSON, CONST_JSON5, CONST_JSONC, CONST_JSX, CONST_LOCKFILE, CONST_MD, CONST_NODE_MODULES, CONST_PUBLIC, CONST_TS, CONST_TSCONFIG, CONST_TSX, CONST_VUE, CONST_YAML, PresetBasicConfigs, PresetJavascriptConfigs, PresetJsonConfigs, commonConfigs, _default as default, ignoresConfigs, importConfigs, javascriptConfigs, jsonConfigs, markdownConfigs, packageJsonSortConfigs, prettierConfigs, regexpConfigs, tsconfigJsonSortConfigs, typescriptConfigs, typescriptCoreConfigs, vueConfigs };

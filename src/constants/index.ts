@@ -39,11 +39,6 @@ export const CONST_JSONC = "**/*.jsonc";
 export const CONST_JSON5 = "**/*.json5";
 
 /**
- * JSON6
- */
-export const CONST_JSON6 = "**/*.json6";
-
-/**
  * MD
  */
 export const CONST_MD = "**/*.md";

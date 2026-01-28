@@ -1,4 +1,4 @@
 import { defineConfig } from "eslint/config";
-import fastChinaFlat from "./dist/index.js";
+import fastChina from "./dist/index.js";
 
-export default defineConfig([...fastChinaFlat]);
+export default defineConfig([...fastChina]);

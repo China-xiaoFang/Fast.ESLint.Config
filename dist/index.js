@@ -577,7 +577,6 @@ var CONST_DTS = "**/*.d.ts";
 var CONST_JSON = "**/*.json";
 var CONST_JSONC = "**/*.jsonc";
 var CONST_JSON5 = "**/*.json5";
-var CONST_JSON6 = "**/*.json6";
 var CONST_MD = "**/*.md";
 var CONST_VUE = "**/*.vue";
 var CONST_YAML = "**/*.y?(a)ml";
@@ -703,16 +702,15 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 var jsonConfigs = defineConfig5([
   {
     name: "@fast-china/json",
-    files: [CONST_JSON, CONST_JSONC, CONST_JSON5, CONST_JSON6],
+    files: [CONST_JSON, CONST_JSONC, CONST_JSON5],
     // 继承某些已有的规则
-    extends: [...eslintPluginJsonc.configs["flat/recommended-with-jsonc"]],
+    extends: [
+      ...eslintPluginJsonc.configs["flat/recommended-with-json"],
+      ...eslintPluginJsonc.configs["flat/recommended-with-jsonc"],
+      ...eslintPluginJsonc.configs["flat/recommended-with-json5"]
+    ],
     languageOptions: {
       parser: jsoncEslintParser
-    },
-    plugins: {
-      jsonc: {
-        rules: eslintPluginJsonc.rules
-      }
     }
   }
 ]);
@@ -922,7 +920,6 @@ export {
   CONST_JS,
   CONST_JSON,
   CONST_JSON5,
-  CONST_JSON6,
   CONST_JSONC,
   CONST_JSX,
   CONST_LOCKFILE,
