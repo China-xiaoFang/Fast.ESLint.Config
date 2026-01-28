@@ -1,6 +1,6 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "1.0.40",
+	"version": "1.0.42",
 	"description": "Fast ESLint Flat 规则库.",
 	"type": "module",
 	"keywords": [
@@ -60,6 +60,7 @@
 		"@typescript-eslint/parser": "^8",
 		"eslint-config-flat-gitignore": "^2",
 		"eslint-config-prettier": "^10",
+		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-import": "^2",
 		"eslint-plugin-jsonc": "^2",
 		"eslint-plugin-prettier": "^5",
