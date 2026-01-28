@@ -48,4 +48,4 @@ export const PresetBasicConfigs = [...PresetJavascriptConfigs, ...typescriptConf
 /**
  * 默认最全的配置
  */
-export default [...PresetBasicConfigs, ...vueConfigs, ...prettierConfigs, ...markdownConfigs];
+export default [...PresetBasicConfigs, ...vueConfigs, ...markdownConfigs, ...prettierConfigs];

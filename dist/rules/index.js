@@ -146,6 +146,11 @@ var importRules = {
           pattern: "@fast-china/**",
           group: "external",
           position: "before"
+        },
+        {
+          pattern: "@api/**",
+          group: "internal",
+          position: "before"
         }
       ],
       pathGroupsExcludedImportTypes: ["type"],

@@ -115,6 +115,11 @@ export const importRules: Linter.RulesRecord = {
 					group: "external",
 					position: "before",
 				},
+				{
+					pattern: "@api/**",
+					group: "internal",
+					position: "before",
+				},
 			],
 			pathGroupsExcludedImportTypes: ["type"],
 			// 禁止不同组之间进行换行

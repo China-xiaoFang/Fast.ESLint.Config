@@ -131,6 +131,11 @@ var importRules = {
           pattern: "@fast-china/**",
           group: "external",
           position: "before"
+        },
+        {
+          pattern: "@api/**",
+          group: "internal",
+          position: "before"
         }
       ],
       pathGroupsExcludedImportTypes: ["type"],
@@ -624,7 +629,7 @@ var importConfigs = defineConfig3([
   {
     name: "@fast-china/import",
     // 继承某些已有的规则
-    extends: [eslintPluginImport.flatConfigs.recommended],
+    extends: [eslintPluginImport.flatConfigs.recommended, eslintPluginImport.flatConfigs.typescript],
     settings: {
       // 确保 ESLint 和 eslint-plugin-import 能够正确解析项目中的所有相关文件类型
       "import/resolver": {
@@ -910,7 +915,7 @@ var vueConfigs = defineConfig12([
 var PresetJavascriptConfigs = [...ignoresConfigs, ...commonConfigs, ...javascriptConfigs, ...importConfigs, ...regexpConfigs];
 var PresetJsonConfigs = [...jsonConfigs, ...packageJsonSortConfigs, ...tsconfigJsonSortConfigs];
 var PresetBasicConfigs = [...PresetJavascriptConfigs, ...typescriptConfigs, ...PresetJsonConfigs];
-var index_default = [...PresetBasicConfigs, ...vueConfigs, ...prettierConfigs, ...markdownConfigs];
+var index_default = [...PresetBasicConfigs, ...vueConfigs, ...markdownConfigs, ...prettierConfigs];
 export {
   CONST_DIST,
   CONST_DTS,

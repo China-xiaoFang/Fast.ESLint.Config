@@ -10,7 +10,7 @@ export const importConfigs = defineConfig([
 	{
 		name: "@fast-china/import",
 		// 继承某些已有的规则
-		extends: [eslintPluginImport.flatConfigs.recommended],
+		extends: [eslintPluginImport.flatConfigs.recommended, eslintPluginImport.flatConfigs.typescript],
 		settings: {
 			// 确保 ESLint 和 eslint-plugin-import 能够正确解析项目中的所有相关文件类型
 			"import/resolver": {
