@@ -74,6 +74,63 @@ export const importRules: Linter.RulesRecord = {
 				"type",
 				"unknown",
 			],
+			pathGroups: [
+				{
+					pattern: "@dcloudio/*",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "vue",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "@vue/**",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "element-plus",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "@element-plus/**",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "fast-element-plus",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "@fast-element-plus/**",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "@fast-china/**",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "lodash",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "lodash-es",
+					group: "external",
+					position: "before",
+				},
+				{
+					pattern: "lodash-unified",
+					group: "external",
+					position: "before",
+				},
+			],
 			pathGroupsExcludedImportTypes: ["type"],
 			// 禁止不同组之间进行换行
 			"newlines-between": "never",
