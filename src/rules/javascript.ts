@@ -41,7 +41,7 @@ export const javascriptRules: Linter.RulesRecord = {
 		"WithStatement",
 	],
 	// 禁止在 return 语句中使用 await
-	"no-return-await": "error",
+	"@typescript-eslint/return-await": "error",
 	// 禁止使用 var 关键字，强制使用 let 或 const
 	"no-var": "error",
 	// 禁止使用空的块语句

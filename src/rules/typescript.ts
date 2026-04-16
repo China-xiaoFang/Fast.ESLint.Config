@@ -24,7 +24,7 @@ export const typescriptRules: Linter.RulesRecord = {
 	// 允许使用 any 类型
 	"@typescript-eslint/no-explicit-any": "off",
 	// 禁止在 TypeScript 文件中使用 require 函数进行模块导入
-	"@typescript-eslint/no-var-requires": "error",
+	"@typescript-eslint/no-require-imports": "error",
 	// 禁止定义空函数
 	"@typescript-eslint/no-empty-function": ["error", { allow: [] }],
 	// 禁止无用的表达式

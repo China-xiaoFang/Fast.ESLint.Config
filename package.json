@@ -50,36 +50,36 @@
 		"lint": "pnpm lint:eslint && pnpm lint:prettier"
 	},
 	"peerDependencies": {
-		"eslint": "^9",
+		"eslint": "^10",
 		"prettier": "^3"
 	},
 	"dependencies": {
-		"@eslint/js": "^9",
-		"@eslint/markdown": "^7",
+		"@eslint/js": "^10",
+		"@eslint/markdown": "^8",
 		"@typescript-eslint/eslint-plugin": "^8",
 		"@typescript-eslint/parser": "^8",
 		"eslint-config-flat-gitignore": "^2",
 		"eslint-config-prettier": "^10",
-		"eslint-import-resolver-typescript": "^4.4.4",
-		"eslint-plugin-import": "^2",
-		"eslint-plugin-jsonc": "^2",
+		"eslint-import-resolver-typescript": "^4",
+		"eslint-plugin-import-x": "^4",
+		"eslint-plugin-jsonc": "^3",
 		"eslint-plugin-prettier": "^5",
-		"eslint-plugin-regexp": "^2",
+		"eslint-plugin-regexp": "^3",
 		"eslint-plugin-vue": "^10",
-		"globals": "^16",
-		"jsonc-eslint-parser": "^2",
+		"globals": "^17",
+		"jsonc-eslint-parser": "^3",
 		"local-pkg": "^1",
 		"typescript-eslint": "^8",
 		"vue-eslint-parser": "^10"
 	},
 	"devDependencies": {
 		"@eslint/config-inspector": "^1",
-		"@types/node": "^24",
-		"eslint": "^9",
+		"@types/node": "^25",
+		"eslint": "^10",
 		"eslint-typegen": "^2",
 		"prettier": "^3",
 		"tsup": "^8",
-		"typescript": "^5"
+		"typescript": "^6"
 	},
 	"engines": {
 		"node": ">=18.18.0"

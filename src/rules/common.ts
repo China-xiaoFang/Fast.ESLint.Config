@@ -20,7 +20,7 @@ export const commonRules: Linter.RulesRecord = {
 	// 禁止使用 void 操作符
 	"no-void": "error",
 	// 禁止多个空行
-	"no-multiple-empty-lines": [
+	"@stylistic/no-multiple-empty-lines": [
 		"error",
 		{
 			// 最多允许1行
