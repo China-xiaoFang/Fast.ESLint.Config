@@ -18,7 +18,7 @@ var commonRules = {
   // 禁止使用 void 操作符
   "no-void": "error",
   // 禁止多个空行
-  "no-multiple-empty-lines": [
+  "@stylistic/no-multiple-empty-lines": [
     "error",
     {
       // 最多允许1行
@@ -66,11 +66,11 @@ var importUseLodashUnifiedRules = {
 };
 var importRules = {
   // 确保所有的 import 语句位于文件的顶部，紧接在文件的开头部分，且在任何其他代码之前
-  "import/first": "error",
+  "import-x/first": "error",
   // 禁止在同一文件中出现重复的 import 语句
-  "import/no-duplicates": "error",
+  "import-x/no-duplicates": "error",
   // 导入模块排序风格
-  "import/order": [
+  "import-x/order": [
     "error",
     {
       // 导入模块分组
@@ -151,7 +151,7 @@ var importRules = {
       pathGroupsExcludedImportTypes: ["type"],
       // 禁止不同组之间进行换行
       "newlines-between": "never",
-      //根据字母顺序对每个组内的顺序进行排序
+      // 根据字母顺序对每个组内的顺序进行排序
       alphabetize: {
         order: "asc",
         caseInsensitive: true
@@ -159,17 +159,17 @@ var importRules = {
     }
   ],
   // 关闭 - 禁用对无法解析的模块导入的检查
-  "import/no-unresolved": "off",
+  "import-x/no-unresolved": "off",
   // 关闭 - 禁用对命名空间导入（例如，import * as）的检查
-  "import/namespace": "off",
+  "import-x/namespace": "off",
   // 关闭 - 禁用对默认导入的检查
-  "import/default": "off",
+  "import-x/default": "off",
   // 关闭 - 禁用对以默认导出方式作为命名导入的检查
-  "import/no-named-as-default": "off",
+  "import-x/no-named-as-default": "off",
   // 关闭 - 禁用对将默认导出成员当作命名导入的检查
-  "import/no-named-as-default-member": "off",
+  "import-x/no-named-as-default-member": "off",
   // 关闭 - 禁用对命名导入（即从模块中导入特定命名的内容）的检查
-  "import/named": "off"
+  "import-x/named": "off"
 };
 
 // src/rules/javascript.ts
@@ -210,7 +210,7 @@ var javascriptRules = {
     "WithStatement"
   ],
   // 禁止在 return 语句中使用 await
-  "no-return-await": "error",
+  "@typescript-eslint/return-await": "error",
   // 禁止使用 var 关键字，强制使用 let 或 const
   "no-var": "error",
   // 禁止使用空的块语句
@@ -475,7 +475,7 @@ var typescriptRules = {
   // 允许使用 any 类型
   "@typescript-eslint/no-explicit-any": "off",
   // 禁止在 TypeScript 文件中使用 require 函数进行模块导入
-  "@typescript-eslint/no-var-requires": "error",
+  "@typescript-eslint/no-require-imports": "error",
   // 禁止定义空函数
   "@typescript-eslint/no-empty-function": ["error", { allow: [] }],
   // 禁止无用的表达式
@@ -635,15 +635,15 @@ var ignoresConfigs = defineConfig2([
 
 // src/configs/import.ts
 import { defineConfig as defineConfig3 } from "eslint/config";
-import eslintPluginImport from "eslint-plugin-import";
+import eslintPluginImportX from "eslint-plugin-import-x";
 var importConfigs = defineConfig3([
   {
     name: "@fast-china/import",
     // 继承某些已有的规则
-    extends: [eslintPluginImport.flatConfigs.recommended, eslintPluginImport.flatConfigs.typescript],
+    extends: [eslintPluginImportX.flatConfigs.recommended, eslintPluginImportX.flatConfigs.typescript],
     settings: {
       // 确保 ESLint 和 eslint-plugin-import 能够正确解析项目中的所有相关文件类型
-      "import/resolver": {
+      "import-x/resolver": {
         node: {
           alwaysTryTypes: true,
           extensions: [CONST_JS, CONST_JSX, CONST_TS, CONST_TSX, CONST_DTS]
@@ -715,7 +715,7 @@ var javascriptConfigs = defineConfig4([
 // src/configs/json.ts
 import { defineConfig as defineConfig5 } from "eslint/config";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
-import jsoncEslintParser from "jsonc-eslint-parser";
+import * as jsoncEslintParser from "jsonc-eslint-parser";
 var jsonConfigs = defineConfig5([
   {
     name: "@fast-china/json",
