@@ -4,7 +4,6 @@
 		"module": "CommonJS",
 		/** TS 严格模式 */
 		"strict": true,
-		"esModuleInterop": true,
-		"ignoreDeprecations": "6.0"
+		"esModuleInterop": true
 	}
 }
