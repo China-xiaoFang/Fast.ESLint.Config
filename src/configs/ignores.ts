@@ -1,42 +1,38 @@
 import { defineConfig } from "eslint/config";
 import eslintConfigFlatGitignore from "eslint-config-flat-gitignore";
-import { CONST_DIST, CONST_LOCKFILE, CONST_NODE_MODULES, CONST_PUBLIC } from "../constants";
+
+import { CONST_DIST, CONST_LOCKFILE, CONST_NODE_MODULES } from "../constants";
 
 /**
  * 忽略配置
  */
-export const ignoresConfigs = defineConfig([
+export const globalIgnoresConfigs = defineConfig([
 	{
 		name: "@fast-china/ignores/global",
 		ignores: [
 			CONST_NODE_MODULES,
 			CONST_DIST,
-			CONST_PUBLIC,
 			...CONST_LOCKFILE,
 
-			"**/output",
-			"**/coverage",
-			"**/temp",
-			"**/fixtures",
-			"**/.vitepress/cache",
-			"**/.nuxt",
-			"**/.vercel",
-			"**/.changeset",
-			"**/.idea",
-			"**/.output",
-			"**/.vite-inspect",
-			"**/.nitro",
+			"**/{coverage,output,temp}/**",
+			"**/{.nuxt,.output,.vercel,.nitro}/**",
+			"**/{.vitepress/cache,.vite-inspect}/**",
 
 			"**/CHANGELOG*.md",
 			"**/*.min.*",
 			"**/LICENSE*",
-			"**/__snapshots__",
+			"**/__snapshots__/**",
 			"**/auto-import?(s).d.ts",
 			"**/components.d.ts",
 		],
 	},
+]);
+
+export const gitignoreConfigs = defineConfig([
 	{
 		name: "@fast-china/ignores/git",
 		...eslintConfigFlatGitignore({ strict: false }),
 	},
 ]);
+
+export const ignoresConfigs = defineConfig([...globalIgnoresConfigs, ...gitignoreConfigs]);

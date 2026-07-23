@@ -1,11 +1,13 @@
 # Package Manager
 node_modules
+.pnpm-store
 
 # System
 .DS_Store
 
 # local env files
 .eslintcache
+coverage
 
 # eslint-config
 .eslint-config-inspector

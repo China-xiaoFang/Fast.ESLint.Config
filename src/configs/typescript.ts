@@ -1,60 +1,52 @@
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
-import { CONST_DTS, CONST_TS, CONST_TSX } from "../constants";
+
+import { CONST_DTS, GLOB_TYPESCRIPT } from "../constants";
 import { typescriptRules } from "../rules";
+
+export interface TypeScriptConfigOptions {
+	typeChecked?: boolean;
+}
 
 /**
  * TypeScript 核心配置
  */
-export const typescriptCoreConfigs = defineConfig([
-	{
-		name: "@fast-china/typescript",
-		files: [CONST_TS, CONST_TSX],
-		// 继承某些已有的规则
-		extends: [tseslint.configs.recommended],
-		languageOptions: {
-			//  允许使用最新的 ECMAScript 语法特性
-			ecmaVersion: "latest",
-			parser: tseslint.parser,
-			parserOptions: {
-				ecmaFeatures: {
-					// 允许使用 TSX 语法，适用于 Vue 组件中的 TSX 代码。
-					tsx: true,
+export const createTypeScriptCoreConfigs = ({ typeChecked = false }: TypeScriptConfigOptions = {}) =>
+	defineConfig([
+		{
+			name: typeChecked ? "@fast-china/typescript/type-checked" : "@fast-china/typescript",
+			files: [...GLOB_TYPESCRIPT],
+			extends: [
+				...(typeChecked ? tseslint.configs.recommendedTypeChecked : tseslint.configs.recommended),
+				...(typeChecked ? tseslint.configs.stylisticTypeChecked : tseslint.configs.stylistic),
+			],
+			languageOptions: {
+				ecmaVersion: "latest",
+				parserOptions: {
+					...(typeChecked ? { projectService: true } : {}),
 				},
-				sourceType: "module",
 			},
+			rules: typescriptRules,
 		},
-		rules: typescriptRules,
-	},
-]);
+	]);
+
+export const typescriptCoreConfigs = createTypeScriptCoreConfigs();
 
 /**
  * TypeScript配置
  */
-export const typescriptConfigs = defineConfig([
-	...typescriptCoreConfigs,
-	{
-		name: "@fast-china/typescript/dts",
-		files: [CONST_DTS],
-		rules: {
-			// 关闭 - 一致地使用 TypeScript 类型导入
-			"@typescript-eslint/consistent-type-imports": "off",
+export const createTypeScriptConfigs = (options: TypeScriptConfigOptions = {}) =>
+	defineConfig([
+		...createTypeScriptCoreConfigs(options),
+		{
+			name: "@fast-china/typescript/declarations",
+			files: [CONST_DTS],
+			rules: {
+				"@typescript-eslint/consistent-type-imports": "off",
+				"@typescript-eslint/no-unused-vars": "off",
+			},
 		},
-	},
-	{
-		name: "@fast-china/typescript/vite",
-		files: ["**/vite.config.*"],
-		rules: {
-			// 关闭 - 要求在 TypeScript 函数和方法中显式地指定返回类型
-			"@typescript-eslint/explicit-function-return-type": "off",
-		},
-	},
-	{
-		name: "@fast-china/typescript/md/js",
-		files: ["**/*.md/*.ts"],
-		rules: {
-			// 允许定义未使用的变量
-			"@typescript-eslint/no-unused-vars": "off",
-		},
-	},
-]);
+	]);
+
+export const typescriptConfigs = createTypeScriptConfigs();
+export const typescriptTypeCheckedConfigs = createTypeScriptConfigs({ typeChecked: true });

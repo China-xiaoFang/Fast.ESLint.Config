@@ -1,56 +1,51 @@
-import type { Linter } from "eslint";
+import type { RuleOptions } from "../typegen";
 
 /**
- * TypeScript规则
+ * TypeScript 本地覆写规则。
+ * 这里补充 typescript-eslint 预置；高影响规则需同步维护风险文档。
  */
-export const typescriptRules: Linter.RulesRecord = {
-	// TS (https://typescript-eslint.io/rules)
-
-	// 要求在导出函数和类的公共方法上显式声明返回类型
-	"@typescript-eslint/explicit-module-boundary-types": [
+export const typescriptRules = {
+	// 使用 TypeScript 版本避免核心规则误判声明合并、类型和值的同名声明。
+	"@typescript-eslint/no-redeclare": "error",
+	// [高影响][可自动修复] 未使用符号视为错误；以下划线开头可显式表示参数或变量被有意忽略。
+	"@typescript-eslint/no-unused-vars": [
 		"error",
 		{
-			allowArgumentsExplicitlyTypedAsAny: true,
+			args: "after-used",
+			argsIgnorePattern: "^_",
+			caughtErrors: "all",
+			caughtErrorsIgnorePattern: "^_",
+			ignoreRestSiblings: true,
+			varsIgnorePattern: "^_",
 		},
 	],
-	// 要求在 TypeScript 函数和方法中显式地指定返回类型
-	"@typescript-eslint/explicit-function-return-type": "error",
-	// 禁止在同一作用域中重新声明 TypeScript 变量
-	"@typescript-eslint/no-redeclare": "error",
-	// 禁止定义未使用的变量，方法参数排除。
-	"@typescript-eslint/no-unused-vars": ["error", { args: "none" }],
-	// 允许使用自定义TypeScript模块和命名空间
+	// [默认关闭] 声明文件、全局扩展和部分 SDK 仍需要 namespace。
 	"@typescript-eslint/no-namespace": "off",
-	// 允许使用 any 类型
-	"@typescript-eslint/no-explicit-any": "off",
-	// 禁止在 TypeScript 文件中使用 require 函数进行模块导入
+	// any 会绕过类型检查，但在迁移和第三方边界中有合理用途，因此只警告。
+	"@typescript-eslint/no-explicit-any": "warn",
+	// [高影响] 默认要求 ESM import；CommonJS、动态加载或工具链互操作代码可能需要按文件关闭。
 	"@typescript-eslint/no-require-imports": "error",
-	// 禁止定义空函数
-	"@typescript-eslint/no-empty-function": ["error", { allow: [] }],
-	// 禁止无用的表达式
+	// 使用 TS 版本识别类型断言等语法；允许常见的短路和三元表达式调用模式。
 	"@typescript-eslint/no-unused-expressions": [
 		"error",
 		{
-			// 允许短路操作符（&& 和 ||）中的无副作用表达式
 			allowShortCircuit: true,
-			// 允许三元操作符中的无副作用表达式
 			allowTernary: true,
 		},
 	],
-	// 禁止在 TypeScript 代码中对类型已经可以被推断的变量或参数进行显式的类型注解
+	// [可自动修复] 删除可由 TypeScript 明确推断的原始值类型标注，减少重复信息。
 	"@typescript-eslint/no-inferrable-types": "error",
-	// 禁止使用后缀运算符的非空断言(!)
-	"@typescript-eslint/no-non-null-assertion": "error",
-	// 禁止在可选链(?)后使用非空断言(!)
+	// 非空断言可能隐藏空值缺陷；以警告提示逐步消除而不阻断迁移。
+	"@typescript-eslint/no-non-null-assertion": "warn",
+	// 可选链之后再做非空断言逻辑矛盾，通常表示边界条件设计有误。
 	"@typescript-eslint/no-non-null-asserted-optional-chain": "error",
-	// 禁止在代码中使用 @ts-ignore 注释
-	"@typescript-eslint/ban-ts-comment": ["error", { "ts-ignore": false }],
-	// 一致地使用 TypeScript 类型导入
+	// [高影响][可自动修复] 类型依赖改用内联 type import；需复核仅靠 import 触发的模块副作用。
 	"@typescript-eslint/consistent-type-imports": [
 		"error",
 		{
-			// 允许使用类型注解
 			disallowTypeAnnotations: false,
+			fixStyle: "inline-type-imports",
+			prefer: "type-imports",
 		},
 	],
-};
+} satisfies RuleOptions;

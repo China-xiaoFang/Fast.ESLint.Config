@@ -1,11 +1,18 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "1.0.48",
-	"description": "Fast ESLint Flat 规则库.",
+	"version": "1.1.0",
+	"packageManager": "pnpm@11.9.0",
+	"description": "A practical ESLint Flat Config for Vue 3, TypeScript, Vite, and JavaScript projects.",
 	"type": "module",
 	"keywords": [
 		"fast",
-		"ESLint"
+		"eslint",
+		"eslint-config",
+		"flat-config",
+		"typescript",
+		"vite",
+		"vue",
+		"vue3"
 	],
 	"license": "Apache-2.0",
 	"homepage": "https://fastdotnet.com",
@@ -18,70 +25,77 @@
 	},
 	"author": "小方",
 	"files": [
-		"./Fast.png",
-		"./LICENSE",
-		"./README.md",
-		"./README.zh.md",
-		"./dist"
+		"Fast.png",
+		"LICENSE",
+		"README.md",
+		"README.zh.md",
+		"dist",
+		"docs"
 	],
-	"main": "dist/dist/index.js",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"require": "./dist/index.js",
-			"import": "./dist/index.js"
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
 		},
 		"./rules": {
 			"types": "./dist/rules/index.d.ts",
-			"require": "./dist/rules/index.js",
-			"import": "./dist/rules/index.js"
-		}
+			"import": "./dist/rules/index.js",
+			"default": "./dist/rules/index.js"
+		},
+		"./package.json": "./package.json"
 	},
+	"sideEffects": false,
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
 		"dev": "eslint-config-inspector --config src/eslint-inspector.config.ts",
-		"build:dev": "eslint-config-inspector build --config src/eslint-inspector.config.ts",
+		"build": "pnpm run typegen:check && tsup",
+		"build:inspector": "eslint-config-inspector build --config src/eslint-inspector.config.ts",
 		"typegen": "tsx scripts/typegen.ts",
-		"build": "tsup && pnpm run typegen ",
-		"lint:eslint": "eslint --max-warnings 0 \"src/**/*.{vue,js,ts,tsx}\" --fix",
-		"lint:prettier": "prettier --write \"src/**/*.{vue,js,ts,jsx,tsx,md,json,css,scss,less,html}\"",
-		"lint": "pnpm lint:eslint && pnpm lint:prettier"
+		"typegen:check": "tsx scripts/typegen.ts --check",
+		"typecheck": "tsc --noEmit",
+		"lint": "eslint . --max-warnings 0",
+		"lint:fix": "eslint . --fix",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"test": "pnpm run test:types && node --test tests/*.test.mjs",
+		"test:types": "tsc --noEmit --project tests/tsconfig.json",
+		"check": "pnpm run build && pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test",
+		"prepack": "pnpm run check"
 	},
 	"peerDependencies": {
-		"eslint": "^10",
-		"prettier": "^3"
+		"eslint": "^10.0.0",
+		"typescript": ">=5.3.0 <6.1.0"
 	},
 	"dependencies": {
-		"@eslint/js": "^10",
-		"@eslint/markdown": "^8",
-		"@typescript-eslint/eslint-plugin": "^8",
-		"@typescript-eslint/parser": "^8",
-		"eslint-config-flat-gitignore": "^2",
-		"eslint-config-prettier": "^10",
-		"eslint-import-resolver-typescript": "^4",
-		"eslint-plugin-import-x": "^4",
-		"eslint-plugin-jsonc": "^3",
-		"eslint-plugin-prettier": "^5",
-		"eslint-plugin-regexp": "^3",
-		"eslint-plugin-vue": "^10",
-		"globals": "^17",
-		"jsonc-eslint-parser": "^3",
-		"local-pkg": "^1",
-		"typescript-eslint": "^8",
-		"vue-eslint-parser": "^10"
+		"@eslint/js": "^10.0.0",
+		"@eslint/markdown": "^8.0.3",
+		"eslint-config-flat-gitignore": "^2.0.0",
+		"eslint-config-prettier": "^10.0.0",
+		"eslint-plugin-import-x": "^4.17.1",
+		"eslint-plugin-jsonc": "^3.3.0",
+		"eslint-plugin-regexp": "^3.1.1",
+		"eslint-plugin-vue": "^10.10.0",
+		"globals": "^17.7.0",
+		"typescript-eslint": "^8.65.0",
+		"vue-eslint-parser": "^10.4.1"
 	},
 	"devDependencies": {
-		"@eslint/config-inspector": "^1",
-		"@types/node": "^25",
-		"eslint": "^10",
-		"eslint-typegen": "^2",
-		"prettier": "^3",
-		"tsup": "^8",
-		"typescript": "^5"
+		"@eslint/config-inspector": "^3.1.0",
+		"@types/node": "^24.13.3",
+		"eslint": "^10.7.0",
+		"eslint-typegen": "^2.3.1",
+		"prettier": "^3.9.6",
+		"tsup": "^8.0.0",
+		"tsx": "^4.23.1",
+		"typescript": "^5.9.0"
 	},
 	"engines": {
-		"node": ">=18.18.0"
+		"node": "^20.19.0 || ^22.13.0 || >=24"
 	}
 }

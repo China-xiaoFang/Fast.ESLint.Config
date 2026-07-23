@@ -1,6 +1,6 @@
 import { defineConfig } from "eslint/config";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
-import * as jsoncEslintParser from "jsonc-eslint-parser";
+
 import { CONST_JSON, CONST_JSON5, CONST_JSONC } from "../constants";
 
 /**
@@ -8,17 +8,19 @@ import { CONST_JSON, CONST_JSON5, CONST_JSONC } from "../constants";
  */
 export const jsonConfigs = defineConfig([
 	{
-		name: "@fast-china/json",
-		files: [CONST_JSON, CONST_JSONC, CONST_JSON5],
-		// 继承某些已有的规则
-		extends: [
-			...eslintPluginJsonc.configs["flat/recommended-with-json"],
-			...eslintPluginJsonc.configs["flat/recommended-with-jsonc"],
-			...eslintPluginJsonc.configs["flat/recommended-with-json5"],
-		],
-		languageOptions: {
-			parser: jsoncEslintParser,
-		},
+		name: "@fast-china/json/strict",
+		files: [CONST_JSON],
+		extends: [eslintPluginJsonc.configs["flat/recommended-with-json"]],
+	},
+	{
+		name: "@fast-china/json/jsonc",
+		files: [CONST_JSONC],
+		extends: [eslintPluginJsonc.configs["flat/recommended-with-jsonc"]],
+	},
+	{
+		name: "@fast-china/json/json5",
+		files: [CONST_JSON5],
+		extends: [eslintPluginJsonc.configs["flat/recommended-with-json5"]],
 	},
 	{
 		name: "@fast-china/json/settings",

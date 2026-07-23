@@ -1,3 +1,9 @@
 # Prettier 会忽略的文件
 
-*.md
+dist
+node_modules
+.eslint-config-inspector
+.pnpm-store
+coverage
+pnpm-lock.yaml
+src/typegen.d.ts

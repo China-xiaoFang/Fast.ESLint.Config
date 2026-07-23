@@ -1,9 +1,14 @@
 {
 	"compilerOptions": {
-		"target": "ES6",
-		"module": "CommonJS",
-		/** TS 严格模式 */
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"types": ["node"],
 		"strict": true,
-		"esModuleInterop": true
-	}
+		"noEmit": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true
+	},
+	"include": ["src", "scripts", "tsup.config.ts"]
 }
