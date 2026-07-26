@@ -1,67 +1,12 @@
-import { jsonConfigs } from "./configs/json";
-import { packageJsonSortConfigs } from "./configs/sort-package";
-import { tsconfigJsonSortConfigs } from "./configs/sort-tsconfig";
-import { createConfig } from "./factory";
-
-export * from "./configs/common";
-export * from "./configs/environment";
-export * from "./configs/ignores";
-export * from "./configs/import";
-export * from "./configs/javascript";
-export * from "./configs/json";
-export * from "./configs/markdown";
-export * from "./configs/prettier";
-export * from "./configs/regexp";
-export * from "./configs/sort-package";
-export * from "./configs/sort-tsconfig";
-export * from "./configs/typescript";
-export * from "./configs/vue";
-
-export * from "./constants";
-export * from "./define-rules";
-export * from "./factory";
-
 /**
- * JavaScript 预置配置
- *
- * @description ignores，common，javascript，import，regexp
+ * 根入口只暴露稳定的配置工厂、默认值和精确规则类型；内部配置片段与 glob 不再构成
+ * 公共 API。需要复用原始规则记录时，请使用 `@fast-china/eslint-config/rules`。
  */
-export const PresetJavascriptConfigs = createConfig({
-	json: false,
-	markdown: false,
-	typescript: false,
-	vue: false,
-});
+export { defineRules } from "./define-rules";
+export { defaultConfigOptions, fastConfig as default, fastConfig } from "./factory";
 
-/**
- * JSON 预置配置
- */
-export const PresetJsonConfigs = [...jsonConfigs, ...packageJsonSortConfigs, ...tsconfigJsonSortConfigs];
-
-/**
- * TypeScript 预置配置（不包含 Vue、JSON 和 Markdown）。
- */
-export const PresetTypescriptConfigs = createConfig({
-	json: false,
-	markdown: false,
-	vue: false,
-});
-
-export const PresetTypeScriptConfigs = PresetTypescriptConfigs;
-
-/**
- * 基础预置配置
- *
- * @description javascript，typescript，json
- */
-export const PresetBasicConfigs = createConfig({ markdown: false, vue: false });
-
-/**
- * Vue 3 + TypeScript 完整预置配置。
- */
-export const PresetVueConfigs = createConfig();
-
-/**
- * 默认最全的配置
- */
-export default PresetVueConfigs;
+export type { RuntimeEnvironment } from "./configs/environment";
+export type { LodashPreference } from "./configs/lodash";
+export type { TypeScriptConfigOptions } from "./configs/typescript";
+export type { FastConfigOptions } from "./factory";
+export type { RuleOptions } from "./typegen";

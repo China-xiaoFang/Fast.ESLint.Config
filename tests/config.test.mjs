@@ -5,7 +5,8 @@ import test from "node:test";
 import { ESLint } from "eslint";
 import ts from "typescript";
 
-import fastConfig, { PresetJavascriptConfigs, PresetTypeScriptConfigs, createConfig, defaultOptions, defineRules } from "@fast-china/eslint-config";
+import fastConfig, * as publicApi from "@fast-china/eslint-config";
+import { preferLodashRules, preferLodashUnifiedRules } from "@fast-china/eslint-config/rules";
 
 const rulesDirectory = new URL("../src/rules/", import.meta.url);
 const readRuleSources = () =>
@@ -23,17 +24,19 @@ const createLinter = (config, options = {}) =>
 		...options,
 	});
 
-test("package exports a backward-compatible default array and named presets", () => {
-	assert.ok(Array.isArray(fastConfig));
-	assert.ok(fastConfig.length > 0);
-	assert.ok(Array.isArray(PresetJavascriptConfigs));
-	assert.ok(Array.isArray(PresetTypeScriptConfigs));
-	assert.equal(Object.isFrozen(defaultOptions), true);
-	assert.deepEqual(defineRules({ "no-console": "warn" }), { "no-console": "warn" });
+test("package exports the configuration factory and typed rule helper", () => {
+	assert.equal(typeof fastConfig, "function");
+	assert.equal(fastConfig, publicApi.fastConfig);
+	assert.ok(Array.isArray(fastConfig({ gitignore: false })));
+	assert.equal(Object.isFrozen(publicApi.defaultConfigOptions), true);
+	assert.equal(publicApi.defaultConfigOptions.lodash, false);
+	assert.equal(publicApi.defaultConfigOptions.sortPackageJson, false);
+	assert.equal(publicApi.defaultConfigOptions.sortTsconfig, false);
+	assert.deepEqual(publicApi.defineRules({ "no-console": "warn" }), { "no-console": "warn" });
 });
 
 test("factory disables optional language integrations without claiming their files", async () => {
-	const minimalConfig = createConfig({
+	const minimalConfig = fastConfig({
 		gitignore: false,
 		imports: false,
 		json: false,
@@ -57,20 +60,128 @@ test("factory disables optional language integrations without claiming their fil
 	assert.equal(await linter.calculateConfigForFile("fixtures/example.vue"), undefined);
 });
 
-test("factory supports Vue 2 and type-aware TypeScript as explicit options", () => {
-	const config = createConfig({
+test("factory can build a JSON-only configuration without activating code rules", async () => {
+	const config = fastConfig({
 		gitignore: false,
-		typescript: { typeChecked: true },
-		vue: { typeChecked: true, version: 2 },
+		imports: false,
+		javascript: false,
+		markdown: false,
+		prettier: false,
+		regexp: false,
+		typescript: false,
+		vue: false,
+	});
+	const linter = createLinter(config);
+
+	const javaScriptConfig = await linter.calculateConfigForFile("fixtures/example.js");
+	assert.equal(Object.keys(javaScriptConfig?.rules ?? {}).length, 0);
+	assert.ok(await linter.calculateConfigForFile("fixtures/example.json"));
+});
+
+test("runtime globals are scoped to application and Node.js tooling files", async () => {
+	const linter = createLinter(
+		fastConfig({
+			gitignore: false,
+			globals: { __APP_VERSION__: "readonly" },
+			imports: false,
+			json: false,
+			markdown: false,
+			prettier: false,
+			regexp: false,
+			typescript: false,
+			vue: false,
+		})
+	);
+	const [applicationResult] = await linter.lintText("process.cwd();\n__APP_VERSION__;\n", { filePath: "fixtures/application.js" });
+	const [toolingResult] = await linter.lintText("process.cwd();\n", { filePath: "fixtures/vite.config.js" });
+
+	assert.ok(applicationResult.messages.some((message) => message.ruleId === "no-undef"));
+	assert.ok(!applicationResult.messages.some((message) => message.message.includes("__APP_VERSION__")));
+	assert.ok(!toolingResult.messages.some((message) => message.ruleId === "no-undef"));
+});
+
+test("project rules and trailing overrides take precedence in declaration order", async () => {
+	const config = fastConfig(
+		{
+			gitignore: false,
+			json: false,
+			markdown: false,
+			rules: publicApi.defineRules({ "no-console": "error" }),
+			typescript: false,
+			vue: false,
+		},
+		{
+			name: "project/allow-console-in-example",
+			files: ["**/allowed.js"],
+			rules: { "no-console": "off" },
+		}
+	);
+	const linter = createLinter(config);
+	const [blockedResult] = await linter.lintText("console.log('blocked');\n", { filePath: "fixtures/blocked.js" });
+	const [allowedResult] = await linter.lintText("console.log('allowed');\n", { filePath: "fixtures/allowed.js" });
+
+	assert.equal(config.at(-1)?.name, "project/allow-console-in-example");
+	assert.ok(blockedResult.messages.some((message) => message.ruleId === "no-console"));
+	assert.ok(!allowedResult.messages.some((message) => message.ruleId === "no-console"));
+});
+
+test("lodash package preference is opt-in and rejects mixed static imports", async () => {
+	const baseOptions = {
+		gitignore: false,
+		imports: false,
+		json: false,
+		markdown: false,
+		prettier: false,
+		regexp: false,
+		typescript: false,
+		vue: false,
+	};
+	const defaultLinter = createLinter(fastConfig(baseOptions));
+	const [defaultResult] = await defaultLinter.lintText('import get from "lodash/get";\nvoid get;\n', {
+		filePath: "fixtures/default-lodash.js",
+	});
+	assert.ok(!defaultResult.messages.some((message) => message.ruleId === "no-restricted-imports"));
+
+	const unifiedLinter = createLinter(fastConfig({ ...baseOptions, lodash: "lodash-unified" }));
+	const [unifiedResult] = await unifiedLinter.lintText(
+		'import get from "lodash/get";\nimport { debounce } from "lodash-es";\nexport { default as pick } from "lodash/pick";\nvoid get;\nvoid debounce;\n',
+		{ filePath: "fixtures/prefer-lodash-unified.js" }
+	);
+	assert.equal(unifiedResult.messages.filter((message) => message.ruleId === "no-restricted-imports").length, 3);
+	const [allowedUnifiedResult] = await unifiedLinter.lintText('import { debounce } from "lodash-unified";\nvoid debounce;\n', {
+		filePath: "fixtures/allowed-lodash-unified.js",
+	});
+	assert.ok(!allowedUnifiedResult.messages.some((message) => message.ruleId === "no-restricted-imports"));
+
+	const lodashLinter = createLinter(fastConfig({ ...baseOptions, lodash: "lodash" }));
+	const [lodashResult] = await lodashLinter.lintText(
+		'import { debounce } from "lodash-unified";\nimport { get } from "lodash-es";\nexport * from "lodash-unified/fp";\nvoid debounce;\nvoid get;\n',
+		{ filePath: "fixtures/prefer-lodash.js" }
+	);
+	assert.equal(lodashResult.messages.filter((message) => message.ruleId === "no-restricted-imports").length, 3);
+	const [allowedLodashResult] = await lodashLinter.lintText('import get from "lodash/get";\nvoid get;\n', {
+		filePath: "fixtures/allowed-lodash.js",
+	});
+	assert.ok(!allowedLodashResult.messages.some((message) => message.ruleId === "no-restricted-imports"));
+	assert.equal(preferLodashRules["no-restricted-imports"]?.[0], "error");
+	assert.equal(preferLodashUnifiedRules["no-restricted-imports"]?.[0], "error");
+});
+
+test("factory supports Vue 3 and type-aware TypeScript", () => {
+	const config = fastConfig({
+		gitignore: false,
+		typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
+		vue: true,
 	});
 
-	assert.ok(config.some((item) => item.name?.includes("vue2")));
+	assert.ok(config.some((item) => item.name?.includes("vue/type-checked")));
 	assert.ok(config.some((item) => item.languageOptions?.parserOptions?.projectService === true));
+	assert.ok(config.some((item) => item.languageOptions?.parserOptions?.tsconfigRootDir === process.cwd()));
 });
 
 test("type-aware configuration can lint a file from the project service", async () => {
 	const linter = createLinter(
-		createConfig({
+		fastConfig({
 			gitignore: false,
 			markdown: false,
 			typescript: { typeChecked: true },
@@ -84,7 +195,7 @@ test("type-aware configuration can lint a file from the project service", async 
 });
 
 test("representative JavaScript, TypeScript, Vue, JSON dialects, and Markdown parse without configuration errors", async () => {
-	const linter = createLinter(createConfig({ gitignore: false }));
+	const linter = createLinter(fastConfig({ gitignore: false }));
 	const fixtures = [
 		{
 			filePath: "fixtures/example.js",
@@ -124,7 +235,7 @@ test("representative JavaScript, TypeScript, Vue, JSON dialects, and Markdown pa
 });
 
 test("quality rules are active for JavaScript and Vue", async () => {
-	const linter = createLinter(createConfig({ gitignore: false }));
+	const linter = createLinter(fastConfig({ gitignore: false }));
 	const [javascriptResult] = await linter.lintText("var answer = 42;\n", { filePath: "fixtures/invalid.js" });
 	const [vueResult] = await linter.lintText(
 		'<script setup lang="ts">\nconst html = "<strong>trusted</strong>";\n</script>\n\n<template>\n\t<div v-html="html" />\n</template>\n',
@@ -135,11 +246,10 @@ test("quality rules are active for JavaScript and Vue", async () => {
 	assert.ok(vueResult.messages.some((message) => message.ruleId === "vue/no-v-html"));
 });
 
-test("package fixes preserve semantic exports condition order", async () => {
-	const linter = createLinter(createConfig({ gitignore: false }), { fix: true });
+test("manifest sorting is opt-in and preserves semantic exports condition order", async () => {
 	const source = `{
-	"name": "fixture",
 	"version": "1.0.0",
+	"name": "fixture",
 	"exports": {
 		".": {
 			"node": "./node.js",
@@ -149,9 +259,15 @@ test("package fixes preserve semantic exports condition order", async () => {
 	}
 }
 `;
-	const [result] = await linter.lintText(source, { filePath: "fixtures/package.json" });
+	const defaultLinter = createLinter(fastConfig({ gitignore: false }), { fix: true });
+	const [defaultResult] = await defaultLinter.lintText(source, { filePath: "fixtures/package.json" });
+	assert.ok(!defaultResult.messages.some((message) => message.ruleId === "jsonc/sort-keys"));
+
+	const sortingLinter = createLinter(fastConfig({ gitignore: false, sortPackageJson: true }), { fix: true });
+	const [result] = await sortingLinter.lintText(source, { filePath: "fixtures/package.json" });
 	const fixed = result.output ?? source;
 
+	assert.ok(fixed.indexOf('"name"') < fixed.indexOf('"version"'));
 	assert.ok(fixed.indexOf('"node"') < fixed.indexOf('"import"'));
 	assert.ok(fixed.indexOf('"import"') < fixed.indexOf('"default"'));
 });
@@ -205,13 +321,17 @@ test("risk guide documents every high-impact local default", () => {
 	}
 });
 
-test("published entry points exist and never advertise CommonJS files that are not built", () => {
+test("published entry points exist and expose the typed factory contract", () => {
 	const manifest = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 	const declarations = fs.readFileSync(new URL("../dist/index.d.ts", import.meta.url), "utf8");
 
+	assert.equal(manifest.version, "2.0.0");
 	assert.equal(fs.existsSync(new URL(`../${manifest.main}`, import.meta.url)), true);
 	assert.equal("require" in manifest.exports["."], false);
 	assert.equal("require" in manifest.exports["./rules"], false);
+	assert.deepEqual(Object.keys(manifest.exports), [".", "./rules", "./package.json"]);
 	assert.match(declarations, /RuleOptions/);
 	assert.match(declarations, /defineRules/);
+	assert.match(declarations, /fastConfig/);
+	assert.match(declarations, /LodashPreference/);
 });

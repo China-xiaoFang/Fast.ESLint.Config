@@ -1,3 +1,3 @@
 import fastChinaFlat from "./index";
 
-export default fastChinaFlat;
+export default fastChinaFlat({ gitignore: false });

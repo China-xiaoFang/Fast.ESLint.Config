@@ -1,51 +1,5 @@
 import type { RuleOptions } from "../typegen";
 
-/**
- * 按需启用：要求项目统一使用 lodash-unified。
- * 该组织偏好不会被默认配置加载，使用者需从 `@fast-china/eslint-config/rules` 显式导入。
- */
-export const importUseLodashUnifiedRules = {
-	// [高影响][按需启用] 阻止 lodash/lodash-es 及其子路径，启用前应先完成依赖迁移。
-	"no-restricted-imports": [
-		"error",
-		{
-			paths: [
-				{ name: "lodash", message: "Use lodash-unified instead." },
-				{ name: "lodash-es", message: "Use lodash-unified instead." },
-			],
-			patterns: [
-				{
-					group: ["lodash/*", "lodash-es/*"],
-					message: "Use lodash-unified instead.",
-				},
-			],
-		},
-	],
-} satisfies RuleOptions;
-
-/**
- * 按需启用：要求项目统一使用 lodash。
- * 该组织偏好不会被默认配置加载，使用者需从 rules 子路径显式导入。
- */
-export const importUseLodashRules = {
-	// [高影响][按需启用] 阻止 lodash-es/lodash-unified 及其子路径，启用前应先完成依赖迁移。
-	"no-restricted-imports": [
-		"error",
-		{
-			paths: [
-				{ name: "lodash-es", message: "Use lodash instead." },
-				{ name: "lodash-unified", message: "Use lodash instead." },
-			],
-			patterns: [
-				{
-					group: ["lodash-es/*", "lodash-unified/*"],
-					message: "Use lodash instead.",
-				},
-			],
-		},
-	],
-} satisfies RuleOptions;
-
 /** 默认启用的模块导入正确性与排序规则。 */
 export const importRules = {
 	// import 必须位于其他语句之前，避免模块依赖散落在执行逻辑中。

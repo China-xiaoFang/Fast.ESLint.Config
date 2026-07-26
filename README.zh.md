@@ -9,17 +9,19 @@
 
 ## 特性
 
-- 基于 ESLint 10 与原生 Flat Config，不再兼容旧式 `.eslintrc`。
-- 默认针对 Vue 3 + TypeScript + Vite，同时可显式选择 Vue 2 或类型感知规则。
+- 基于 ESLint 10，仅提供原生 Flat Config。
+- 默认针对 Vue 3 + TypeScript + Vite，可显式开启类型感知规则或关闭不需要的语言能力。
 - 完整覆盖 JavaScript、TypeScript、Vue SFC、JSON、JSONC、JSON5、Markdown、正则表达式与导入规则。
-- 保留零配置的默认数组，并提供轻量的 `createConfig()` 工厂适配其他类型项目。
+- 默认导出单一 `fastConfig()` 工厂，公共 API 清晰，并且不会在导入模块时读取项目文件。
 - 根据 ESLint 与内置插件的规则 schema 生成精确类型，提供规则名和规则选项自动补全。
 - 插件与解析器均由本包直接声明依赖，使用者不需要手工拼装插件依赖树。
 - Prettier 只负责格式化：默认配置仅关闭冲突规则，不在 ESLint 内重复运行 Prettier。
+- `package.json` 与 `tsconfig.json` 排序为显式 opt-in，避免安装后首次修复产生非预期大 diff。
+- 可选统一使用 `lodash` 或 `lodash-unified`，避免同一项目混用多个 Lodash 入口。
 
 ## 环境要求
 
-- Node.js `^20.19.0`、`^22.13.0` 或 `>=24`
+- Node.js `^22.13.0` 或 `^24.0.0`
 - ESLint `^10.0.0`
 - TypeScript `>=5.3.0 <6.1.0`
 
@@ -38,83 +40,115 @@ pnpm add -D eslint typescript @fast-china/eslint-config
 创建 `eslint.config.mjs`：
 
 ```js
-import { defineConfig } from "eslint/config";
-
 import fastChina from "@fast-china/eslint-config";
 
-export default defineConfig([...fastChina]);
+export default fastChina();
 ```
 
 默认配置会启用 Vue 3、TypeScript、JavaScript、JSON 各方言、Markdown、导入排序、正则检查、`.gitignore` 与浏览器全局变量；常见配置文件、脚本、测试和 CLI 文件会额外获得 Node.js 全局变量。
 
 ## 适配其他项目
 
-通过 `createConfig()` 只保留项目真正需要的能力。
+通过默认导出的 `fastConfig()` 只保留项目真正需要的能力。
 
 ### Node.js + TypeScript
 
 ```js
-import { defineConfig } from "eslint/config";
+import fastChina from "@fast-china/eslint-config";
 
-import { createConfig } from "@fast-china/eslint-config";
-
-export default defineConfig(
-	createConfig({
-		environment: "node",
-		vue: false,
-	})
-);
+export default fastChina({
+	environment: "node",
+	vue: false,
+});
 ```
 
 ### 纯 JavaScript
 
 ```js
-import { defineConfig } from "eslint/config";
+import fastChina from "@fast-china/eslint-config";
 
-import { createConfig } from "@fast-china/eslint-config";
-
-export default defineConfig(
-	createConfig({
-		environment: "node",
-		json: false,
-		markdown: false,
-		typescript: false,
-		vue: false,
-	})
-);
+export default fastChina({
+	environment: "node",
+	json: false,
+	markdown: false,
+	typescript: false,
+	vue: false,
+});
 ```
 
 ### 启用 TypeScript 类型感知规则
 
 ```js
-import { defineConfig } from "eslint/config";
+import fastChina from "@fast-china/eslint-config";
 
-import { createConfig } from "@fast-china/eslint-config";
-
-export default defineConfig(
-	createConfig({
-		typescript: { typeChecked: true },
-		vue: { typeChecked: true, version: 3 },
-	})
-);
+export default fastChina({
+	typescript: {
+		tsconfigRootDir: import.meta.dirname,
+		typeChecked: true,
+	},
+});
 ```
 
-类型感知模式使用 typescript-eslint project service，被检查的文件必须属于某个 `tsconfig.json`。
+类型感知模式使用 typescript-eslint Project Service，被检查的文件必须属于某个 `tsconfig.json`。普通项目通常可省略 `tsconfigRootDir`；复杂 monorepo 建议显式传入配置文件所在目录。
 
 ## 配置选项
 
-| 选项          | 默认值      | 作用                                                   |
-| ------------- | ----------- | ------------------------------------------------------ |
-| `environment` | `"browser"` | 可选 `"browser"`、`"node"` 或 `"universal"` 全局变量。 |
-| `gitignore`   | `true`      | 读取项目根目录的 `.gitignore`。                        |
-| `ignores`     | `[]`        | 增加项目自己的全局忽略模式。                           |
-| `imports`     | `true`      | 启用 import-x 正确性与排序规则。                       |
-| `json`        | `true`      | 启用 JSON/JSONC/JSON5 及 package/tsconfig 排序。       |
-| `markdown`    | `true`      | 启用官方 Markdown 语言规则。                           |
-| `prettier`    | `true`      | 关闭与 Prettier 冲突的 ESLint 规则。                   |
-| `regexp`      | `true`      | 启用推荐的正则表达式规则。                             |
-| `typescript`  | `true`      | 可关闭，或传入 `{ typeChecked: true }`。               |
-| `vue`         | `3`         | 可关闭、传入 `2`/`3`，或传入 Vue 选项对象。            |
+| 选项              | 默认值      | 作用                                                           |
+| ----------------- | ----------- | -------------------------------------------------------------- |
+| `environment`     | `"browser"` | 可选 `"browser"`、`"node"` 或 `"universal"` 全局变量。         |
+| `globals`         | 无          | 增加项目宿主、测试运行器等提供的全局变量。                     |
+| `gitignore`       | `true`      | 读取项目根目录的 `.gitignore`。                                |
+| `ignores`         | `[]`        | 追加项目自己的全局忽略模式。                                   |
+| `imports`         | `true`      | 启用 import-x 正确性与排序规则。                               |
+| `javascript`      | `true`      | 处理 JavaScript 与 JSX。                                       |
+| `json`            | `true`      | 启用 JSON、JSONC 与 JSON5 推荐规则。                           |
+| `lodash`          | `false`     | 可选 `"lodash"` 或 `"lodash-unified"`，统一静态导入来源。      |
+| `markdown`        | `true`      | 启用官方 Markdown 语言规则。                                   |
+| `prettier`        | `true`      | 关闭与 Prettier 冲突的 ESLint 规则。                           |
+| `regexp`          | `true`      | 启用推荐的正则表达式规则。                                     |
+| `rules`           | 无          | 对所有已启用代码文件追加具有精确类型的项目规则。               |
+| `sortPackageJson` | `false`     | 按安全白名单排序 `package.json`，不会进入 `exports` 条件对象。 |
+| `sortTsconfig`    | `false`     | 按 TypeScript 文档主题排序 `tsconfig*.json`。                  |
+| `typescript`      | `true`      | 可关闭，或传入 `{ typeChecked: true, tsconfigRootDir }`。      |
+| `vue`             | `true`      | 启用 Vue 3 单文件组件支持。                                    |
+
+## Lodash 导入策略
+
+默认值 `lodash: false` 不限制项目选择。需要统一依赖入口时，可选择以下任一策略：
+
+- `lodash: "lodash-unified"`：禁止从 `lodash`、`lodash-es` 及其子路径静态导入或重新导出。
+- `lodash: "lodash"`：禁止从 `lodash-es`、`lodash-unified` 及其子路径静态导入或重新导出；允许 `lodash` 根入口和 `lodash/*` 按方法导入。
+
+选择 `lodash-unified`：
+
+```sh
+pnpm add lodash-unified
+```
+
+```js
+import fastChina from "@fast-china/eslint-config";
+import { cloneDeep, debounce } from "lodash-unified";
+
+export default fastChina({ lodash: "lodash-unified" });
+```
+
+选择标准 `lodash`：
+
+```sh
+pnpm add lodash
+pnpm add -D @types/lodash
+```
+
+```js
+import fastChina from "@fast-china/eslint-config";
+import debounce from "lodash/debounce";
+
+export default fastChina({ lodash: "lodash" });
+```
+
+该能力使用 ESLint 核心 `no-restricted-imports`，不需要额外插件，也不会替项目安装 Lodash。它只检查静态 `import`/`export`，不检查动态 `import()` 或 CommonJS `require()`。`imports: false` 只关闭 import-x，不会关闭已经显式选择的 Lodash 策略。
+
+如果后续 `rules` 或文件级覆写再次设置 `no-restricted-imports`，ESLint 会用后面的完整规则替换这套策略，而不是合并选项。需要组合更多包限制时，可从 `@fast-china/eslint-config/rules` 导入原始 `preferLodashRules` 或 `preferLodashUnifiedRules`，统一维护一份完整规则。
 
 ## 精确规则类型与自动补全
 
@@ -122,9 +156,7 @@ export default defineConfig(
 
 ```js
 // @ts-check
-import { defineConfig } from "eslint/config";
-
-import { createConfig, defineRules } from "@fast-china/eslint-config";
+import fastChina, { defineRules } from "@fast-china/eslint-config";
 
 const projectRules = defineRules({
 	"@typescript-eslint/no-unused-vars": ["error", { args: "after-used" }],
@@ -132,13 +164,14 @@ const projectRules = defineRules({
 	"vue/attributes-order": ["error", { order: ["DEFINITION", "EVENTS", "CONTENT"] }],
 });
 
-export default defineConfig([
-	...createConfig(),
+export default fastChina(
+	{ rules: projectRules },
 	{
-		name: "project/rules",
-		rules: projectRules,
-	},
-]);
+		files: ["**/*.generated.ts"],
+		name: "project/generated",
+		rules: defineRules({ "@typescript-eslint/no-unused-vars": "off" }),
+	}
+);
 ```
 
 在 TypeScript 配置或工具代码中，也可以直接使用：
@@ -155,31 +188,32 @@ const rules = {
 
 ## 规则风险与维护
 
-默认配置包含少量高影响规则：它们可能在首次启用时产生大面积排序差异、阻断旧项目写法，或要求复核 import 副作用、类型导入和组件公共事件。源码使用 `[高影响]`、`[可自动修复]` 与 `[安全关注]` 标记这类规则。
+默认配置包含少量高影响规则：它们可能阻断特定写法，或要求复核 import 副作用、类型导入和组件公共事件。清单排序同样属于高影响能力，但默认关闭。源码使用 `[高影响]`、`[可自动修复]` 与 `[安全关注]` 标记这类规则。
 
 完整的默认预置来源、高影响规则清单、关闭示例和维护约定见 [默认规则与风险指南](./docs/rules-risk.zh.md)。运行 `eslint --fix` 前建议先只检查，在独立提交中应用修复，并审查 import、`package.json`、组件事件和构建产物。
 
 ## 覆盖项目规则
 
-将项目规则放在共享配置之后即可覆盖：
+最常用的全局覆盖可以直接放入 `rules`；按文件覆盖作为后续参数传入，后面的配置优先级更高：
 
 ```js
-import { defineConfig } from "eslint/config";
+import fastChina, { defineRules } from "@fast-china/eslint-config";
 
-import { createConfig } from "@fast-china/eslint-config";
-
-export default defineConfig([
-	...createConfig({ vue: 3 }),
+export default fastChina(
 	{
-		name: "project/overrides",
 		rules: {
-			"no-console": "off",
+			"no-console": "warn",
 		},
 	},
-]);
+	{
+		files: ["**/{scripts,tests}/**/*.{js,ts}"],
+		name: "project/node-files",
+		rules: defineRules({ "no-console": "off" }),
+	}
+);
 ```
 
-可复用导出包括 `PresetJavascriptConfigs`、`PresetTypeScriptConfigs`、`PresetBasicConfigs`、`PresetJsonConfigs`、`PresetVueConfigs`、各独立配置组和常量；原始规则记录可从 `@fast-china/eslint-config/rules` 导入。
+根入口只公开 `fastConfig`、`defaultConfigOptions`、`defineRules` 及相关类型。高级使用者可以从 `@fast-china/eslint-config/rules` 导入有完整注释的原始规则记录。
 
 ## Prettier
 
@@ -198,20 +232,12 @@ pnpm exec prettier --check .
 pnpm install
 pnpm typegen
 pnpm check
+pnpm pack --dry-run
 ```
 
 升级 ESLint 或插件后运行 `pnpm typegen` 并提交 `src/typegen.d.ts`；不要手工编辑生成文件。`pnpm check` 会验证生成类型没有漂移，然后依次构建、类型检查、检查所有支持的文件类型、验证格式，并针对构建后的真实包运行运行时和消费者类型测试。
 
 贡献流程见 [CONTRIBUTING.md](./CONTRIBUTING.md)，规则维护约定见 [默认规则与风险指南](./docs/rules-risk.zh.md)，本次工程审查和质量基线见 [工程质量审查报告](./docs/engineering-audit.zh.md)。
-
-## 从 1.0.48 及更早版本迁移
-
-- 现有 `export default [...fastChina]` 用法继续有效。
-- 包现在明确为 ESM-only，不再暴露指向 ESM 文件的伪 CommonJS 条件。
-- Vue 3 成为明确默认值；Vue 2 请使用 `createConfig({ vue: 2 })`。
-- 默认不再强制项目改用 `lodash-unified`，组织定制规则仍保留在 rules 子路径中供显式使用。
-- Prettier 不再运行于 ESLint 内部，请改用 Prettier CLI 或编辑器集成。
-- Node.js 最低版本调整为 ESLint 10 的实际要求。
 
 ## 开源协议
 

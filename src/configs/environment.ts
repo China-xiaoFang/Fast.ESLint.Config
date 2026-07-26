@@ -1,7 +1,9 @@
 import { defineConfig } from "eslint/config";
 import globals from "globals";
 
-import { GLOB_CODE, GLOB_NODE } from "../constants";
+import { GLOBS_CODE, GLOBS_JAVASCRIPT, GLOBS_NODE_TOOLING } from "../constants";
+
+import type { Linter } from "eslint";
 
 export type RuntimeEnvironment = "browser" | "node" | "universal";
 
@@ -15,12 +17,29 @@ export type RuntimeEnvironment = "browser" | "node" | "universal";
  * @param files 应用源码匹配规则，默认为所有代码文件
  * @returns ESLint Flat Config 配置数组
  */
-export const createEnvironmentConfigs = (environment: RuntimeEnvironment = "browser", files: readonly string[] = GLOB_CODE) => {
+export interface EnvironmentConfigOptions {
+	/** 应用代码实际运行的环境，默认是浏览器。 */
+	environment?: RuntimeEnvironment;
+	/** 需要获得运行时全局变量的代码文件。 */
+	files?: readonly string[];
+	/** 当前启用且可能作为 Node.js 工程文件执行的脚本类型。 */
+	nodeFiles?: readonly string[];
+	/** 项目额外提供的只读、可写或禁写全局变量。 */
+	globals?: Linter.Globals;
+}
+
+export const createEnvironmentConfigs = ({
+	environment = "browser",
+	files = GLOBS_CODE,
+	nodeFiles = GLOBS_JAVASCRIPT,
+	globals: projectGlobals = {},
+}: EnvironmentConfigOptions = {}) => {
 	const runtimeGlobals = {
 		...(environment !== "node" ? globals.browser : {}),
 		...(environment !== "browser" ? globals.node : {}),
+		...projectGlobals,
 	};
-	const nodeToolingFiles = GLOB_NODE.flatMap((nodeGlob) => files.map((fileGlob) => [nodeGlob, fileGlob]));
+	const nodeToolingFiles = GLOBS_NODE_TOOLING.flatMap((nodeGlob) => nodeFiles.map((fileGlob) => [nodeGlob, fileGlob]));
 
 	return defineConfig([
 		{
@@ -42,22 +61,3 @@ export const createEnvironmentConfigs = (environment: RuntimeEnvironment = "brow
 		},
 	]);
 };
-/**
- * 浏览器应用环境配置。
- *
- * 适用于普通 Vue、React 等浏览器端项目。
- */
-export const browserConfigs = createEnvironmentConfigs("browser");
-/**
- * Node.js 应用环境配置。
- *
- * 适用于 Node.js 服务、CLI 工具等项目。
- */
-export const nodeConfigs = createEnvironmentConfigs("node");
-/**
- * 通用运行环境配置。
- *
- * 同时启用浏览器和 Node.js 全局变量，
- * 适用于 SSR、同构应用或跨运行时共享代码。
- */
-export const universalConfigs = createEnvironmentConfigs("universal");

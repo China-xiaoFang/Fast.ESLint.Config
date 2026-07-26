@@ -21,7 +21,7 @@ export const typescriptRules = {
 	],
 	// [默认关闭] 声明文件、全局扩展和部分 SDK 仍需要 namespace。
 	"@typescript-eslint/no-namespace": "off",
-	// any 会绕过类型检查，但在迁移和第三方边界中有合理用途，因此只警告。
+	// any 会绕过类型检查，但在第三方边界和渐进式类型完善中有合理用途，因此只警告。
 	"@typescript-eslint/no-explicit-any": "warn",
 	// [高影响] 默认要求 ESM import；CommonJS、动态加载或工具链互操作代码可能需要按文件关闭。
 	"@typescript-eslint/no-require-imports": "error",
@@ -35,7 +35,7 @@ export const typescriptRules = {
 	],
 	// [可自动修复] 删除可由 TypeScript 明确推断的原始值类型标注，减少重复信息。
 	"@typescript-eslint/no-inferrable-types": "error",
-	// 非空断言可能隐藏空值缺陷；以警告提示逐步消除而不阻断迁移。
+	// 非空断言可能隐藏空值缺陷；以警告提示逐步消除，避免一次性产生大量阻断错误。
 	"@typescript-eslint/no-non-null-assertion": "warn",
 	// 可选链之后再做非空断言逻辑矛盾，通常表示边界条件设计有误。
 	"@typescript-eslint/no-non-null-asserted-optional-chain": "error",

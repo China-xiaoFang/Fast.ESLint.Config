@@ -6,7 +6,7 @@
 
 源码中的标记采用以下含义：
 
-- `[高影响]`：规则可能产生大面积差异、阻断旧项目迁移，或要求人工确认运行时与公共 API 行为。
+- `[高影响]`：规则可能产生大面积差异、阻断既有写法，或要求人工确认运行时与公共 API 行为。
 - `[可自动修复]`：当前锁定的 ESLint/插件版本声明该规则可被 `eslint --fix` 修改；不代表无需代码审查。
 - `[安全关注]`：规则主要提示注入、信任边界等安全问题。
 - `[默认关闭]`、`[按需启用]`：规则记录存在，但默认配置不会启用。
@@ -15,13 +15,13 @@
 
 ## 默认继承的上游预置
 
-`createConfig()` 的默认选项是 Vue 3、TypeScript、JavaScript、import、RegExp、JSON、Markdown 与 Prettier 兼容层全部开启；TypeScript 类型感知模式默认关闭。
+`fastConfig()` 默认开启 Vue 3、TypeScript、JavaScript、import、RegExp、JSON、Markdown 与 Prettier 兼容层；TypeScript 类型感知和清单排序默认关闭。
 
 | 范围             | 默认继承                                                                                  | 说明                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | JavaScript       | `@eslint/js` 的 `recommended`                                                             | 基础语法和运行时正确性，包括 `no-undef`、`no-unused-vars` 等。                   |
 | TypeScript       | typescript-eslint 的 `recommended` + `stylistic`                                          | 默认不读取类型信息；本库规则在预置之后覆写。                                     |
-| Vue 3            | `@eslint/js`、typescript-eslint 非类型感知预置、`eslint-plugin-vue` 的 `flat/recommended` | Vue 2 仅在显式选择时使用 `flat/vue2-recommended`。                               |
+| Vue 3            | `@eslint/js`、typescript-eslint 非类型感知预置、`eslint-plugin-vue` 的 `flat/recommended` | 处理 Vue 3 单文件组件，并让 TypeScript 规则正确作用于 `<script lang="ts">`。     |
 | import           | `eslint-plugin-import-x` 的 `recommended`                                                 | 本库额外配置导入位置、去重和排序。解析器相关规则默认关闭，避免绑定具体别名方案。 |
 | RegExp           | `eslint-plugin-regexp` 的 `flat/recommended`                                              | 部分规则可自动改写正则表达式，批量修复后需运行测试。                             |
 | JSON/JSONC/JSON5 | `eslint-plugin-jsonc` 对应方言的 `flat/recommended-*`                                     | 三种方言按扩展名隔离，不会互相叠加。                                             |
@@ -32,33 +32,32 @@
 
 ## 默认启用的高影响规则
 
-下表覆盖本库主动设置的高影响规则，以及上游默认预置中最需要在旧项目落地前关注的规则。
+下表覆盖本库主动设置的高影响规则，以及上游默认预置中采用成本较高、最需要审查的规则。
 
-| 规则                                                | 等级       | 自动修复           | 主要影响                                                                                            | 建议                                                           |
-| --------------------------------------------------- | ---------- | ------------------ | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `jsonc/sort-keys`、`jsonc/sort-array-values`        | error      | 是                 | 重排 `package.json`、`tsconfig*.json` 的字段或 `files` 数组，首次运行会产生较大清单差异。           | 单独提交排序结果；确认发布清单。`exports` 条件键已被明确排除。 |
-| `import-x/order`                                    | error      | 是                 | 重排并分组 import。带副作用的裸 import 会被报告但不会安全地自动移动，人工调整顺序可能改变启动行为。 | 先检查入口、polyfill、样式和注册器 import。                    |
-| `@typescript-eslint/no-unused-vars`                 | error      | 是（当前插件版本） | 可能删除未使用的 import、变量或声明；以下划线开头是显式保留出口。                                   | 在独立提交中修复并运行类型检查、构建和测试。                   |
-| `@typescript-eslint/consistent-type-imports`        | error      | 是                 | 将纯类型依赖改成内联 `type` import；若原 import 还承担模块副作用，编译后行为可能变化。              | 副作用应改成独立的 `import "module"`，并复核构建产物。         |
-| `@typescript-eslint/no-require-imports`             | error      | 否                 | 阻断 CommonJS、条件加载和部分工具链互操作写法。                                                     | 在迁移文件或配置文件上按范围关闭，不要全局隐藏。               |
-| `no-var`                                            | error      | 是                 | 将 `var` 迁移到块级声明；旧代码的提升和循环闭包行为需要关注。                                       | 先运行现有测试，重点复核循环内回调。                           |
-| `prefer-arrow-callback`                             | error      | 是                 | 批量改写回调形式，影响 `this`、`arguments` 或函数名调试体验的代码需要人工确认。                     | 检查事件处理器、类库回调和栈追踪。                             |
-| `logical-assignment-operators`                      | error      | 是                 | 将条件赋值改成 `                                                                                    |                                                                | =`、`&&=`、`??=`；getter 或 Proxy 场景要确认读取和写入次数。 | 对状态容器和响应式对象运行行为测试。 |
-| `no-restricted-syntax`（`LabeledStatement`）        | error      | 否                 | 禁止 labeled break/continue，可能要求重构多层循环控制流。                                           | 迁移期可按文件降级，重构后再恢复。                             |
-| `sort-imports`                                      | warn       | 是                 | 排序同一 import 声明中的成员，通常只产生文本差异。                                                  | 与 `import-x/order` 一起在独立整理提交中执行。                 |
-| `vue/require-explicit-emits`                        | error      | 否                 | 要求组件声明事件，相当于补全组件公共 API；旧组件可能大量报错。                                      | 先补齐实际事件清单，不要盲目关闭。                             |
-| `vue/no-mutating-props`                             | error      | 否                 | 强制单向数据流，可能要求引入本地状态或事件。                                                        | 把修复当作组件设计变更审查。                                   |
-| `vue/attributes-order`                              | error      | 是                 | 首次运行会重排大量模板属性，通常不改变运行逻辑但会形成大 diff。                                     | 单独提交模板排序，不与业务修改混合。                           |
-| `no-unused-vars`、`no-undef`（JavaScript 上游预置） | error      | 否                 | 旧 JavaScript 项目可能出现大量阻断错误；`no-undef` 还会暴露缺失的运行时全局变量声明。               | 正确选择 `environment`，再逐步清理无用代码。                   |
-| RegExp 推荐预置                                     | 由上游决定 | 部分规则是         | 可能改写字符类、量词或断言；语法等价不代表业务输入覆盖充分。                                        | 修复后运行覆盖真实输入的正则测试。                             |
+| 规则                                                | 等级       | 自动修复           | 主要影响                                                                                            | 建议                                                   |
+| --------------------------------------------------- | ---------- | ------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `import-x/order`                                    | error      | 是                 | 重排并分组 import。带副作用的裸 import 会被报告但不会安全地自动移动，人工调整顺序可能改变启动行为。 | 先检查入口、polyfill、样式和注册器 import。            |
+| `@typescript-eslint/no-unused-vars`                 | error      | 是（当前插件版本） | 可能删除未使用的 import、变量或声明；以下划线开头是显式保留出口。                                   | 在独立提交中修复并运行类型检查、构建和测试。           |
+| `@typescript-eslint/consistent-type-imports`        | error      | 是                 | 将纯类型依赖改成内联 `type` import；若原 import 还承担模块副作用，编译后行为可能变化。              | 副作用应改成独立的 `import "module"`，并复核构建产物。 |
+| `@typescript-eslint/no-require-imports`             | error      | 否                 | 阻断 CommonJS、条件加载和部分工具链互操作写法。                                                     | 仅在确实需要的配置文件上按范围关闭，不要全局隐藏。     |
+| `no-var`                                            | error      | 是                 | 将 `var` 改为块级声明；声明提升和循环闭包行为需要关注。                                             | 先运行现有测试，重点复核循环内回调。                   |
+| `prefer-arrow-callback`                             | error      | 是                 | 批量改写回调形式，影响 `this`、`arguments` 或函数名调试体验的代码需要人工确认。                     | 检查事件处理器、类库回调和栈追踪。                     |
+| `logical-assignment-operators`                      | error      | 是                 | 将条件赋值改成 `\|\|=`、`&&=`、`??=`；getter 或 Proxy 场景要确认读取和写入次数。                    | 对状态容器和响应式对象运行行为测试。                   |
+| `no-restricted-syntax`（`LabeledStatement`）        | error      | 否                 | 禁止 labeled break/continue，可能要求重构多层循环控制流。                                           | 必要时按文件降级，重构后再恢复。                       |
+| `sort-imports`                                      | warn       | 是                 | 排序同一 import 声明中的成员，通常只产生文本差异。                                                  | 与 `import-x/order` 一起在独立整理提交中执行。         |
+| `vue/require-explicit-emits`                        | error      | 否                 | 要求组件声明事件，相当于补全组件公共 API；旧组件可能大量报错。                                      | 先补齐实际事件清单，不要盲目关闭。                     |
+| `vue/no-mutating-props`                             | error      | 否                 | 强制单向数据流，可能要求引入本地状态或事件。                                                        | 把修复当作组件设计变更审查。                           |
+| `vue/attributes-order`                              | error      | 是                 | 首次运行会重排大量模板属性，通常不改变运行逻辑但会形成大 diff。                                     | 单独提交模板排序，不与业务修改混合。                   |
+| `no-unused-vars`、`no-undef`（JavaScript 上游预置） | error      | 否                 | JavaScript 代码可能出现较多阻断错误；`no-undef` 还会暴露缺失的运行时全局变量声明。                  | 正确选择 `environment`，再逐步清理无用代码。           |
+| RegExp 推荐预置                                     | 由上游决定 | 部分规则是         | 可能改写字符类、量词或断言；语法等价不代表业务输入覆盖充分。                                        | 修复后运行覆盖真实输入的正则测试。                     |
 
 另外，`vue/no-v-html` 默认是 `warn`，属于安全关注而非自动重写规则。它提示调用方必须保证 HTML 来自可信来源或经过可靠净化。
 
 ## 明确不默认启用的高影响能力
 
 - TypeScript 和 Vue 的类型感知预置仅在 `typeChecked: true` 时启用；它们会增加项目服务开销，并启用 `no-floating-promises` 等需要类型信息的规则。
-- Vue 2 兼容预置仅在 `vue: 2` 时启用。
-- `importUseLodashRules` 与 `importUseLodashUnifiedRules` 是组织级迁移策略，只能从 `@fast-china/eslint-config/rules` 显式导入。
+- 清单排序规则 `jsonc/sort-keys`、`jsonc/sort-array-values` 分别仅在 `sortPackageJson: true`、`sortTsconfig: true` 时启用；首次修复应单独提交并核对发布清单。
+- Lodash 静态导入限制仅在 `lodash: "lodash"` 或 `lodash: "lodash-unified"` 时启用。该策略使用 `no-restricted-imports` 阻止混用包入口，但不会检查动态 `import()` 或 CommonJS `require()`。
 - `import-x/no-unresolved`、`import-x/named` 等依赖 resolver 的检查默认关闭。
 - `package.json` 的 `exports` 条件键永不自动排序。Node 条件导出按键顺序匹配，改写顺序可能改变实际加载文件。
 
@@ -67,38 +66,28 @@
 覆盖项必须放在共享配置之后，并尽量限定文件范围：
 
 ```js
-import { defineConfig } from "eslint/config";
+import fastChina, { defineRules } from "@fast-china/eslint-config";
 
-import { createConfig } from "@fast-china/eslint-config";
-
-export default defineConfig([
-	...createConfig(),
+export default fastChina(
+	{},
 	{
-		name: "project/typescript-migration",
+		name: "project/typescript-exceptions",
 		files: ["**/*.{ts,tsx,mts,cts,vue}"],
-		rules: {
+		rules: defineRules({
 			"@typescript-eslint/consistent-type-imports": "warn",
 			"@typescript-eslint/no-require-imports": "off",
 			"@typescript-eslint/no-unused-vars": "warn",
-		},
+		}),
 	},
 	{
-		name: "project/vue-migration",
+		name: "project/vue-exceptions",
 		files: ["**/*.vue"],
-		rules: {
+		rules: defineRules({
 			"vue/attributes-order": "warn",
 			"vue/require-explicit-emits": "warn",
-		},
-	},
-	{
-		name: "project/json-migration",
-		files: ["**/{package.json,tsconfig*.json}"],
-		rules: {
-			"jsonc/sort-array-values": "off",
-			"jsonc/sort-keys": "off",
-		},
-	},
-]);
+		}),
+	}
+);
 ```
 
 建议先执行只读检查，再在独立分支或独立提交中运行 `eslint --fix`。重点审查 import、副作用入口、包导出、组件事件和清单文件，并运行项目的类型检查、构建与测试。

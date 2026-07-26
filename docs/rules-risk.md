@@ -4,7 +4,7 @@ This document records what the default config inherits, which rules can have a l
 
 ## Risk labels
 
-- `[High impact]`: the rule can create a large diff, block migration, or require a review of runtime or public API behavior.
+- `[High impact]`: the rule can create a large diff, block existing patterns, or require a review of runtime or public API behavior.
 - `[Auto-fixable]`: the currently locked ESLint or plugin version declares the rule fixable by `eslint --fix`. It does not remove the need for review.
 - `[Security]`: the rule primarily protects a trust or injection boundary.
 - `[Disabled by default]` and `[Opt-in]`: the rule record exists but is not loaded by the default config.
@@ -13,13 +13,13 @@ High impact does not mean inherently unsafe. It means adoption or fix review is 
 
 ## Upstream presets enabled by default
 
-`createConfig()` defaults to Vue 3, TypeScript, JavaScript, import, RegExp, JSON, Markdown, and the Prettier compatibility layer. Type-aware TypeScript linting is opt-in.
+`fastConfig()` defaults to Vue 3, TypeScript, JavaScript, import, RegExp, JSON, Markdown, and the Prettier compatibility layer. Type-aware TypeScript linting and manifest sorting are opt-in.
 
 | Scope                  | Inherited preset                                                                                   | Notes                                                                                                   |
 | ---------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | JavaScript             | `@eslint/js` `recommended`                                                                         | Core syntax and runtime correctness, including `no-undef` and `no-unused-vars`.                         |
 | TypeScript             | typescript-eslint `recommended` + `stylistic`                                                      | Does not read type information by default; local overrides are applied afterward.                       |
-| Vue 3                  | `@eslint/js`, non-type-aware typescript-eslint presets, and `eslint-plugin-vue` `flat/recommended` | Vue 2 uses `flat/vue2-recommended` only when selected explicitly.                                       |
+| Vue 3                  | `@eslint/js`, non-type-aware typescript-eslint presets, and `eslint-plugin-vue` `flat/recommended` | Handles Vue 3 SFCs and applies TypeScript rules to `<script lang="ts">` correctly.                      |
 | Imports                | `eslint-plugin-import-x` `recommended`                                                             | Local rules add import placement, deduplication, and ordering. Resolver-dependent checks stay disabled. |
 | RegExp                 | `eslint-plugin-regexp` `flat/recommended`                                                          | Some rules can rewrite regular expressions; run tests after bulk fixes.                                 |
 | JSON dialects          | The matching `eslint-plugin-jsonc` `flat/recommended-*` preset                                     | JSON, JSONC, and JSON5 are scoped separately.                                                           |
@@ -30,71 +30,60 @@ The exact upstream rule set is defined by the dependency versions in `pnpm-lock.
 
 ## High-impact defaults
 
-| Rule                                                    | Severity         | Auto-fix                 | Main impact                                                                                                                       | Recommended review                                                                                       |
-| ------------------------------------------------------- | ---------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `jsonc/sort-keys`, `jsonc/sort-array-values`            | error            | Yes                      | Reorders `package.json`, `tsconfig*.json`, or the package `files` array and can create a large first-run diff.                    | Isolate the sorting commit and verify published files. `exports` condition keys are explicitly excluded. |
-| `import-x/order`                                        | error            | Yes                      | Groups and reorders imports. Unassigned side-effect imports are reported but cannot be safely moved automatically.                | Check entrypoints, polyfills, styles, and registration imports.                                          |
-| `@typescript-eslint/no-unused-vars`                     | error            | Yes in the locked plugin | Can remove unused imports, variables, or declarations. An underscore prefix is the explicit escape hatch.                         | Run type checking, builds, and tests after an isolated cleanup.                                          |
-| `@typescript-eslint/consistent-type-imports`            | error            | Yes                      | Converts type-only dependencies to inline `type` imports; an import used only for side effects could disappear from emitted code. | Express side effects as a separate `import "module"` and inspect build output.                           |
-| `@typescript-eslint/no-require-imports`                 | error            | No                       | Blocks CommonJS, conditional loading, and some toolchain interop patterns.                                                        | Disable only for scoped migration or configuration files.                                                |
-| `no-var`                                                | error            | Yes                      | Moves legacy declarations to block scope; hoisting and loop closures need attention.                                              | Run behavior tests, especially around callbacks created in loops.                                        |
-| `prefer-arrow-callback`                                 | error            | Yes                      | Rewrites callbacks; code relying on `this`, `arguments`, or named stack frames needs review.                                      | Check event handlers, library callbacks, and stack traces.                                               |
-| `logical-assignment-operators`                          | error            | Yes                      | Rewrites conditional assignment; getter and Proxy access counts deserve review.                                                   | Test state containers and reactive objects.                                                              |
-| `no-restricted-syntax` (`LabeledStatement`)             | error            | No                       | Requires control-flow refactoring for labeled break or continue.                                                                  | Downgrade only in migration files and restore after refactoring.                                         |
-| `sort-imports`                                          | warn             | Yes                      | Sorts members inside one import declaration and usually creates text-only diffs.                                                  | Keep it in an isolated cleanup with `import-x/order`.                                                    |
-| `vue/require-explicit-emits`                            | error            | No                       | Makes emitted events an explicit component API and can surface many legacy omissions.                                             | Model the real event list instead of disabling it blindly.                                               |
-| `vue/no-mutating-props`                                 | error            | No                       | Enforces one-way data flow and may require local state or event changes.                                                          | Review the fix as a component-design change.                                                             |
-| `vue/attributes-order`                                  | error            | Yes                      | Can reorder many template attributes on first use.                                                                                | Keep template sorting separate from business changes.                                                    |
-| `no-unused-vars`, `no-undef` from the JavaScript preset | error            | No                       | Can block legacy JavaScript projects and expose missing runtime-global declarations.                                              | Select the correct `environment` before cleanup.                                                         |
-| RegExp recommended preset                               | Upstream-defined | Some rules               | May rewrite character classes, quantifiers, or assertions.                                                                        | Exercise representative real-world inputs after fixing.                                                  |
+| Rule                                                    | Severity         | Auto-fix                 | Main impact                                                                                                                       | Recommended review                                                             |
+| ------------------------------------------------------- | ---------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `import-x/order`                                        | error            | Yes                      | Groups and reorders imports. Unassigned side-effect imports are reported but cannot be safely moved automatically.                | Check entrypoints, polyfills, styles, and registration imports.                |
+| `@typescript-eslint/no-unused-vars`                     | error            | Yes in the locked plugin | Can remove unused imports, variables, or declarations. An underscore prefix is the explicit escape hatch.                         | Run type checking, builds, and tests after an isolated cleanup.                |
+| `@typescript-eslint/consistent-type-imports`            | error            | Yes                      | Converts type-only dependencies to inline `type` imports; an import used only for side effects could disappear from emitted code. | Express side effects as a separate `import "module"` and inspect build output. |
+| `@typescript-eslint/no-require-imports`                 | error            | No                       | Blocks CommonJS, conditional loading, and some toolchain interop patterns.                                                        | Disable only for configuration files that genuinely require it.                |
+| `no-var`                                                | error            | Yes                      | Moves `var` declarations to block scope; hoisting and loop closures need attention.                                               | Run behavior tests, especially around callbacks created in loops.              |
+| `prefer-arrow-callback`                                 | error            | Yes                      | Rewrites callbacks; code relying on `this`, `arguments`, or named stack frames needs review.                                      | Check event handlers, library callbacks, and stack traces.                     |
+| `logical-assignment-operators`                          | error            | Yes                      | Rewrites conditional assignment; getter and Proxy access counts deserve review.                                                   | Test state containers and reactive objects.                                    |
+| `no-restricted-syntax` (`LabeledStatement`)             | error            | No                       | Requires control-flow refactoring for labeled break or continue.                                                                  | Downgrade only in affected files and restore after refactoring.                |
+| `sort-imports`                                          | warn             | Yes                      | Sorts members inside one import declaration and usually creates text-only diffs.                                                  | Keep it in an isolated cleanup with `import-x/order`.                          |
+| `vue/require-explicit-emits`                            | error            | No                       | Makes emitted events an explicit component API and can surface undeclared events.                                                 | Model the real event list instead of disabling it blindly.                     |
+| `vue/no-mutating-props`                                 | error            | No                       | Enforces one-way data flow and may require local state or event changes.                                                          | Review the fix as a component-design change.                                   |
+| `vue/attributes-order`                                  | error            | Yes                      | Can reorder many template attributes on first use.                                                                                | Keep template sorting separate from business changes.                          |
+| `no-unused-vars`, `no-undef` from the JavaScript preset | error            | No                       | Can report many existing issues and expose missing runtime-global declarations.                                                   | Select the correct `environment` before cleanup.                               |
+| RegExp recommended preset                               | Upstream-defined | Some rules               | May rewrite character classes, quantifiers, or assertions.                                                                        | Exercise representative real-world inputs after fixing.                        |
 
 `vue/no-v-html` is also enabled as a warning. It is a security signal rather than an automatic rewrite: HTML must be trusted or reliably sanitized.
 
 ## High-impact features not enabled by default
 
 - Type-aware TypeScript and Vue presets require `typeChecked: true`. They add project-service cost and rules such as `no-floating-promises`.
-- Vue 2 support requires `vue: 2`.
-- `importUseLodashRules` and `importUseLodashUnifiedRules` are organization-specific migration records exported only from `@fast-china/eslint-config/rules`.
+- The `jsonc/sort-keys` and `jsonc/sort-array-values` manifest rules require `sortPackageJson: true` or `sortTsconfig: true`. Isolate the first fix and verify the publish manifest.
+- Lodash import restrictions require `lodash: "lodash"` or `lodash: "lodash-unified"`. They use `no-restricted-imports` to prevent mixed static package entry points but do not inspect dynamic `import()` or CommonJS `require()`.
 - Resolver-dependent import checks such as `import-x/no-unresolved` and `import-x/named` stay disabled.
 - Keys inside `package.json#exports` are never sorted. Node conditional exports use key order during matching, so reordering can change the loaded file.
 
-## Scoped migration overrides
+## Scoped overrides
 
 Overrides must follow the shared config and should target only the affected files:
 
 ```js
-import { defineConfig } from "eslint/config";
+import fastChina, { defineRules } from "@fast-china/eslint-config";
 
-import { createConfig } from "@fast-china/eslint-config";
-
-export default defineConfig([
-	...createConfig(),
+export default fastChina(
+	{},
 	{
-		name: "project/typescript-migration",
+		name: "project/typescript-exceptions",
 		files: ["**/*.{ts,tsx,mts,cts,vue}"],
-		rules: {
+		rules: defineRules({
 			"@typescript-eslint/consistent-type-imports": "warn",
 			"@typescript-eslint/no-require-imports": "off",
 			"@typescript-eslint/no-unused-vars": "warn",
-		},
+		}),
 	},
 	{
-		name: "project/vue-migration",
+		name: "project/vue-exceptions",
 		files: ["**/*.vue"],
-		rules: {
+		rules: defineRules({
 			"vue/attributes-order": "warn",
 			"vue/require-explicit-emits": "warn",
-		},
-	},
-	{
-		name: "project/json-migration",
-		files: ["**/{package.json,tsconfig*.json}"],
-		rules: {
-			"jsonc/sort-array-values": "off",
-			"jsonc/sort-keys": "off",
-		},
-	},
-]);
+		}),
+	}
+);
 ```
 
 Run a read-only lint first, then apply `eslint --fix` on a separate branch or commit. Review imports, side-effect entrypoints, package exports, component events, and manifests before running the project's type checks, build, and tests.

@@ -1,15 +1,18 @@
 import { defineConfig } from "eslint/config";
 
-import { CONST_TSCONFIG } from "../constants";
+import { GLOBS_TSCONFIG } from "../constants";
 import { tsconfigJsonSortRules } from "../rules";
 
 /**
- * tsconfig.json 属性排序
+ * 创建 tsconfig.json 排序配置。
+ *
+ * 排序只改变字段阅读顺序，不改变编译选项值；由于首次修复 diff 较大，默认关闭。
  */
-export const tsconfigJsonSortConfigs = defineConfig([
-	{
-		name: "@fast-china/sort/tsconfig",
-		files: CONST_TSCONFIG,
-		rules: tsconfigJsonSortRules,
-	},
-]);
+export const createTsconfigSortConfigs = () =>
+	defineConfig([
+		{
+			name: "@fast-china/sort/tsconfig",
+			files: [...GLOBS_TSCONFIG],
+			rules: tsconfigJsonSortRules,
+		},
+	]);

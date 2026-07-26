@@ -8,7 +8,6 @@ type RejectUnknownRuleNames<Rules extends RuleOptions> = Rules & Record<Exclude<
  *
  * 该函数不会修改传入对象；它只在 TypeScript 编译阶段拒绝未知规则和无效选项。
  */
-export const defineRules = <const Rules extends RuleOptions>(rules: RejectUnknownRuleNames<Rules>): Rules & Linter.RulesRecord =>
-	rules as Rules & Linter.RulesRecord;
+export const defineRules = <const Rules extends RuleOptions>(rules: RejectUnknownRuleNames<Rules>): Rules & Linter.RulesRecord => rules;
 
 export type { RuleOptions } from "./typegen";

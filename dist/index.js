@@ -1,80 +1,43 @@
-import { defineConfig } from 'eslint/config';
-import eslintPluginJsonc from 'eslint-plugin-jsonc';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import eslintConfigFlatGitignore from 'eslint-config-flat-gitignore';
 import eslintPluginImportX from 'eslint-plugin-import-x';
 import eslint from '@eslint/js';
+import eslintPluginJsonc from 'eslint-plugin-jsonc';
 import eslintMarkdown from '@eslint/markdown';
 import eslintConfigPrettierFlat from 'eslint-config-prettier/flat';
 import eslintPluginRegexp from 'eslint-plugin-regexp';
-import tseslint2 from 'typescript-eslint';
+import tseslint from 'typescript-eslint';
 import eslintPluginVue from 'eslint-plugin-vue';
 import vueEslintParser from 'vue-eslint-parser';
 
-// src/configs/json.ts
-
-// src/constants/index.ts
-var CONST_JS = "**/*.?([cm])js";
-var CONST_JSX = "**/*.?([cm])jsx";
-var CONST_TS = "**/*.?([cm])ts";
-var CONST_TSX = "**/*.?([cm])tsx";
-var CONST_DTS = "**/*.d.ts";
-var CONST_JSON = "**/*.json";
-var CONST_JSONC = "**/*.jsonc";
-var CONST_JSON5 = "**/*.json5";
-var CONST_MD = "**/*.md";
-var CONST_VUE = "**/*.vue";
-var CONST_YAML = "**/*.y?(a)ml";
-var CONST_NODE_MODULES = "**/node_modules/**";
-var CONST_DIST = "**/dist/**";
-var CONST_LOCKFILE = ["**/package-lock.json", "**/yarn.lock", "**/pnpm-lock.yaml", "**/bun.lock", "**/bun.lockb", "**/deno.lock"];
-var CONST_PUBLIC = "**/public";
-var CONST_TSCONFIG = ["**/tsconfig.json", "**/tsconfig.*.json"];
-var GLOB_JAVASCRIPT = [CONST_JS, CONST_JSX];
-var GLOB_TYPESCRIPT = [CONST_TS, CONST_TSX];
-var GLOB_CODE = [...GLOB_JAVASCRIPT, ...GLOB_TYPESCRIPT, CONST_VUE];
-var GLOB_NODE = [
-  "**/*.{config,setup}.{js,cjs,mjs,ts,cts,mts}",
-  "**/{scripts,bin}/**/*.{js,cjs,mjs,ts,cts,mts}",
-  "**/{test,tests}/**/*.{js,cjs,mjs,ts,cts,mts}",
-  "**/cli.{js,cjs,mjs,ts,cts,mts}"
-];
-
-// src/configs/json.ts
-var jsonConfigs = defineConfig([
-  {
-    name: "@fast-china/json/strict",
-    files: [CONST_JSON],
-    extends: [eslintPluginJsonc.configs["flat/recommended-with-json"]]
-  },
-  {
-    name: "@fast-china/json/jsonc",
-    files: [CONST_JSONC],
-    extends: [eslintPluginJsonc.configs["flat/recommended-with-jsonc"]]
-  },
-  {
-    name: "@fast-china/json/json5",
-    files: [CONST_JSON5],
-    extends: [eslintPluginJsonc.configs["flat/recommended-with-json5"]]
-  },
-  {
-    name: "@fast-china/json/settings",
-    files: ["**/.vscode/settings.json"],
-    rules: {
-      // 允许注释
-      "jsonc/no-comments": "off"
-    }
-  }
-]);
-
 // src/define-rules.ts
 var defineRules = (rules) => rules;
+
+// src/constants/index.ts
+var GLOBS_JAVASCRIPT = ["**/*.{js,cjs,mjs,jsx}"];
+var GLOBS_TYPESCRIPT = ["**/*.{ts,cts,mts,tsx}"];
+var GLOB_VUE = "**/*.vue";
+var GLOB_JSON = "**/*.json";
+var GLOB_JSONC = "**/*.jsonc";
+var GLOB_JSON5 = "**/*.json5";
+var GLOB_MARKDOWN = "**/*.md";
+var GLOBS_CODE = [...GLOBS_JAVASCRIPT, ...GLOBS_TYPESCRIPT, GLOB_VUE];
+var GLOBS_NODE_TOOLING = [
+  "**/*.{config,setup}.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+  "**/{scripts,bin}/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+  "**/{test,tests}/**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+  "**/*.{test,spec}.{js,cjs,mjs,jsx,ts,cts,mts,tsx}",
+  "**/cli.{js,cjs,mjs,ts,cts,mts}"
+];
+var GLOBS_TSCONFIG = ["**/tsconfig.json", "**/tsconfig.*.json"];
+var GLOBS_LOCKFILES = ["**/package-lock.json", "**/yarn.lock", "**/pnpm-lock.yaml", "**/bun.lock", "**/bun.lockb", "**/deno.lock"];
 
 // src/rules/common.ts
 var commonRules = {
   // 要求数组回调在所有可到达分支返回值，避免 map/filter 等调用静默产生 undefined。
   "array-callback-return": "error",
-  // 浏览器弹窗通常不适合生产代码，但保留为警告以兼容原型开发和已有项目。
+  // 浏览器弹窗通常不适合生产代码；使用 warn 允许原型调试，同时确保发布前能够被发现。
   "no-alert": "warn",
   // switch 的 case 不创建词法作用域；要求用花括号包裹声明，避免跨 case 冲突。
   "no-case-declarations": "error",
@@ -181,9 +144,9 @@ var javascriptRules = {
       checkLoops: false
     }
   ],
-  // [高影响] 禁止标签语句；迁移包含多层循环 labeled break/continue 的代码时需先重构控制流。
+  // [高影响] 禁止标签语句；包含多层循环 labeled break/continue 的代码需先重构控制流。
   "no-restricted-syntax": ["error", "LabeledStatement"],
-  // [高影响][可自动修复] 使用 let/const 替代 var；首次迁移需复核循环闭包和声明提升行为。
+  // [高影响][可自动修复] 使用 let/const 替代 var；首次启用需复核循环闭包和声明提升行为。
   "no-var": "error",
   // 禁止无说明的空代码块；允许用于“忽略失败”语义的空 catch。
   "no-empty": [
@@ -194,7 +157,7 @@ var javascriptRules = {
   ],
   // 拒绝肉眼难以识别、可能导致解析差异的非常规空白字符。
   "no-irregular-whitespace": "error",
-  // 变量和类先声明后使用；函数声明允许提升。使用 warn 降低旧项目迁移阻力。
+  // 变量和类先声明后使用；函数声明允许提升。warn 保留函数式组合和循环依赖重构空间。
   "no-use-before-define": [
     "warn",
     {
@@ -211,7 +174,7 @@ var javascriptRules = {
       ignoreReadBeforeAssign: true
     }
   ],
-  // [高影响][可自动修复] 优先箭头回调；批量迁移后应复核 this/arguments 与函数名栈信息。
+  // [高影响][可自动修复] 优先箭头回调；批量修复后应复核 this/arguments 与函数名栈信息。
   "prefer-arrow-callback": [
     "error",
     {
@@ -242,9 +205,59 @@ var javascriptRules = {
   "no-redeclare": "error"
 };
 
+// src/rules/lodash.ts
+var preferLodashUnifiedRules = {
+  // [高影响][按需启用] 禁止混用 lodash 与 lodash-es，避免同一项目维护多套等价依赖入口。
+  "no-restricted-imports": [
+    "error",
+    {
+      paths: [
+        {
+          name: "lodash",
+          message: 'Use "lodash-unified" consistently instead of "lodash".'
+        },
+        {
+          name: "lodash-es",
+          message: 'Use "lodash-unified" consistently instead of "lodash-es".'
+        }
+      ],
+      patterns: [
+        {
+          group: ["lodash/*", "lodash-es/*"],
+          message: 'Use exports from "lodash-unified" instead of Lodash subpath imports.'
+        }
+      ]
+    }
+  ]
+};
+var preferLodashRules = {
+  // [高影响][按需启用] 禁止混用 lodash-es 与 lodash-unified，保持运行时和类型来源一致。
+  "no-restricted-imports": [
+    "error",
+    {
+      paths: [
+        {
+          name: "lodash-es",
+          message: 'Use "lodash" consistently instead of "lodash-es".'
+        },
+        {
+          name: "lodash-unified",
+          message: 'Use "lodash" consistently instead of "lodash-unified".'
+        }
+      ],
+      patterns: [
+        {
+          group: ["lodash-es/*", "lodash-unified/*"],
+          message: 'Use "lodash" or a "lodash/*" subpath consistently.'
+        }
+      ]
+    }
+  ]
+};
+
 // src/rules/sort-package.ts
 var packageJsonSortRules = {
-  // [高影响][可自动修复] npm 的 files 清单按字母排序；数组顺序不改打包集合，但首次 diff 较大。
+  // [高影响][可自动修复][按需启用] npm 的 files 清单按字母排序；数组顺序不改打包集合，但首次 diff 较大。
   "jsonc/sort-array-values": [
     "error",
     {
@@ -252,7 +265,7 @@ var packageJsonSortRules = {
       pathPattern: "^files$"
     }
   ],
-  // [高影响][可自动修复] 仅排序明确安全的 package.json 区域，不进入 exports 条件对象。
+  // [高影响][可自动修复][按需启用] 仅排序明确安全的 package.json 区域，不进入 exports 条件对象。
   "jsonc/sort-keys": [
     "error",
     // 根字段按常见阅读顺序组织，减少不同项目之间的清单噪声。
@@ -320,7 +333,7 @@ var packageJsonSortRules = {
 var tsconfigJsonSortRules = {
   // tsconfig 是 JSONC，注释用于解释不直观的编译器取舍，必须保留。
   "jsonc/no-comments": "off",
-  // [高影响][可自动修复] 只调整顶层和 compilerOptions 的键顺序，不改写任何选项值或数组。
+  // [高影响][可自动修复][按需启用] 只调整顶层和 compilerOptions 的键顺序，不改写任何选项值或数组。
   "jsonc/sort-keys": [
     "error",
     // 顶层按继承、选项、项目引用和文件范围的阅读顺序排列。
@@ -452,7 +465,7 @@ var typescriptRules = {
   ],
   // [默认关闭] 声明文件、全局扩展和部分 SDK 仍需要 namespace。
   "@typescript-eslint/no-namespace": "off",
-  // any 会绕过类型检查，但在迁移和第三方边界中有合理用途，因此只警告。
+  // any 会绕过类型检查，但在第三方边界和渐进式类型完善中有合理用途，因此只警告。
   "@typescript-eslint/no-explicit-any": "warn",
   // [高影响] 默认要求 ESM import；CommonJS、动态加载或工具链互操作代码可能需要按文件关闭。
   "@typescript-eslint/no-require-imports": "error",
@@ -466,7 +479,7 @@ var typescriptRules = {
   ],
   // [可自动修复] 删除可由 TypeScript 明确推断的原始值类型标注，减少重复信息。
   "@typescript-eslint/no-inferrable-types": "error",
-  // 非空断言可能隐藏空值缺陷；以警告提示逐步消除而不阻断迁移。
+  // 非空断言可能隐藏空值缺陷；以警告提示逐步消除，避免一次性产生大量阻断错误。
   "@typescript-eslint/no-non-null-assertion": "warn",
   // 可选链之后再做非空断言逻辑矛盾，通常表示边界条件设计有误。
   "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
@@ -487,7 +500,7 @@ var vueRules = {
   "vue/no-v-html": "warn",
   // [默认关闭] TypeScript 类型 props 和 required 声明已能表达可选性，不强制每个可选 prop 提供默认值。
   "vue/require-default-prop": "off",
-  // [高影响] 组件必须声明对外事件；旧组件迁移时会暴露未建模的公共事件 API。
+  // [高影响] 组件必须声明对外事件；首次启用时会暴露未建模的公共事件 API。
   "vue/require-explicit-emits": "error",
   // [默认关闭] 允许 App、Layout 等约定俗成的单词组件名。
   "vue/multi-word-component-names": "off",
@@ -514,22 +527,8 @@ var vueRules = {
   ]
 };
 
-// src/configs/sort-package.ts
-var packageJsonSortConfigs = defineConfig([
-  {
-    name: "@fast-china/sort/package",
-    files: ["**/package.json"],
-    rules: packageJsonSortRules
-  }
-]);
-var tsconfigJsonSortConfigs = defineConfig([
-  {
-    name: "@fast-china/sort/tsconfig",
-    files: CONST_TSCONFIG,
-    rules: tsconfigJsonSortRules
-  }
-]);
-var createCommonConfigs = (files = GLOB_CODE) => defineConfig([
+// src/configs/common.ts
+var createBaseConfigs = (files = GLOBS_CODE) => defineConfig([
   {
     name: "@fast-china/common",
     files: [...files],
@@ -539,13 +538,18 @@ var createCommonConfigs = (files = GLOB_CODE) => defineConfig([
     rules: commonRules
   }
 ]);
-var commonConfigs = createCommonConfigs();
-var createEnvironmentConfigs = (environment = "browser", files = GLOB_CODE) => {
+var createEnvironmentConfigs = ({
+  environment = "browser",
+  files = GLOBS_CODE,
+  nodeFiles = GLOBS_JAVASCRIPT,
+  globals: projectGlobals = {}
+} = {}) => {
   const runtimeGlobals = {
     ...environment !== "node" ? globals.browser : {},
-    ...environment !== "browser" ? globals.node : {}
+    ...environment !== "browser" ? globals.node : {},
+    ...projectGlobals
   };
-  const nodeToolingFiles = GLOB_NODE.flatMap((nodeGlob) => files.map((fileGlob) => [nodeGlob, fileGlob]));
+  const nodeToolingFiles = GLOBS_NODE_TOOLING.flatMap((nodeGlob) => nodeFiles.map((fileGlob) => [nodeGlob, fileGlob]));
   return defineConfig([
     {
       name: `@fast-china/globals/${environment}`,
@@ -566,36 +570,25 @@ var createEnvironmentConfigs = (environment = "browser", files = GLOB_CODE) => {
     }
   ]);
 };
-var browserConfigs = createEnvironmentConfigs("browser");
-var nodeConfigs = createEnvironmentConfigs("node");
-var universalConfigs = createEnvironmentConfigs("universal");
-var globalIgnoresConfigs = defineConfig([
-  {
-    name: "@fast-china/ignores/global",
-    ignores: [
-      CONST_NODE_MODULES,
-      CONST_DIST,
-      ...CONST_LOCKFILE,
-      "**/{coverage,output,temp}/**",
-      "**/{.nuxt,.output,.vercel,.nitro}/**",
-      "**/{.vitepress/cache,.vite-inspect}/**",
-      "**/CHANGELOG*.md",
-      "**/*.min.*",
-      "**/LICENSE*",
-      "**/__snapshots__/**",
-      "**/auto-import?(s).d.ts",
-      "**/components.d.ts"
-    ]
-  }
+var DEFAULT_IGNORE_PATTERNS = Object.freeze([
+  "**/node_modules/**",
+  "**/{dist,build,coverage,output,temp,tmp}/**",
+  "**/{.cache,.nuxt,.output,.vercel,.nitro}/**",
+  "**/{.vitepress/cache,.vite-inspect}/**",
+  "**/__snapshots__/**",
+  "**/*.min.*",
+  "**/auto-import?(s).d.ts",
+  "**/components.d.ts",
+  ...GLOBS_LOCKFILES
 ]);
-var gitignoreConfigs = defineConfig([
+var createGlobalIgnores = (additionalPatterns = []) => globalIgnores([...DEFAULT_IGNORE_PATTERNS, ...additionalPatterns], "@fast-china/ignores/global");
+var createGitignoreConfigs = () => defineConfig([
   {
     name: "@fast-china/ignores/git",
     ...eslintConfigFlatGitignore({ strict: false })
   }
 ]);
-var ignoresConfigs = defineConfig([...globalIgnoresConfigs, ...gitignoreConfigs]);
-var createImportConfigs = (files = GLOB_CODE) => defineConfig([
+var createImportConfigs = (files = GLOBS_CODE) => defineConfig([
   {
     name: "@fast-china/import",
     files: [...files],
@@ -603,19 +596,16 @@ var createImportConfigs = (files = GLOB_CODE) => defineConfig([
     rules: importRules
   }
 ]);
-var importConfigs = createImportConfigs();
-var javascriptConfigs = defineConfig([
+var createJavaScriptConfigs = (files = GLOBS_JAVASCRIPT) => defineConfig([
   {
     name: "@fast-china/javascript",
-    files: [...GLOB_JAVASCRIPT],
-    // 继承某些已有的规则
+    files: [...files],
     extends: [eslint.configs.recommended],
     languageOptions: {
-      // 允许使用最新的 ECMAScript 语法特性
       ecmaVersion: "latest",
       parserOptions: {
         ecmaFeatures: {
-          // 允许在 JavaScript 文件中使用 JSX。
+          // 普通 `.jsx` 文件需要显式开启 JSX 语法解析。
           jsx: true
         }
       }
@@ -623,164 +613,197 @@ var javascriptConfigs = defineConfig([
     rules: javascriptRules
   }
 ]);
-var markdownConfigs = defineConfig([
+var createJsonConfigs = () => defineConfig([
+  {
+    name: "@fast-china/json/json",
+    files: [GLOB_JSON],
+    extends: [eslintPluginJsonc.configs["flat/recommended-with-json"]]
+  },
+  {
+    name: "@fast-china/json/jsonc",
+    files: [GLOB_JSONC],
+    extends: [eslintPluginJsonc.configs["flat/recommended-with-jsonc"]]
+  },
+  {
+    name: "@fast-china/json/json5",
+    files: [GLOB_JSON5],
+    extends: [eslintPluginJsonc.configs["flat/recommended-with-json5"]]
+  },
+  {
+    name: "@fast-china/json/vscode-settings",
+    files: ["**/.vscode/settings.json"],
+    rules: {
+      // VS Code 的 settings.json 使用带注释的 JSONC 方言。
+      "jsonc/no-comments": "off"
+    }
+  }
+]);
+var createLodashConfigs = (preference, files = GLOBS_CODE) => defineConfig([
+  {
+    name: `@fast-china/lodash/${preference}`,
+    files: [...files],
+    rules: preference === "lodash" ? preferLodashRules : preferLodashUnifiedRules
+  }
+]);
+var createMarkdownConfigs = () => defineConfig([
   {
     name: "@fast-china/markdown",
-    files: [CONST_MD],
+    files: [GLOB_MARKDOWN],
     extends: [eslintMarkdown.configs.recommended]
   }
 ]);
-var prettierConfigs = defineConfig([
+var createPrettierConfigs = () => defineConfig([
   {
     ...eslintConfigPrettierFlat,
     name: "@fast-china/prettier"
   }
 ]);
-var createRegexpConfigs = (files = GLOB_CODE) => defineConfig([
+var createRegexpConfigs = (files = GLOBS_CODE) => defineConfig([
   {
     name: "@fast-china/regexp",
     files: [...files],
     extends: [eslintPluginRegexp.configs["flat/recommended"]]
   }
 ]);
-var regexpConfigs = createRegexpConfigs();
-var createTypeScriptCoreConfigs = ({ typeChecked = false } = {}) => defineConfig([
+var createPackageJsonSortConfigs = () => defineConfig([
   {
-    name: typeChecked ? "@fast-china/typescript/type-checked" : "@fast-china/typescript",
-    files: [...GLOB_TYPESCRIPT],
-    extends: [
-      ...typeChecked ? tseslint2.configs.recommendedTypeChecked : tseslint2.configs.recommended,
-      ...typeChecked ? tseslint2.configs.stylisticTypeChecked : tseslint2.configs.stylistic
-    ],
+    name: "@fast-china/sort/package-json",
+    files: ["**/package.json"],
+    rules: packageJsonSortRules
+  }
+]);
+var createTsconfigSortConfigs = () => defineConfig([
+  {
+    name: "@fast-china/sort/tsconfig",
+    files: [...GLOBS_TSCONFIG],
+    rules: tsconfigJsonSortRules
+  }
+]);
+var getTypeScriptPresetConfigs = (typeChecked, removeFileScopes = false) => {
+  const configs = [
+    ...typeChecked ? tseslint.configs.recommendedTypeChecked : tseslint.configs.recommended,
+    ...typeChecked ? tseslint.configs.stylisticTypeChecked : tseslint.configs.stylistic
+  ];
+  if (!removeFileScopes) return configs;
+  return configs.map((config) => {
+    const { files: _files, ...configWithoutFiles } = config;
+    return configWithoutFiles;
+  });
+};
+var createTypeScriptParserOptions = ({ typeChecked = false, tsconfigRootDir } = {}) => ({
+  ...typeChecked ? { projectService: true } : {},
+  ...typeChecked && tsconfigRootDir ? { tsconfigRootDir } : {}
+});
+var createTypeScriptConfigs = (options = {}, files = GLOBS_TYPESCRIPT) => defineConfig([
+  {
+    name: options.typeChecked ? "@fast-china/typescript/type-checked" : "@fast-china/typescript",
+    files: [...files],
+    extends: getTypeScriptPresetConfigs(options.typeChecked ?? false),
     languageOptions: {
       ecmaVersion: "latest",
-      parserOptions: {
-        ...typeChecked ? { projectService: true } : {}
-      }
+      parserOptions: createTypeScriptParserOptions(options)
     },
     rules: typescriptRules
   }
 ]);
-var typescriptCoreConfigs = createTypeScriptCoreConfigs();
-var createTypeScriptConfigs = (options = {}) => defineConfig([
-  ...createTypeScriptCoreConfigs(options),
-  {
-    name: "@fast-china/typescript/declarations",
-    files: [CONST_DTS],
-    rules: {
-      "@typescript-eslint/consistent-type-imports": "off",
-      "@typescript-eslint/no-unused-vars": "off"
-    }
-  }
-]);
-var typescriptConfigs = createTypeScriptConfigs();
-var typescriptTypeCheckedConfigs = createTypeScriptConfigs({ typeChecked: true });
-var withoutFileScope = (config) => {
-  const { files: _files, ...unscopedConfig } = config;
-  return unscopedConfig;
-};
-var createVueConfigs = ({ typeChecked = false, version = 3 } = {}) => {
-  const typeScriptConfigs = [
-    ...typeChecked ? tseslint2.configs.recommendedTypeChecked : tseslint2.configs.recommended,
-    ...typeChecked ? tseslint2.configs.stylisticTypeChecked : tseslint2.configs.stylistic
-  ].map((config) => withoutFileScope(config));
-  const vueRecommendedConfigs = version === 3 ? eslintPluginVue.configs["flat/recommended"] : eslintPluginVue.configs["flat/vue2-recommended"];
+var createVueConfigs = ({ typescript = true, typescriptOptions = {} } = {}) => {
+  const typeChecked = typescriptOptions.typeChecked ?? false;
+  const typeScriptConfigs = typescript ? getTypeScriptPresetConfigs(typeChecked, true) : [];
   return defineConfig([
     {
-      name: version === 3 ? "@fast-china/vue3" : "@fast-china/vue2",
-      files: [CONST_VUE],
-      extends: [eslint.configs.recommended, ...typeScriptConfigs, ...vueRecommendedConfigs],
+      name: typeChecked ? "@fast-china/vue/type-checked" : "@fast-china/vue",
+      files: [GLOB_VUE],
+      extends: [eslint.configs.recommended, ...typeScriptConfigs, ...eslintPluginVue.configs["flat/recommended"]],
       languageOptions: {
         ecmaVersion: "latest",
         parser: vueEslintParser,
         parserOptions: {
-          parser: tseslint2.parser,
-          extraFileExtensions: [".vue"],
+          ...typescript ? { parser: tseslint.parser, extraFileExtensions: [".vue"] } : {},
           ecmaFeatures: {
             jsx: true
           },
           sourceType: "module",
-          ...typeChecked ? { projectService: true } : {}
+          ...createTypeScriptParserOptions(typescriptOptions)
         }
       },
       rules: {
-        ...typescriptRules,
+        ...typescript ? typescriptRules : {},
         ...vueRules
       }
     }
   ]);
 };
-var vueConfigs = createVueConfigs();
-var vue2Configs = createVueConfigs({ version: 2 });
-var vueTypeCheckedConfigs = createVueConfigs({ typeChecked: true });
 
 // src/factory.ts
-var defaultOptions = Object.freeze({
+var defaultConfigOptions = Object.freeze({
   environment: "browser",
   gitignore: true,
   imports: true,
+  javascript: true,
   json: true,
+  lodash: false,
   markdown: true,
   prettier: true,
   regexp: true,
+  sortPackageJson: false,
+  sortTsconfig: false,
   typescript: true,
-  vue: 3
+  vue: true
 });
-var createConfig = (options = {}) => {
-  const resolvedOptions = { ...defaultOptions, ...options };
-  const typeScriptEnabled = resolvedOptions.typescript !== false;
-  const typeScriptOptions = typeof resolvedOptions.typescript === "object" ? resolvedOptions.typescript : {};
-  const vueEnabled = resolvedOptions.vue !== false;
-  let vueOptions = {
-    typeChecked: typeScriptOptions.typeChecked,
-    version: 3
-  };
-  if (typeof resolvedOptions.vue === "number") {
-    vueOptions = { ...vueOptions, version: resolvedOptions.vue };
-  } else if (typeof resolvedOptions.vue === "object") {
-    vueOptions = { ...vueOptions, ...resolvedOptions.vue };
-  }
-  const codeFiles = [...GLOB_JAVASCRIPT, ...typeScriptEnabled ? GLOB_TYPESCRIPT : [], ...vueEnabled ? [CONST_VUE] : []];
+var fastConfig = (options = {}, ...overrides) => {
+  const environment = options.environment ?? defaultConfigOptions.environment;
+  const gitignore = options.gitignore ?? defaultConfigOptions.gitignore;
+  const imports = options.imports ?? defaultConfigOptions.imports;
+  const javascript = options.javascript ?? defaultConfigOptions.javascript;
+  const json = options.json ?? defaultConfigOptions.json;
+  const lodash = options.lodash ?? defaultConfigOptions.lodash;
+  const markdown = options.markdown ?? defaultConfigOptions.markdown;
+  const prettier = options.prettier ?? defaultConfigOptions.prettier;
+  const regexp = options.regexp ?? defaultConfigOptions.regexp;
+  const sortPackageJson = options.sortPackageJson ?? defaultConfigOptions.sortPackageJson;
+  const sortTsconfig = options.sortTsconfig ?? defaultConfigOptions.sortTsconfig;
+  const typescript = options.typescript ?? defaultConfigOptions.typescript;
+  const vue = options.vue ?? defaultConfigOptions.vue;
+  const typeScriptEnabled = typescript !== false;
+  const typeScriptOptions = typeof typescript === "object" ? typescript : {};
+  const projectRules = options.rules;
+  const scriptFiles = [...javascript ? GLOBS_JAVASCRIPT : [], ...typeScriptEnabled ? GLOBS_TYPESCRIPT : []];
+  const codeFiles = [...scriptFiles, ...vue ? [GLOB_VUE] : []];
+  const jsonEnabled = json || sortPackageJson || sortTsconfig;
   return defineConfig([
-    ...globalIgnoresConfigs,
-    ...resolvedOptions.gitignore ? gitignoreConfigs : [],
-    ...resolvedOptions.ignores?.length ? [
+    createGlobalIgnores(options.ignores),
+    ...gitignore ? createGitignoreConfigs() : [],
+    ...codeFiles.length ? [
+      ...createEnvironmentConfigs({
+        environment,
+        files: codeFiles,
+        globals: options.globals,
+        nodeFiles: scriptFiles
+      }),
+      ...createBaseConfigs(codeFiles)
+    ] : [],
+    ...javascript ? createJavaScriptConfigs() : [],
+    ...imports && codeFiles.length ? createImportConfigs(codeFiles) : [],
+    ...lodash && codeFiles.length ? createLodashConfigs(lodash, codeFiles) : [],
+    ...regexp && codeFiles.length ? createRegexpConfigs(codeFiles) : [],
+    ...typeScriptEnabled ? createTypeScriptConfigs(typeScriptOptions) : [],
+    ...jsonEnabled ? createJsonConfigs() : [],
+    ...sortPackageJson ? createPackageJsonSortConfigs() : [],
+    ...sortTsconfig ? createTsconfigSortConfigs() : [],
+    ...vue ? createVueConfigs({ typescript: typeScriptEnabled, typescriptOptions: typeScriptOptions }) : [],
+    ...markdown ? createMarkdownConfigs() : [],
+    ...prettier ? createPrettierConfigs() : [],
+    ...projectRules && codeFiles.length ? [
       {
-        name: "@fast-china/ignores/custom",
-        ignores: resolvedOptions.ignores
+        name: "@fast-china/project/rules",
+        files: codeFiles,
+        rules: projectRules
       }
     ] : [],
-    ...createEnvironmentConfigs(resolvedOptions.environment, codeFiles),
-    ...createCommonConfigs(codeFiles),
-    ...javascriptConfigs,
-    ...resolvedOptions.imports ? createImportConfigs(codeFiles) : [],
-    ...resolvedOptions.regexp ? createRegexpConfigs(codeFiles) : [],
-    ...typeScriptEnabled ? createTypeScriptConfigs(typeScriptOptions) : [],
-    ...resolvedOptions.json ? [...jsonConfigs, ...packageJsonSortConfigs, ...tsconfigJsonSortConfigs] : [],
-    ...vueEnabled ? createVueConfigs(vueOptions) : [],
-    ...resolvedOptions.markdown ? markdownConfigs : [],
-    ...resolvedOptions.prettier ? prettierConfigs : []
+    ...overrides
   ]);
 };
 
-// src/index.ts
-var PresetJavascriptConfigs = createConfig({
-  json: false,
-  markdown: false,
-  typescript: false,
-  vue: false
-});
-var PresetJsonConfigs = [...jsonConfigs, ...packageJsonSortConfigs, ...tsconfigJsonSortConfigs];
-var PresetTypescriptConfigs = createConfig({
-  json: false,
-  markdown: false,
-  vue: false
-});
-var PresetTypeScriptConfigs = PresetTypescriptConfigs;
-var PresetBasicConfigs = createConfig({ markdown: false, vue: false });
-var PresetVueConfigs = createConfig();
-var src_default = PresetVueConfigs;
-
-export { CONST_DIST, CONST_DTS, CONST_JS, CONST_JSON, CONST_JSON5, CONST_JSONC, CONST_JSX, CONST_LOCKFILE, CONST_MD, CONST_NODE_MODULES, CONST_PUBLIC, CONST_TS, CONST_TSCONFIG, CONST_TSX, CONST_VUE, CONST_YAML, GLOB_CODE, GLOB_JAVASCRIPT, GLOB_NODE, GLOB_TYPESCRIPT, PresetBasicConfigs, PresetJavascriptConfigs, PresetJsonConfigs, PresetTypeScriptConfigs, PresetTypescriptConfigs, PresetVueConfigs, browserConfigs, commonConfigs, createCommonConfigs, createConfig, createEnvironmentConfigs, createImportConfigs, createRegexpConfigs, createTypeScriptConfigs, createTypeScriptCoreConfigs, createVueConfigs, src_default as default, defaultOptions, defineRules, gitignoreConfigs, globalIgnoresConfigs, ignoresConfigs, importConfigs, javascriptConfigs, jsonConfigs, markdownConfigs, nodeConfigs, packageJsonSortConfigs, prettierConfigs, regexpConfigs, tsconfigJsonSortConfigs, typescriptConfigs, typescriptCoreConfigs, typescriptTypeCheckedConfigs, universalConfigs, vue2Configs, vueConfigs, vueTypeCheckedConfigs };
+export { fastConfig as default, defaultConfigOptions, defineRules, fastConfig };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

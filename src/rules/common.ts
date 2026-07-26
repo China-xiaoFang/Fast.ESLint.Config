@@ -3,13 +3,13 @@ import type { RuleOptions } from "../typegen";
 /**
  * 跨 JavaScript、TypeScript 与 Vue 脚本生效的公共规则。
  *
- * 维护约定：每条本地覆写都要说明启用原因；可能造成大面积改动、迁移阻断或
+ * 维护约定：每条本地覆写都要说明启用原因；可能造成大面积改动、采用成本或
  * 行为变化的规则使用 `[高影响]` 标记，并同步维护 `docs/rules-risk.zh.md`。
  */
 export const commonRules = {
 	// 要求数组回调在所有可到达分支返回值，避免 map/filter 等调用静默产生 undefined。
 	"array-callback-return": "error",
-	// 浏览器弹窗通常不适合生产代码，但保留为警告以兼容原型开发和已有项目。
+	// 浏览器弹窗通常不适合生产代码；使用 warn 允许原型调试，同时确保发布前能够被发现。
 	"no-alert": "warn",
 	// switch 的 case 不创建词法作用域；要求用花括号包裹声明，避免跨 case 冲突。
 	"no-case-declarations": "error",

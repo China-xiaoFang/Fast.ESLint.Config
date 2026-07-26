@@ -1,8 +1,7 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "1.1.0",
-	"packageManager": "pnpm@11.9.0",
-	"description": "A practical ESLint Flat Config for Vue 3, TypeScript, Vite, and JavaScript projects.",
+	"version": "2.0.0",
+	"description": "Opinionated, typed ESLint Flat Config for Vue 3, Vite, TypeScript, JavaScript, and Node.js.",
 	"type": "module",
 	"keywords": [
 		"fast",
@@ -25,6 +24,7 @@
 	},
 	"author": "小方",
 	"files": [
+		"CHANGELOG.md",
 		"Fast.png",
 		"LICENSE",
 		"README.md",
@@ -96,6 +96,7 @@
 		"typescript": "^5.9.0"
 	},
 	"engines": {
-		"node": "^20.19.0 || ^22.13.0 || >=24"
+		"node": "^22.13.0 || ^24.0.0",
+		"pnpm": "^11.0.0"
 	}
 }

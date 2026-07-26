@@ -6,7 +6,7 @@ export default defineConfig({
 		"rules/index": "src/rules/index.ts",
 	},
 	format: ["esm"],
-	target: "node20",
+	target: "node22",
 	dts: true,
 	splitting: false,
 	sourcemap: true,

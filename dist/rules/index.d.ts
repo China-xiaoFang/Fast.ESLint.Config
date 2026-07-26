@@ -4,7 +4,7 @@ import 'eslint';
 /**
  * 跨 JavaScript、TypeScript 与 Vue 脚本生效的公共规则。
  *
- * 维护约定：每条本地覆写都要说明启用原因；可能造成大面积改动、迁移阻断或
+ * 维护约定：每条本地覆写都要说明启用原因；可能造成大面积改动、采用成本或
  * 行为变化的规则使用 `[高影响]` 标记，并同步维护 `docs/rules-risk.zh.md`。
  */
 declare const commonRules: {
@@ -30,38 +30,6 @@ declare const commonRules: {
     }];
 };
 
-/**
- * 按需启用：要求项目统一使用 lodash-unified。
- * 该组织偏好不会被默认配置加载，使用者需从 `@fast-china/eslint-config/rules` 显式导入。
- */
-declare const importUseLodashUnifiedRules: {
-    "no-restricted-imports": ["error", {
-        paths: {
-            name: string;
-            message: string;
-        }[];
-        patterns: {
-            group: string[];
-            message: string;
-        }[];
-    }];
-};
-/**
- * 按需启用：要求项目统一使用 lodash。
- * 该组织偏好不会被默认配置加载，使用者需从 rules 子路径显式导入。
- */
-declare const importUseLodashRules: {
-    "no-restricted-imports": ["error", {
-        paths: {
-            name: string;
-            message: string;
-        }[];
-        patterns: {
-            group: string[];
-            message: string;
-        }[];
-    }];
-};
 /** 默认启用的模块导入正确性与排序规则。 */
 declare const importRules: {
     "import-x/first": "error";
@@ -129,9 +97,46 @@ declare const javascriptRules: {
 };
 
 /**
+ * 统一使用 `lodash-unified` 的可选导入策略。
+ *
+ * 该规则只约束静态 import/export 的模块来源，不会安装依赖，也不会检查动态
+ * `import()` 或 CommonJS `require()`。选择此策略的项目应自行安装 `lodash-unified`。
+ */
+declare const preferLodashUnifiedRules: {
+    "no-restricted-imports": ["error", {
+        paths: {
+            name: string;
+            message: string;
+        }[];
+        patterns: {
+            group: string[];
+            message: string;
+        }[];
+    }];
+};
+/**
+ * 统一使用 `lodash` 的可选导入策略。
+ *
+ * 根入口和 `lodash/*` 子路径都允许使用；规则只负责避免与 `lodash-es` 或
+ * `lodash-unified` 混用，不替项目决定整包导入或按方法导入。
+ */
+declare const preferLodashRules: {
+    "no-restricted-imports": ["error", {
+        paths: {
+            name: string;
+            message: string;
+        }[];
+        patterns: {
+            group: string[];
+            message: string;
+        }[];
+    }];
+};
+
+/**
  * package.json 属性排序规则。
  *
- * `[高影响][可自动修复]`：默认随 `json: true` 启用，首次修复可能重排大量字段。
+ * `[高影响][可自动修复]`：仅在 `sortPackageJson: true` 时启用，首次修复可能重排大量字段。
  * 注意：这里故意不排序 `exports` 内部键；条件导出的键顺序具有模块解析语义。
  */
 declare const packageJsonSortRules: {
@@ -160,7 +165,7 @@ declare const packageJsonSortRules: {
 /**
  * tsconfig.json 属性排序规则。
  *
- * `[高影响][可自动修复]`：默认随 `json: true` 启用，首次修复会重排大量字段，
+ * `[高影响][可自动修复]`：仅在 `sortTsconfig: true` 时启用，首次修复会重排大量字段，
  * 但只改变 JSONC 的阅读顺序，不改变 TypeScript 编译选项值。
  */
 declare const tsconfigJsonSortRules: {
@@ -226,4 +231,4 @@ declare const vueRules: {
     }];
 };
 
-export { commonRules, importRules, importUseLodashRules, importUseLodashUnifiedRules, javascriptRules, packageJsonSortRules, tsconfigJsonSortRules, typescriptRules, vueRules };
+export { commonRules, importRules, javascriptRules, packageJsonSortRules, preferLodashRules, preferLodashUnifiedRules, tsconfigJsonSortRules, typescriptRules, vueRules };

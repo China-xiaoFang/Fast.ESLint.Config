@@ -4,7 +4,7 @@ import process from "node:process";
 import { builtinRules } from "eslint/use-at-your-own-risk";
 import { flatConfigsToRulesDTS } from "eslint-typegen/core";
 
-import { createConfig } from "../src/factory";
+import { fastConfig } from "../src/factory";
 
 import type { ESLint, Linter } from "eslint";
 
@@ -22,7 +22,7 @@ const configs: Linter.Config[] = [
 			"": corePlugin,
 		},
 	},
-	...createConfig({ gitignore: false }),
+	...fastConfig({ gitignore: false }),
 ];
 
 const declarations = await flatConfigsToRulesDTS(configs, {

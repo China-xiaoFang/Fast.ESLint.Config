@@ -21,9 +21,9 @@ export const javascriptRules = {
 			checkLoops: false,
 		},
 	],
-	// [高影响] 禁止标签语句；迁移包含多层循环 labeled break/continue 的代码时需先重构控制流。
+	// [高影响] 禁止标签语句；包含多层循环 labeled break/continue 的代码需先重构控制流。
 	"no-restricted-syntax": ["error", "LabeledStatement"],
-	// [高影响][可自动修复] 使用 let/const 替代 var；首次迁移需复核循环闭包和声明提升行为。
+	// [高影响][可自动修复] 使用 let/const 替代 var；首次启用需复核循环闭包和声明提升行为。
 	"no-var": "error",
 	// 禁止无说明的空代码块；允许用于“忽略失败”语义的空 catch。
 	"no-empty": [
@@ -34,7 +34,7 @@ export const javascriptRules = {
 	],
 	// 拒绝肉眼难以识别、可能导致解析差异的非常规空白字符。
 	"no-irregular-whitespace": "error",
-	// 变量和类先声明后使用；函数声明允许提升。使用 warn 降低旧项目迁移阻力。
+	// 变量和类先声明后使用；函数声明允许提升。warn 保留函数式组合和循环依赖重构空间。
 	"no-use-before-define": [
 		"warn",
 		{
@@ -51,7 +51,7 @@ export const javascriptRules = {
 			ignoreReadBeforeAssign: true,
 		},
 	],
-	// [高影响][可自动修复] 优先箭头回调；批量迁移后应复核 this/arguments 与函数名栈信息。
+	// [高影响][可自动修复] 优先箭头回调；批量修复后应复核 this/arguments 与函数名栈信息。
 	"prefer-arrow-callback": [
 		"error",
 		{

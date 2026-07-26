@@ -3,12 +3,16 @@ import { defineConfig } from "eslint/config";
 import { packageJsonSortRules } from "../rules";
 
 /**
- * package.json 属性排序
+ * 创建 package.json 排序配置。
+ *
+ * 该能力会产生较大的可修复 diff，因此必须显式启用；规则不会进入顺序具有
+ * 条件导出语义的 `exports` 对象内部。
  */
-export const packageJsonSortConfigs = defineConfig([
-	{
-		name: "@fast-china/sort/package",
-		files: ["**/package.json"],
-		rules: packageJsonSortRules,
-	},
-]);
+export const createPackageJsonSortConfigs = () =>
+	defineConfig([
+		{
+			name: "@fast-china/sort/package-json",
+			files: ["**/package.json"],
+			rules: packageJsonSortRules,
+		},
+	]);

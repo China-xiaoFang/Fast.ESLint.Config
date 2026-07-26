@@ -1,99 +1,187 @@
-import { defineConfig } from "eslint/config";
+import { type Config, defineConfig } from "eslint/config";
 
-import { createCommonConfigs } from "./configs/common";
+import { createBaseConfigs } from "./configs/common";
 import { type RuntimeEnvironment, createEnvironmentConfigs } from "./configs/environment";
-import { gitignoreConfigs, globalIgnoresConfigs } from "./configs/ignores";
+import { createGitignoreConfigs, createGlobalIgnores } from "./configs/ignores";
 import { createImportConfigs } from "./configs/import";
-import { javascriptConfigs } from "./configs/javascript";
-import { jsonConfigs } from "./configs/json";
-import { markdownConfigs } from "./configs/markdown";
-import { prettierConfigs } from "./configs/prettier";
+import { createJavaScriptConfigs } from "./configs/javascript";
+import { createJsonConfigs } from "./configs/json";
+import { type LodashPreference, createLodashConfigs } from "./configs/lodash";
+import { createMarkdownConfigs } from "./configs/markdown";
+import { createPrettierConfigs } from "./configs/prettier";
 import { createRegexpConfigs } from "./configs/regexp";
-import { packageJsonSortConfigs } from "./configs/sort-package";
-import { tsconfigJsonSortConfigs } from "./configs/sort-tsconfig";
+import { createPackageJsonSortConfigs } from "./configs/sort-package";
+import { createTsconfigSortConfigs } from "./configs/sort-tsconfig";
 import { type TypeScriptConfigOptions, createTypeScriptConfigs } from "./configs/typescript";
-import { type VueConfigOptions, createVueConfigs } from "./configs/vue";
-import { CONST_VUE, GLOB_JAVASCRIPT, GLOB_TYPESCRIPT } from "./constants";
+import { createVueConfigs } from "./configs/vue";
+import { GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT, GLOB_VUE } from "./constants";
+
+import type { RuleOptions } from "./typegen";
+import type { Linter } from "eslint";
 
 export interface FastConfigOptions {
-	/** 运行时全局变量。Vue/Vite 应用通常使用 browser。 */
+	/**
+	 * 应用代码的运行环境；Vue/Vite 项目通常使用 `browser`。
+	 * @default "browser"
+	 */
 	environment?: RuntimeEnvironment;
-	/** 是否读取项目根目录的 .gitignore。 */
+	/**
+	 * 项目额外提供的全局变量，例如测试运行器或宿主平台 API。
+	 * @default undefined
+	 */
+	globals?: Linter.Globals;
+	/**
+	 * 是否读取项目根目录的 .gitignore。
+	 * @default true
+	 */
 	gitignore?: boolean;
-	/** 额外的全局忽略模式。 */
-	ignores?: string[];
-	/** 是否启用 import-x 规则。 */
+	/**
+	 * 追加到内置集合的全局忽略模式。
+	 * @default []
+	 */
+	ignores?: readonly string[];
+	/**
+	 * 是否启用 import-x 规则。
+	 * @default true
+	 */
 	imports?: boolean;
-	/** 是否启用 JSON、JSONC、JSON5 规则及常用清单排序。 */
+	/**
+	 * 是否处理 JavaScript 与 JSX 文件。
+	 * @default true
+	 */
+	javascript?: boolean;
+	/**
+	 * 是否启用 JSON、JSONC 与 JSON5 推荐规则；清单排序由独立选项控制。
+	 * @default true
+	 */
 	json?: boolean;
-	/** 是否启用 Markdown 规则。 */
+	/**
+	 * 统一项目使用的 Lodash 包；`false` 表示不限制 `lodash`、`lodash-es` 或 `lodash-unified`。
+	 * @default false
+	 */
+	lodash?: false | LodashPreference;
+	/**
+	 * 是否启用 Markdown 规则。
+	 * @default true
+	 */
 	markdown?: boolean;
-	/** 是否在末尾关闭与 Prettier 冲突的格式规则。 */
+	/**
+	 * 是否在末尾关闭与 Prettier 冲突的格式规则。
+	 * @default true
+	 */
 	prettier?: boolean;
-	/** 是否启用正则表达式规则。 */
+	/**
+	 * 是否启用正则表达式规则。
+	 * @default true
+	 */
 	regexp?: boolean;
-	/** TypeScript 支持；传入对象可开启类型感知规则。 */
+	/**
+	 * 应用于全部已启用代码文件的项目级规则，提供精确规则名与选项类型。
+	 * @default undefined
+	 */
+	rules?: RuleOptions;
+	/**
+	 * 是否按安全的固定顺序整理 package.json；启用后首次运行可能产生较大 diff。
+	 * @default false
+	 */
+	sortPackageJson?: boolean;
+	/**
+	 * 是否按 TypeScript 文档主题整理 tsconfig*.json。
+	 * @default false
+	 */
+	sortTsconfig?: boolean;
+	/**
+	 * TypeScript 支持；传入对象可开启类型感知规则。
+	 * @default true
+	 */
 	typescript?: boolean | TypeScriptConfigOptions;
-	/** Vue 支持；默认 Vue 3，也可显式选择 Vue 2。 */
-	vue?: boolean | 2 | 3 | VueConfigOptions;
+	/**
+	 * 是否启用 Vue 3 单文件组件支持。
+	 * @default true
+	 */
+	vue?: boolean;
 }
 
-export const defaultOptions = Object.freeze({
+/** `fastConfig()` 使用的稳定默认值；对象被冻结，避免运行时被意外修改。 */
+export const defaultConfigOptions = Object.freeze({
 	environment: "browser",
 	gitignore: true,
 	imports: true,
+	javascript: true,
 	json: true,
+	lodash: false,
 	markdown: true,
 	prettier: true,
 	regexp: true,
+	sortPackageJson: false,
+	sortTsconfig: false,
 	typescript: true,
-	vue: 3,
-} satisfies Required<Omit<FastConfigOptions, "ignores">>);
+	vue: true,
+} as const satisfies Required<Omit<FastConfigOptions, "globals" | "ignores" | "rules">>);
 
 /**
- * 创建可组合的 ESLint Flat Config。
+ * 创建面向 Vue 3、Vite、TypeScript、JavaScript 与 Node.js 项目的 ESLint Flat Config。
  *
- * 返回普通配置数组，可直接展开，也可继续通过 defineConfig 追加项目规则。
+ * 默认导出就是此函数。额外配置参数会放在内置配置之后，因此项目可以按文件范围
+ * 覆盖任何默认规则，而无需再次调用 ESLint 的 `defineConfig()`。
  */
-export const createConfig = (options: FastConfigOptions = {}) => {
-	const resolvedOptions = { ...defaultOptions, ...options };
-	const typeScriptEnabled = resolvedOptions.typescript !== false;
-	const typeScriptOptions = typeof resolvedOptions.typescript === "object" ? resolvedOptions.typescript : {};
-	const vueEnabled = resolvedOptions.vue !== false;
+export const fastConfig = (options: FastConfigOptions = {}, ...overrides: Config[]): Config[] => {
+	const environment = options.environment ?? defaultConfigOptions.environment;
+	const gitignore = options.gitignore ?? defaultConfigOptions.gitignore;
+	const imports = options.imports ?? defaultConfigOptions.imports;
+	const javascript = options.javascript ?? defaultConfigOptions.javascript;
+	const json = options.json ?? defaultConfigOptions.json;
+	const lodash = options.lodash ?? defaultConfigOptions.lodash;
+	const markdown = options.markdown ?? defaultConfigOptions.markdown;
+	const prettier = options.prettier ?? defaultConfigOptions.prettier;
+	const regexp = options.regexp ?? defaultConfigOptions.regexp;
+	const sortPackageJson = options.sortPackageJson ?? defaultConfigOptions.sortPackageJson;
+	const sortTsconfig = options.sortTsconfig ?? defaultConfigOptions.sortTsconfig;
+	const typescript = options.typescript ?? defaultConfigOptions.typescript;
+	const vue = options.vue ?? defaultConfigOptions.vue;
 
-	let vueOptions: VueConfigOptions = {
-		typeChecked: typeScriptOptions.typeChecked,
-		version: 3,
-	};
-
-	if (typeof resolvedOptions.vue === "number") {
-		vueOptions = { ...vueOptions, version: resolvedOptions.vue };
-	} else if (typeof resolvedOptions.vue === "object") {
-		vueOptions = { ...vueOptions, ...resolvedOptions.vue };
-	}
-
-	const codeFiles = [...GLOB_JAVASCRIPT, ...(typeScriptEnabled ? GLOB_TYPESCRIPT : []), ...(vueEnabled ? [CONST_VUE] : [])];
+	const typeScriptEnabled = typescript !== false;
+	const typeScriptOptions = typeof typescript === "object" ? typescript : {};
+	// RuleOptions 是无字符串索引签名的精确映射；运行时形状仍完全符合 ESLint RulesRecord。
+	const projectRules = options.rules as Linter.RulesRecord | undefined;
+	const scriptFiles = [...(javascript ? GLOBS_JAVASCRIPT : []), ...(typeScriptEnabled ? GLOBS_TYPESCRIPT : [])];
+	const codeFiles = [...scriptFiles, ...(vue ? [GLOB_VUE] : [])];
+	const jsonEnabled = json || sortPackageJson || sortTsconfig;
 
 	return defineConfig([
-		...globalIgnoresConfigs,
-		...(resolvedOptions.gitignore ? gitignoreConfigs : []),
-		...(resolvedOptions.ignores?.length
+		createGlobalIgnores(options.ignores),
+		...(gitignore ? createGitignoreConfigs() : []),
+		...(codeFiles.length
+			? [
+					...createEnvironmentConfigs({
+						environment,
+						files: codeFiles,
+						globals: options.globals,
+						nodeFiles: scriptFiles,
+					}),
+					...createBaseConfigs(codeFiles),
+				]
+			: []),
+		...(javascript ? createJavaScriptConfigs() : []),
+		...(imports && codeFiles.length ? createImportConfigs(codeFiles) : []),
+		...(lodash && codeFiles.length ? createLodashConfigs(lodash, codeFiles) : []),
+		...(regexp && codeFiles.length ? createRegexpConfigs(codeFiles) : []),
+		...(typeScriptEnabled ? createTypeScriptConfigs(typeScriptOptions) : []),
+		...(jsonEnabled ? createJsonConfigs() : []),
+		...(sortPackageJson ? createPackageJsonSortConfigs() : []),
+		...(sortTsconfig ? createTsconfigSortConfigs() : []),
+		...(vue ? createVueConfigs({ typescript: typeScriptEnabled, typescriptOptions: typeScriptOptions }) : []),
+		...(markdown ? createMarkdownConfigs() : []),
+		...(prettier ? createPrettierConfigs() : []),
+		...(projectRules && codeFiles.length
 			? [
 					{
-						name: "@fast-china/ignores/custom",
-						ignores: resolvedOptions.ignores,
+						name: "@fast-china/project/rules",
+						files: codeFiles,
+						rules: projectRules,
 					},
 				]
 			: []),
-		...createEnvironmentConfigs(resolvedOptions.environment, codeFiles),
-		...createCommonConfigs(codeFiles),
-		...javascriptConfigs,
-		...(resolvedOptions.imports ? createImportConfigs(codeFiles) : []),
-		...(resolvedOptions.regexp ? createRegexpConfigs(codeFiles) : []),
-		...(typeScriptEnabled ? createTypeScriptConfigs(typeScriptOptions) : []),
-		...(resolvedOptions.json ? [...jsonConfigs, ...packageJsonSortConfigs, ...tsconfigJsonSortConfigs] : []),
-		...(vueEnabled ? createVueConfigs(vueOptions) : []),
-		...(resolvedOptions.markdown ? markdownConfigs : []),
-		...(resolvedOptions.prettier ? prettierConfigs : []),
+		...overrides,
 	]);
 };

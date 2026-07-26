@@ -9,7 +9,7 @@ export const vueRules = {
 	"vue/no-v-html": "warn",
 	// [默认关闭] TypeScript 类型 props 和 required 声明已能表达可选性，不强制每个可选 prop 提供默认值。
 	"vue/require-default-prop": "off",
-	// [高影响] 组件必须声明对外事件；旧组件迁移时会暴露未建模的公共事件 API。
+	// [高影响] 组件必须声明对外事件；首次启用时会暴露未建模的公共事件 API。
 	"vue/require-explicit-emits": "error",
 	// [默认关闭] 允许 App、Layout 等约定俗成的单词组件名。
 	"vue/multi-word-component-names": "off",

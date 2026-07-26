@@ -5,7 +5,7 @@ var defineRules = (rules) => rules;
 var commonRules = {
   // 要求数组回调在所有可到达分支返回值，避免 map/filter 等调用静默产生 undefined。
   "array-callback-return": "error",
-  // 浏览器弹窗通常不适合生产代码，但保留为警告以兼容原型开发和已有项目。
+  // 浏览器弹窗通常不适合生产代码；使用 warn 允许原型调试，同时确保发布前能够被发现。
   "no-alert": "warn",
   // switch 的 case 不创建词法作用域；要求用花括号包裹声明，避免跨 case 冲突。
   "no-case-declarations": "error",
@@ -40,42 +40,6 @@ var commonRules = {
 };
 
 // src/rules/import.ts
-var importUseLodashUnifiedRules = {
-  // [高影响][按需启用] 阻止 lodash/lodash-es 及其子路径，启用前应先完成依赖迁移。
-  "no-restricted-imports": [
-    "error",
-    {
-      paths: [
-        { name: "lodash", message: "Use lodash-unified instead." },
-        { name: "lodash-es", message: "Use lodash-unified instead." }
-      ],
-      patterns: [
-        {
-          group: ["lodash/*", "lodash-es/*"],
-          message: "Use lodash-unified instead."
-        }
-      ]
-    }
-  ]
-};
-var importUseLodashRules = {
-  // [高影响][按需启用] 阻止 lodash-es/lodash-unified 及其子路径，启用前应先完成依赖迁移。
-  "no-restricted-imports": [
-    "error",
-    {
-      paths: [
-        { name: "lodash-es", message: "Use lodash instead." },
-        { name: "lodash-unified", message: "Use lodash instead." }
-      ],
-      patterns: [
-        {
-          group: ["lodash-es/*", "lodash-unified/*"],
-          message: "Use lodash instead."
-        }
-      ]
-    }
-  ]
-};
 var importRules = {
   // import 必须位于其他语句之前，避免模块依赖散落在执行逻辑中。
   "import-x/first": "error",
@@ -148,9 +112,9 @@ var javascriptRules = {
       checkLoops: false
     }
   ],
-  // [高影响] 禁止标签语句；迁移包含多层循环 labeled break/continue 的代码时需先重构控制流。
+  // [高影响] 禁止标签语句；包含多层循环 labeled break/continue 的代码需先重构控制流。
   "no-restricted-syntax": ["error", "LabeledStatement"],
-  // [高影响][可自动修复] 使用 let/const 替代 var；首次迁移需复核循环闭包和声明提升行为。
+  // [高影响][可自动修复] 使用 let/const 替代 var；首次启用需复核循环闭包和声明提升行为。
   "no-var": "error",
   // 禁止无说明的空代码块；允许用于“忽略失败”语义的空 catch。
   "no-empty": [
@@ -161,7 +125,7 @@ var javascriptRules = {
   ],
   // 拒绝肉眼难以识别、可能导致解析差异的非常规空白字符。
   "no-irregular-whitespace": "error",
-  // 变量和类先声明后使用；函数声明允许提升。使用 warn 降低旧项目迁移阻力。
+  // 变量和类先声明后使用；函数声明允许提升。warn 保留函数式组合和循环依赖重构空间。
   "no-use-before-define": [
     "warn",
     {
@@ -178,7 +142,7 @@ var javascriptRules = {
       ignoreReadBeforeAssign: true
     }
   ],
-  // [高影响][可自动修复] 优先箭头回调；批量迁移后应复核 this/arguments 与函数名栈信息。
+  // [高影响][可自动修复] 优先箭头回调；批量修复后应复核 this/arguments 与函数名栈信息。
   "prefer-arrow-callback": [
     "error",
     {
@@ -209,9 +173,59 @@ var javascriptRules = {
   "no-redeclare": "error"
 };
 
+// src/rules/lodash.ts
+var preferLodashUnifiedRules = {
+  // [高影响][按需启用] 禁止混用 lodash 与 lodash-es，避免同一项目维护多套等价依赖入口。
+  "no-restricted-imports": [
+    "error",
+    {
+      paths: [
+        {
+          name: "lodash",
+          message: 'Use "lodash-unified" consistently instead of "lodash".'
+        },
+        {
+          name: "lodash-es",
+          message: 'Use "lodash-unified" consistently instead of "lodash-es".'
+        }
+      ],
+      patterns: [
+        {
+          group: ["lodash/*", "lodash-es/*"],
+          message: 'Use exports from "lodash-unified" instead of Lodash subpath imports.'
+        }
+      ]
+    }
+  ]
+};
+var preferLodashRules = {
+  // [高影响][按需启用] 禁止混用 lodash-es 与 lodash-unified，保持运行时和类型来源一致。
+  "no-restricted-imports": [
+    "error",
+    {
+      paths: [
+        {
+          name: "lodash-es",
+          message: 'Use "lodash" consistently instead of "lodash-es".'
+        },
+        {
+          name: "lodash-unified",
+          message: 'Use "lodash" consistently instead of "lodash-unified".'
+        }
+      ],
+      patterns: [
+        {
+          group: ["lodash-es/*", "lodash-unified/*"],
+          message: 'Use "lodash" or a "lodash/*" subpath consistently.'
+        }
+      ]
+    }
+  ]
+};
+
 // src/rules/sort-package.ts
 var packageJsonSortRules = {
-  // [高影响][可自动修复] npm 的 files 清单按字母排序；数组顺序不改打包集合，但首次 diff 较大。
+  // [高影响][可自动修复][按需启用] npm 的 files 清单按字母排序；数组顺序不改打包集合，但首次 diff 较大。
   "jsonc/sort-array-values": [
     "error",
     {
@@ -219,7 +233,7 @@ var packageJsonSortRules = {
       pathPattern: "^files$"
     }
   ],
-  // [高影响][可自动修复] 仅排序明确安全的 package.json 区域，不进入 exports 条件对象。
+  // [高影响][可自动修复][按需启用] 仅排序明确安全的 package.json 区域，不进入 exports 条件对象。
   "jsonc/sort-keys": [
     "error",
     // 根字段按常见阅读顺序组织，减少不同项目之间的清单噪声。
@@ -287,7 +301,7 @@ var packageJsonSortRules = {
 var tsconfigJsonSortRules = {
   // tsconfig 是 JSONC，注释用于解释不直观的编译器取舍，必须保留。
   "jsonc/no-comments": "off",
-  // [高影响][可自动修复] 只调整顶层和 compilerOptions 的键顺序，不改写任何选项值或数组。
+  // [高影响][可自动修复][按需启用] 只调整顶层和 compilerOptions 的键顺序，不改写任何选项值或数组。
   "jsonc/sort-keys": [
     "error",
     // 顶层按继承、选项、项目引用和文件范围的阅读顺序排列。
@@ -419,7 +433,7 @@ var typescriptRules = {
   ],
   // [默认关闭] 声明文件、全局扩展和部分 SDK 仍需要 namespace。
   "@typescript-eslint/no-namespace": "off",
-  // any 会绕过类型检查，但在迁移和第三方边界中有合理用途，因此只警告。
+  // any 会绕过类型检查，但在第三方边界和渐进式类型完善中有合理用途，因此只警告。
   "@typescript-eslint/no-explicit-any": "warn",
   // [高影响] 默认要求 ESM import；CommonJS、动态加载或工具链互操作代码可能需要按文件关闭。
   "@typescript-eslint/no-require-imports": "error",
@@ -433,7 +447,7 @@ var typescriptRules = {
   ],
   // [可自动修复] 删除可由 TypeScript 明确推断的原始值类型标注，减少重复信息。
   "@typescript-eslint/no-inferrable-types": "error",
-  // 非空断言可能隐藏空值缺陷；以警告提示逐步消除而不阻断迁移。
+  // 非空断言可能隐藏空值缺陷；以警告提示逐步消除，避免一次性产生大量阻断错误。
   "@typescript-eslint/no-non-null-assertion": "warn",
   // 可选链之后再做非空断言逻辑矛盾，通常表示边界条件设计有误。
   "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
@@ -454,7 +468,7 @@ var vueRules = {
   "vue/no-v-html": "warn",
   // [默认关闭] TypeScript 类型 props 和 required 声明已能表达可选性，不强制每个可选 prop 提供默认值。
   "vue/require-default-prop": "off",
-  // [高影响] 组件必须声明对外事件；旧组件迁移时会暴露未建模的公共事件 API。
+  // [高影响] 组件必须声明对外事件；首次启用时会暴露未建模的公共事件 API。
   "vue/require-explicit-emits": "error",
   // [默认关闭] 允许 App、Layout 等约定俗成的单词组件名。
   "vue/multi-word-component-names": "off",
@@ -481,6 +495,6 @@ var vueRules = {
   ]
 };
 
-export { commonRules, defineRules, importRules, importUseLodashRules, importUseLodashUnifiedRules, javascriptRules, packageJsonSortRules, tsconfigJsonSortRules, typescriptRules, vueRules };
+export { commonRules, defineRules, importRules, javascriptRules, packageJsonSortRules, preferLodashRules, preferLodashUnifiedRules, tsconfigJsonSortRules, typescriptRules, vueRules };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map
