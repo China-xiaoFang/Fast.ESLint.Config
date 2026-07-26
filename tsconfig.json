@@ -10,5 +10,5 @@
 		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true
 	},
-	"include": ["src", "scripts", "tsup.config.ts"]
+	"include": ["src", "scripts", "tsdown.config.ts"]
 }

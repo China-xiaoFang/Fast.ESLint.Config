@@ -2,7 +2,7 @@
 
 # @fast-china/eslint-config
 
-面向 Vue 3、Vite、TypeScript 与 JavaScript 项目的实用型 ESLint Flat Config 规则库。
+面向 Vue 3、React、Angular、Vite、TypeScript 与 JavaScript 项目的实用型 ESLint Flat Config 规则库。
 
 [![npm version](https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange)](https://www.npmjs.com/package/@fast-china/eslint-config)
 [![license](https://img.shields.io/npm/l/@fast-china/eslint-config)](./LICENSE)
@@ -10,8 +10,8 @@
 ## 特性
 
 - 基于 ESLint 10，仅提供原生 Flat Config。
-- 默认针对 Vue 3 + TypeScript + Vite，可显式开启类型感知规则或关闭不需要的语言能力。
-- 完整覆盖 JavaScript、TypeScript、Vue SFC、JSON、JSONC、JSON5、Markdown、正则表达式与导入规则。
+- 默认针对 Vue 3 + TypeScript + Vite；React 与 Angular 是完整但按需启用的框架集成，Vue 项目不会意外接管无关文件。
+- 完整覆盖 JavaScript、TypeScript、Vue SFC、JSX/TSX、Angular TypeScript 与模板、JSON 各方言、Markdown、正则表达式与导入规则。
 - 默认导出单一 `fastConfig()` 工厂，公共 API 清晰，并且不会在导入模块时读取项目文件。
 - 根据 ESLint 与内置插件的规则 schema 生成精确类型，提供规则名和规则选项自动补全。
 - 插件与解析器均由本包直接声明依赖，使用者不需要手工拼装插件依赖树。
@@ -21,9 +21,9 @@
 
 ## 环境要求
 
-- Node.js `^22.13.0` 或 `^24.0.0`
+- Node.js `^22.18.0` 或 `>=24.11.0`
 - ESLint `^10.0.0`
-- TypeScript `>=5.3.0 <6.1.0`
+- TypeScript `>=6.0.0 <6.1.0`
 
 这些版本范围与 ESLint 10 及内置语言插件的运行要求保持一致。
 
@@ -50,6 +50,44 @@ export default fastChina();
 ## 适配其他项目
 
 通过默认导出的 `fastConfig()` 只保留项目真正需要的能力。
+
+### React + Vite
+
+```js
+import fastChina from "@fast-china/eslint-config";
+
+export default fastChina({
+	react: true,
+	vue: false,
+});
+```
+
+React 集成会应用现代 `@eslint-react` JavaScript/TypeScript 预置、React 官方 Hooks Flat Config，以及额外的 DOM 安全检查。JSX 与 TSX 分别复用现有 JavaScript、TypeScript 解析能力。Preact 等兼容 React 的 JSX 运行时可设置 `react: { importSource: "preact" }`。
+
+### Angular
+
+```js
+import fastChina from "@fast-china/eslint-config";
+
+export default fastChina({
+	angular: true,
+	vue: false,
+});
+```
+
+Angular 集成会检查框架 TypeScript、外部 `.html` 模板和组件内联模板。模板无障碍规则与内联模板提取默认开启，也可以显式配置：
+
+```js
+export default fastChina({
+	angular: {
+		inlineTemplates: true,
+		templateAccessibility: true,
+	},
+	vue: false,
+});
+```
+
+Angular 依赖 TypeScript 集成；同时设置 `angular: true` 与 `typescript: false` 时会立即抛出清晰的配置错误。
 
 ### Node.js + TypeScript
 
@@ -95,6 +133,7 @@ export default fastChina({
 
 | 选项              | 默认值      | 作用                                                           |
 | ----------------- | ----------- | -------------------------------------------------------------- |
+| `angular`         | `false`     | 启用 Angular TypeScript 与模板，或传入 Angular 专用选项。      |
 | `environment`     | `"browser"` | 可选 `"browser"`、`"node"` 或 `"universal"` 全局变量。         |
 | `globals`         | 无          | 增加项目宿主、测试运行器等提供的全局变量。                     |
 | `gitignore`       | `true`      | 读取项目根目录的 `.gitignore`。                                |
@@ -105,12 +144,19 @@ export default fastChina({
 | `lodash`          | `false`     | 可选 `"lodash"` 或 `"lodash-unified"`，统一静态导入来源。      |
 | `markdown`        | `true`      | 启用官方 Markdown 语言规则。                                   |
 | `prettier`        | `true`      | 关闭与 Prettier 冲突的 ESLint 规则。                           |
+| `react`           | `false`     | 启用 React、JSX 与 Hooks，或传入运行时和 React 版本设置。      |
 | `regexp`          | `true`      | 启用推荐的正则表达式规则。                                     |
 | `rules`           | 无          | 对所有已启用代码文件追加具有精确类型的项目规则。               |
 | `sortPackageJson` | `false`     | 按安全白名单排序 `package.json`，不会进入 `exports` 条件对象。 |
 | `sortTsconfig`    | `false`     | 按 TypeScript 文档主题排序 `tsconfig*.json`。                  |
 | `typescript`      | `true`      | 可关闭，或传入 `{ typeChecked: true, tsconfigRootDir }`。      |
 | `vue`             | `true`      | 启用 Vue 3 单文件组件支持。                                    |
+
+## 框架覆盖范围
+
+Vue 3、React 与 Angular 都有专用解析器或处理器、推荐规则、配置选项、生成规则类型与集成测试。Nuxt 可使用 Vue 基础配置；Next.js 与 Remix 可使用 React 基础配置，并在 `fastConfig()` 后追加各自的框架 Flat Config。兼容 React 的 JSX 运行时可以使用 `react.importSource`。
+
+Svelte、Astro 与 Solid 具有不同的模板或编译器语义，目前不会被包装成名义上的“一键支持”。项目已经可以把它们的官方 Flat Config 作为末尾覆写传入；将来只有在解析器、处理器、规则 schema、文档和真实运行时 fixture 一并完成时，才会增加对应的一等开关。
 
 ## Lodash 导入策略
 
@@ -159,8 +205,11 @@ export default fastChina({ lodash: "lodash" });
 import fastChina, { defineRules } from "@fast-china/eslint-config";
 
 const projectRules = defineRules({
+	"@angular-eslint/template/alt-text": "error",
+	"@eslint-react/dom-no-missing-button-type": "error",
 	"@typescript-eslint/no-unused-vars": ["error", { args: "after-used" }],
 	"import-x/order": ["error", { "newlines-between": "always" }],
+	"react-hooks/exhaustive-deps": "warn",
 	"vue/attributes-order": ["error", { order: ["DEFINITION", "EVENTS", "CONTENT"] }],
 });
 
@@ -188,7 +237,7 @@ const rules = {
 
 ## 规则风险与维护
 
-默认配置包含少量高影响规则：它们可能阻断特定写法，或要求复核 import 副作用、类型导入和组件公共事件。清单排序同样属于高影响能力，但默认关闭。源码使用 `[高影响]`、`[可自动修复]` 与 `[安全关注]` 标记这类规则。
+默认配置包含少量高影响规则：它们可能阻断特定写法，或要求复核 import 副作用、类型导入和组件公共事件。React 与 Angular 在全局默认关闭，但启用框架后也会启用文档中列出的现代框架约束和无障碍规则。清单排序同样属于高影响能力，但默认关闭。源码使用 `[高影响]`、`[可自动修复]`、`[安全关注]` 与 `[按需启用]` 标记这类规则。
 
 完整的默认预置来源、高影响规则清单、关闭示例和维护约定见 [默认规则与风险指南](./docs/rules-risk.zh.md)。运行 `eslint --fix` 前建议先只检查，在独立提交中应用修复，并审查 import、`package.json`、组件事件和构建产物。
 

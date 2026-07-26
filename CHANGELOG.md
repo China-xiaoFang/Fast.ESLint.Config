@@ -6,6 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.0.1 - 2026-07-26
+
+### Added
+
+- Added first-class opt-in React support with JavaScript/TypeScript presets, official Hooks and React Compiler diagnostics, DOM safety rules, React-compatible JSX runtime settings, generated rule types, and runtime tests.
+- Added first-class opt-in Angular support for framework TypeScript, external and inline templates, modern recommended rules, configurable template accessibility, generated rule types, and runtime tests.
+
+### Changed
+
+- Changed the newly bundled React and Angular dependencies to caret ranges so compatible minor and patch releases can be installed without editing the manifest.
+- Completed the TypeScript 6 migration with TypeScript 6.0.3, removed the deprecated compiler-option suppression, and replaced tsup with tsdown 0.22.14 for native `.mjs`, `.d.mts`, and source-map builds.
+- Raised the verified runtime baselines to Node.js 22.18.0 and 24.11.0 to match the current tsdown toolchain.
+- Updated the development baseline to ESLint 10.8.0, then upgraded `actions/checkout` plus `actions/setup-node` to their current v7 major releases.
+
 ## 2.0.0 - 2026-07-26
 
 ### Added

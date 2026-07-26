@@ -35,7 +35,7 @@ Use `pnpm lint:fix` and `pnpm format` for safe mechanical fixes. `pnpm check` is
 
 ## Pull requests
 
-Keep changes focused and explain user-visible compatibility effects. Do not commit credentials or publish from a pull request. Changes to the Node.js, ESLint, TypeScript, Vue, Prettier, or module-format contract should be treated as release-significant changes.
+Keep changes focused and explain user-visible compatibility effects. Do not commit credentials or publish from a pull request. Changes to the Node.js, ESLint, TypeScript, Vue, React, Angular, Prettier, or module-format contract should be treated as release-significant changes.
 
 ## Releases
 
@@ -47,13 +47,13 @@ pnpm pack --dry-run
 pnpm publish --access public --registry https://registry.npmjs.org/
 ```
 
-`prepack` reruns the complete quality gate before pnpm creates the publish archive. Inspect the dry-run list and verify that both root and `./rules` entry points contain JavaScript, declarations, and source maps. After publication, verify the registry result and tag the exact commit:
+`prepack` reruns the complete quality gate before pnpm creates the publish archive. Inspect the dry-run list and verify that both root and `./rules` entry points contain JavaScript and declarations, together with the generated JavaScript and declaration source maps. After publication, verify the registry result and tag the exact commit:
 
 ```sh
 pnpm view @fast-china/eslint-config version --registry https://registry.npmjs.org/
-git tag -a v2.0.0 -m "release: v2.0.0"
+git tag -a v2.0.1 -m "release: v2.0.1"
 git push origin master
-git push origin v2.0.0
+git push origin v2.0.1
 ```
 
 npm versions are immutable; never reuse an already published version.

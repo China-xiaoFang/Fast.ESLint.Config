@@ -13,15 +13,17 @@
 
 “高影响”不等于规则本身不安全。它表示规则的采用成本或修复审查成本较高。默认自动修复的目标仍是保持语义，但模块副作用、getter/Proxy、构建器约定和公共组件 API 都需要项目维护者复核。
 
-## 默认继承的上游预置
+## 内置预置来源
 
-`fastConfig()` 默认开启 Vue 3、TypeScript、JavaScript、import、RegExp、JSON、Markdown 与 Prettier 兼容层；TypeScript 类型感知和清单排序默认关闭。
+`fastConfig()` 默认开启 Vue 3、TypeScript、JavaScript、import、RegExp、JSON、Markdown 与 Prettier 兼容层；React、Angular、TypeScript 类型感知和清单排序默认关闭。
 
 | 范围             | 默认继承                                                                                  | 说明                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | JavaScript       | `@eslint/js` 的 `recommended`                                                             | 基础语法和运行时正确性，包括 `no-undef`、`no-unused-vars` 等。                   |
 | TypeScript       | typescript-eslint 的 `recommended` + `stylistic`                                          | 默认不读取类型信息；本库规则在预置之后覆写。                                     |
 | Vue 3            | `@eslint/js`、typescript-eslint 非类型感知预置、`eslint-plugin-vue` 的 `flat/recommended` | 处理 Vue 3 单文件组件，并让 TypeScript 规则正确作用于 `<script lang="ts">`。     |
+| React（按需）    | `@eslint-react/recommended*` 与 `eslint-plugin-react-hooks` 的 `flat/recommended`         | 检查组件、JSX/TSX、DOM API、Hooks 与稳定的 React Compiler 诊断。                 |
+| Angular（按需）  | angular-eslint 22.x 的 TypeScript、模板推荐与模板无障碍规则集                             | 检查 Angular TypeScript、外部模板和提取后的内联模板；必须启用 TypeScript。       |
 | import           | `eslint-plugin-import-x` 的 `recommended`                                                 | 本库额外配置导入位置、去重和排序。解析器相关规则默认关闭，避免绑定具体别名方案。 |
 | RegExp           | `eslint-plugin-regexp` 的 `flat/recommended`                                              | 部分规则可自动改写正则表达式，批量修复后需运行测试。                             |
 | JSON/JSONC/JSON5 | `eslint-plugin-jsonc` 对应方言的 `flat/recommended-*`                                     | 三种方言按扩展名隔离，不会互相叠加。                                             |
@@ -56,10 +58,14 @@
 ## 明确不默认启用的高影响能力
 
 - TypeScript 和 Vue 的类型感知预置仅在 `typeChecked: true` 时启用；它们会增加项目服务开销，并启用 `no-floating-promises` 等需要类型信息的规则。
+- React 仅在 `react: true` 时启用。其上游推荐预置和官方 Hooks 预置包含阻断级组件、Hooks 与 React Compiler 规则；接入旧项目时应重点审查自定义 Hook 和 memoization 写法。
+- Angular 仅在 `angular: true` 时启用。框架规则默认要求 `inject()`、OnPush 变更检测、独立组件、现代模板控制流和模板无障碍；这些约束不会进入默认 Vue 配置。
 - 清单排序规则 `jsonc/sort-keys`、`jsonc/sort-array-values` 分别仅在 `sortPackageJson: true`、`sortTsconfig: true` 时启用；首次修复应单独提交并核对发布清单。
 - Lodash 静态导入限制仅在 `lodash: "lodash"` 或 `lodash: "lodash-unified"` 时启用。该策略使用 `no-restricted-imports` 阻止混用包入口，但不会检查动态 `import()` 或 CommonJS `require()`。
 - `import-x/no-unresolved`、`import-x/named` 等依赖 resolver 的检查默认关闭。
 - `package.json` 的 `exports` 条件键永不自动排序。Node 条件导出按键顺序匹配，改写顺序可能改变实际加载文件。
+
+启用 Angular 后，采用成本最高的规则是 `@angular-eslint/prefer-inject`、`@angular-eslint/prefer-on-push-component-change-detection`、`@angular-eslint/prefer-standalone` 与 `@angular-eslint/template/prefer-control-flow`。应把修复视为框架迁移，而不是格式整理。只有项目已使用等效工具保障无障碍时，才建议设置 `angular: { templateAccessibility: false }`；个别例外通常应通过末尾的文件级覆写处理。
 
 ## 按项目降低规则强度
 

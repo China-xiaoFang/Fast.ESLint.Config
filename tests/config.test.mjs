@@ -29,7 +29,9 @@ test("package exports the configuration factory and typed rule helper", () => {
 	assert.equal(fastConfig, publicApi.fastConfig);
 	assert.ok(Array.isArray(fastConfig({ gitignore: false })));
 	assert.equal(Object.isFrozen(publicApi.defaultConfigOptions), true);
+	assert.equal(publicApi.defaultConfigOptions.angular, false);
 	assert.equal(publicApi.defaultConfigOptions.lodash, false);
+	assert.equal(publicApi.defaultConfigOptions.react, false);
 	assert.equal(publicApi.defaultConfigOptions.sortPackageJson, false);
 	assert.equal(publicApi.defaultConfigOptions.sortTsconfig, false);
 	assert.deepEqual(publicApi.defineRules({ "no-console": "warn" }), { "no-console": "warn" });
@@ -51,6 +53,8 @@ test("factory disables optional language integrations without claiming their fil
 	assert.ok(names.some((name) => name.includes("javascript")));
 	assert.ok(!names.some((name) => name.includes("typescript")));
 	assert.ok(!names.some((name) => name.includes("vue")));
+	assert.ok(!names.some((name) => name.includes("react")));
+	assert.ok(!names.some((name) => name.includes("angular")));
 	assert.ok(!names.some((name) => name.includes("json")));
 	assert.ok(!names.some((name) => name.includes("markdown")));
 
@@ -177,6 +181,93 @@ test("factory supports Vue 3 and type-aware TypeScript", () => {
 	assert.ok(config.some((item) => item.name?.includes("vue/type-checked")));
 	assert.ok(config.some((item) => item.languageOptions?.parserOptions?.projectService === true));
 	assert.ok(config.some((item) => item.languageOptions?.parserOptions?.tsconfigRootDir === process.cwd()));
+});
+
+test("factory enables React correctness, official Hooks, and DOM safety rules on demand", async () => {
+	const config = fastConfig({
+		gitignore: false,
+		imports: false,
+		json: false,
+		markdown: false,
+		prettier: false,
+		react: true,
+		regexp: false,
+		vue: false,
+	});
+	const names = config.map((item) => item.name ?? "");
+	const linter = createLinter(config);
+	const [result] = await linter.lintText(
+		'import { useState } from "react";\n\nfunction App({ ready }) {\n\tif (ready) useState(0);\n\treturn <button>Save</button>;\n}\n\nexport { App };\n',
+		{ filePath: "fixtures/App.jsx" }
+	);
+
+	assert.ok(names.some((name) => name.includes("react/javascript")));
+	assert.ok(names.some((name) => name.includes("react/typescript")));
+	assert.equal(result.fatalErrorCount, 0);
+	assert.ok(result.messages.some((message) => message.ruleId === "react-hooks/rules-of-hooks"));
+	assert.ok(result.messages.some((message) => message.ruleId === "@eslint-react/dom-no-missing-button-type"));
+});
+
+test("factory enables Angular TypeScript, external templates, inline templates, and accessibility on demand", async () => {
+	const config = fastConfig({
+		angular: true,
+		gitignore: false,
+		imports: false,
+		javascript: false,
+		json: false,
+		markdown: false,
+		prettier: false,
+		regexp: false,
+		vue: false,
+	});
+	const names = config.map((item) => item.name ?? "");
+	const linter = createLinter(config);
+	const [templateResult] = await linter.lintText('<img src="logo.png">\n', {
+		filePath: "fixtures/app.component.html",
+	});
+	const [inlineResult] = await linter.lintText(
+		'import { Component } from "@angular/core";\n\n@Component({ template: `<div (click)="save()">Save</div>` })\nexport class AppComponent {\n\tsave() { return true; }\n}\n',
+		{ filePath: "fixtures/app.component.ts" }
+	);
+
+	assert.ok(names.some((name) => name.includes("angular/typescript-with-inline-templates")));
+	assert.ok(names.some((name) => name.includes("angular/template-accessibility")));
+	assert.equal(templateResult.fatalErrorCount, 0);
+	assert.equal(inlineResult.fatalErrorCount, 0);
+	assert.ok(templateResult.messages.some((message) => message.ruleId === "@angular-eslint/template/alt-text"));
+	assert.ok(inlineResult.messages.some((message) => message.ruleId === "@angular-eslint/template/click-events-have-key-events"));
+});
+
+test("Angular support requires the TypeScript language integration", () => {
+	assert.throws(() => fastConfig({ angular: true, typescript: false }), /Angular support requires TypeScript/);
+});
+
+test("Angular inline-template and accessibility policies can be disabled explicitly", async () => {
+	const config = fastConfig({
+		angular: { inlineTemplates: false, templateAccessibility: false },
+		gitignore: false,
+		imports: false,
+		javascript: false,
+		json: false,
+		markdown: false,
+		prettier: false,
+		regexp: false,
+		vue: false,
+	});
+	const names = config.map((item) => item.name ?? "");
+	const linter = createLinter(config);
+	const [templateResult] = await linter.lintText('<img src="logo.png">\n', {
+		filePath: "fixtures/app.component.html",
+	});
+	const [inlineResult] = await linter.lintText(
+		'import { Component } from "@angular/core";\n\n@Component({ template: `<div (click)="save()">Save</div>` })\nexport class AppComponent {\n\tsave() { return true; }\n}\n',
+		{ filePath: "fixtures/app.component.ts" }
+	);
+
+	assert.ok(names.includes("@fast-china/angular/typescript"));
+	assert.ok(names.includes("@fast-china/angular/template"));
+	assert.ok(!templateResult.messages.some((message) => message.ruleId === "@angular-eslint/template/alt-text"));
+	assert.ok(!inlineResult.messages.some((message) => message.ruleId?.startsWith("@angular-eslint/template/")));
 });
 
 test("type-aware configuration can lint a file from the project service", async () => {
@@ -323,15 +414,31 @@ test("risk guide documents every high-impact local default", () => {
 
 test("published entry points exist and expose the typed factory contract", () => {
 	const manifest = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
-	const declarations = fs.readFileSync(new URL("../dist/index.d.ts", import.meta.url), "utf8");
+	const resolvePackageFile = (filePath) => new URL(`../${filePath.replace(/^\.\//, "")}`, import.meta.url);
+	const declarations = fs.readFileSync(resolvePackageFile(manifest.types), "utf8");
+	const publicEntries = [manifest.exports["."], manifest.exports["./rules"]];
 
-	assert.equal(manifest.version, "2.0.0");
-	assert.equal(fs.existsSync(new URL(`../${manifest.main}`, import.meta.url)), true);
+	assert.equal(manifest.version, "2.0.1");
+	assert.equal(manifest.main, manifest.exports["."].import);
+	assert.equal(manifest.module, manifest.exports["."].import);
+	assert.equal(manifest.types, manifest.exports["."].types);
+	assert.match(manifest.main, /\.mjs$/);
+	assert.match(manifest.types, /\.d\.mts$/);
+	assert.equal(fs.existsSync(resolvePackageFile(manifest.main)), true);
 	assert.equal("require" in manifest.exports["."], false);
 	assert.equal("require" in manifest.exports["./rules"], false);
 	assert.deepEqual(Object.keys(manifest.exports), [".", "./rules", "./package.json"]);
+	for (const entry of publicEntries) {
+		assert.match(entry.import, /\.mjs$/);
+		assert.match(entry.types, /\.d\.mts$/);
+		assert.equal(entry.default, entry.import);
+		assert.equal(fs.existsSync(resolvePackageFile(entry.import)), true);
+		assert.equal(fs.existsSync(resolvePackageFile(entry.types)), true);
+	}
 	assert.match(declarations, /RuleOptions/);
 	assert.match(declarations, /defineRules/);
 	assert.match(declarations, /fastConfig/);
 	assert.match(declarations, /LodashPreference/);
+	assert.match(declarations, /AngularConfigOptions/);
+	assert.match(declarations, /ReactConfigOptions/);
 });

@@ -22,7 +22,7 @@ const configs: Linter.Config[] = [
 			"": corePlugin,
 		},
 	},
-	...fastConfig({ gitignore: false }),
+	...fastConfig({ angular: true, gitignore: false, react: true }),
 ];
 
 const declarations = await flatConfigsToRulesDTS(configs, {

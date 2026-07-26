@@ -5,8 +5,10 @@
 export { defineRules } from "./define-rules";
 export { defaultConfigOptions, fastConfig as default, fastConfig } from "./factory";
 
+export type { AngularConfigOptions } from "./configs/angular";
 export type { RuntimeEnvironment } from "./configs/environment";
 export type { LodashPreference } from "./configs/lodash";
+export type { ReactConfigOptions } from "./configs/react";
 export type { TypeScriptConfigOptions } from "./configs/typescript";
 export type { FastConfigOptions } from "./factory";
 export type { RuleOptions } from "./typegen";

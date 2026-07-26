@@ -11,15 +11,17 @@ This document records what the default config inherits, which rules can have a l
 
 High impact does not mean inherently unsafe. It means adoption or fix review is relatively expensive. Module side effects, getters and proxies, build-tool conventions, and public component APIs deserve particular attention.
 
-## Upstream presets enabled by default
+## Bundled preset sources
 
-`fastConfig()` defaults to Vue 3, TypeScript, JavaScript, import, RegExp, JSON, Markdown, and the Prettier compatibility layer. Type-aware TypeScript linting and manifest sorting are opt-in.
+`fastConfig()` defaults to Vue 3, TypeScript, JavaScript, import, RegExp, JSON, Markdown, and the Prettier compatibility layer. React, Angular, type-aware TypeScript linting, and manifest sorting are opt-in.
 
 | Scope                  | Inherited preset                                                                                   | Notes                                                                                                   |
 | ---------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | JavaScript             | `@eslint/js` `recommended`                                                                         | Core syntax and runtime correctness, including `no-undef` and `no-unused-vars`.                         |
 | TypeScript             | typescript-eslint `recommended` + `stylistic`                                                      | Does not read type information by default; local overrides are applied afterward.                       |
 | Vue 3                  | `@eslint/js`, non-type-aware typescript-eslint presets, and `eslint-plugin-vue` `flat/recommended` | Handles Vue 3 SFCs and applies TypeScript rules to `<script lang="ts">` correctly.                      |
+| React (opt-in)         | `@eslint-react/recommended*` and `eslint-plugin-react-hooks` `flat/recommended`                    | Checks components, JSX/TSX, DOM APIs, Hooks, and stable React Compiler diagnostics.                     |
+| Angular (opt-in)       | angular-eslint 22.x TypeScript, template recommended, and template accessibility rule sets         | Checks Angular TypeScript plus external and extracted inline templates; requires TypeScript support.    |
 | Imports                | `eslint-plugin-import-x` `recommended`                                                             | Local rules add import placement, deduplication, and ordering. Resolver-dependent checks stay disabled. |
 | RegExp                 | `eslint-plugin-regexp` `flat/recommended`                                                          | Some rules can rewrite regular expressions; run tests after bulk fixes.                                 |
 | JSON dialects          | The matching `eslint-plugin-jsonc` `flat/recommended-*` preset                                     | JSON, JSONC, and JSON5 are scoped separately.                                                           |
@@ -52,10 +54,14 @@ The exact upstream rule set is defined by the dependency versions in `pnpm-lock.
 ## High-impact features not enabled by default
 
 - Type-aware TypeScript and Vue presets require `typeChecked: true`. They add project-service cost and rules such as `no-floating-promises`.
+- React requires `react: true`. Its upstream recommended and official Hooks presets include blocking component, Hooks, and React Compiler rules; review existing custom hook and memoization patterns when adopting it.
+- Angular requires `angular: true`. The framework bundle enables `prefer-inject`, OnPush change detection, standalone components, modern template control flow, and template accessibility. These policies are intentionally not active in the default Vue configuration.
 - The `jsonc/sort-keys` and `jsonc/sort-array-values` manifest rules require `sortPackageJson: true` or `sortTsconfig: true`. Isolate the first fix and verify the publish manifest.
 - Lodash import restrictions require `lodash: "lodash"` or `lodash: "lodash-unified"`. They use `no-restricted-imports` to prevent mixed static package entry points but do not inspect dynamic `import()` or CommonJS `require()`.
 - Resolver-dependent import checks such as `import-x/no-unresolved` and `import-x/named` stay disabled.
 - Keys inside `package.json#exports` are never sorted. Node conditional exports use key order during matching, so reordering can change the loaded file.
+
+When Angular is enabled, the highest-adoption-cost rules are `@angular-eslint/prefer-inject`, `@angular-eslint/prefer-on-push-component-change-detection`, `@angular-eslint/prefer-standalone`, and `@angular-eslint/template/prefer-control-flow`. Treat their fixes as framework migrations rather than formatting cleanup. Set `angular: { templateAccessibility: false }` only when accessibility is enforced by another equivalent tool; individual exceptions should normally use file-scoped trailing overrides.
 
 ## Scoped overrides
 

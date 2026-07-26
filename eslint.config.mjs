@@ -1,4 +1,4 @@
-import fastChina from "./dist/index.js";
+import fastChina from "./dist/index.mjs";
 
 export default fastChina({
 	environment: "node",

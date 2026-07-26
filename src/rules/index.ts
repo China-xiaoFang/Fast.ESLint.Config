@@ -8,10 +8,12 @@
 export { defineRules } from "../define-rules";
 export type { RuleOptions } from "../typegen";
 
+export { angularRules, angularTemplateAccessibilityRules, angularTemplateRules } from "./angular";
 export { commonRules } from "./common";
 export { importRules } from "./import";
 export { javascriptRules } from "./javascript";
 export { preferLodashRules, preferLodashUnifiedRules } from "./lodash";
+export { reactRules } from "./react";
 export { packageJsonSortRules } from "./sort-package";
 export { tsconfigJsonSortRules } from "./sort-tsconfig";
 export { typescriptRules } from "./typescript";

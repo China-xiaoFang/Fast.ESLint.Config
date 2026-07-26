@@ -7,6 +7,12 @@ export const GLOBS_TYPESCRIPT = ["**/*.{ts,cts,mts,tsx}"] as const;
 /** Vue 3 单文件组件。 */
 export const GLOB_VUE = "**/*.vue";
 
+/** Angular 组件、指令、服务等框架源码；Angular CLI 项目以 `.ts` 为标准源码扩展名。 */
+export const GLOB_ANGULAR_TYPESCRIPT = "**/*.ts";
+
+/** Angular 外部模板；内联模板由 Angular 处理器提取后复用同一模板配置。 */
+export const GLOB_ANGULAR_TEMPLATE = "**/*.html";
+
 /** ESLint JSON language 支持的三种 JSON 方言。 */
 export const GLOB_JSON = "**/*.json";
 export const GLOB_JSONC = "**/*.jsonc";

@@ -1,13 +1,15 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "2.0.0",
-	"description": "Opinionated, typed ESLint Flat Config for Vue 3, Vite, TypeScript, JavaScript, and Node.js.",
+	"version": "2.0.1",
+	"description": "Opinionated, typed ESLint Flat Config for Vue 3, React, Angular, Vite, TypeScript, JavaScript, and Node.js.",
 	"type": "module",
 	"keywords": [
 		"fast",
+		"angular",
 		"eslint",
 		"eslint-config",
 		"flat-config",
+		"react",
 		"typescript",
 		"vite",
 		"vue",
@@ -32,19 +34,19 @@
 		"dist",
 		"docs"
 	],
-	"main": "./dist/index.js",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"main": "./dist/index.mjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"default": "./dist/index.js"
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs",
+			"default": "./dist/index.mjs"
 		},
 		"./rules": {
-			"types": "./dist/rules/index.d.ts",
-			"import": "./dist/rules/index.js",
-			"default": "./dist/rules/index.js"
+			"types": "./dist/rules/index.d.mts",
+			"import": "./dist/rules/index.mjs",
+			"default": "./dist/rules/index.mjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -54,7 +56,7 @@
 	},
 	"scripts": {
 		"dev": "eslint-config-inspector --config src/eslint-inspector.config.ts",
-		"build": "pnpm run typegen:check && tsup",
+		"build": "pnpm run typegen:check && tsdown",
 		"build:inspector": "eslint-config-inspector build --config src/eslint-inspector.config.ts",
 		"typegen": "tsx scripts/typegen.ts",
 		"typegen:check": "tsx scripts/typegen.ts --check",
@@ -70,15 +72,20 @@
 	},
 	"peerDependencies": {
 		"eslint": "^10.0.0",
-		"typescript": ">=5.3.0 <6.1.0"
+		"typescript": ">=6.0.0 <6.1.0"
 	},
 	"dependencies": {
+		"@angular-eslint/eslint-plugin": "^22.1.0",
+		"@angular-eslint/eslint-plugin-template": "^22.1.0",
+		"@angular-eslint/template-parser": "^22.1.0",
+		"@eslint-react/eslint-plugin": "^5.18.0",
 		"@eslint/js": "^10.0.0",
 		"@eslint/markdown": "^8.0.3",
 		"eslint-config-flat-gitignore": "^2.0.0",
 		"eslint-config-prettier": "^10.0.0",
 		"eslint-plugin-import-x": "^4.17.1",
 		"eslint-plugin-jsonc": "^3.3.0",
+		"eslint-plugin-react-hooks": "^7.1.1",
 		"eslint-plugin-regexp": "^3.1.1",
 		"eslint-plugin-vue": "^10.10.0",
 		"globals": "^17.7.0",
@@ -88,15 +95,15 @@
 	"devDependencies": {
 		"@eslint/config-inspector": "^3.1.0",
 		"@types/node": "^24.13.3",
-		"eslint": "^10.7.0",
+		"eslint": "^10.8.0",
 		"eslint-typegen": "^2.3.1",
 		"prettier": "^3.9.6",
-		"tsup": "^8.0.0",
+		"tsdown": "^0.22.14",
 		"tsx": "^4.23.1",
-		"typescript": "^5.9.0"
+		"typescript": "^6.0.3"
 	},
 	"engines": {
-		"node": "^22.13.0 || ^24.0.0",
+		"node": "^22.18.0 || >=24.11.0",
 		"pnpm": "^11.0.0"
 	}
 }
