@@ -416,9 +416,10 @@ test("published entry points exist and expose the typed factory contract", () =>
 	const manifest = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 	const resolvePackageFile = (filePath) => new URL(`../${filePath.replace(/^\.\//, "")}`, import.meta.url);
 	const declarations = fs.readFileSync(resolvePackageFile(manifest.types), "utf8");
+	const ruleDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./rules"].types), "utf8");
 	const publicEntries = [manifest.exports["."], manifest.exports["./rules"]];
 
-	assert.equal(manifest.version, "2.0.1");
+	assert.equal(manifest.version, "2.0.2");
 	assert.equal(manifest.main, manifest.exports["."].import);
 	assert.equal(manifest.module, manifest.exports["."].import);
 	assert.equal(manifest.types, manifest.exports["."].types);
@@ -441,4 +442,5 @@ test("published entry points exist and expose the typed factory contract", () =>
 	assert.match(declarations, /LodashPreference/);
 	assert.match(declarations, /AngularConfigOptions/);
 	assert.match(declarations, /ReactConfigOptions/);
+	assert.doesNotMatch(ruleDeclarations, /defineRules/);
 });

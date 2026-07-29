@@ -1,4 +1,4 @@
-import { n as RuleOptions, t as defineRules } from "../define-rules.mjs";
+import { t as RuleOptions } from "../typegen.mjs";
 //#region src/rules/angular.d.ts
 /**
  * Angular TypeScript 推荐规则。
@@ -305,5 +305,5 @@ declare const vueRules: {
   }];
 };
 //#endregion
-export { type RuleOptions, angularRules, angularTemplateAccessibilityRules, angularTemplateRules, commonRules, defineRules, importRules, javascriptRules, packageJsonSortRules, preferLodashRules, preferLodashUnifiedRules, reactRules, tsconfigJsonSortRules, typescriptRules, vueRules };
+export { type RuleOptions, angularRules, angularTemplateAccessibilityRules, angularTemplateRules, commonRules, importRules, javascriptRules, packageJsonSortRules, preferLodashRules, preferLodashUnifiedRules, reactRules, tsconfigJsonSortRules, typescriptRules, vueRules };
 //# sourceMappingURL=index.d.mts.map

@@ -7,27 +7,77 @@ import { reactRules } from "../rules";
 
 import type { Linter } from "eslint";
 
+/**
+ * React 与兼容 JSX 运行时的检测设置。
+ *
+ * 该对象通过 `fastConfig({ react: { ... } })` 传入。传入对象会启用 React 支持，并在
+ * JavaScript/JSX 和 TypeScript/TSX 文件上加载对应的 `@eslint-react` 推荐预置、React
+ * 官方 Hooks Flat Config 以及本库规则。实际文件范围仍受顶层 `javascript`、
+ * `typescript` 开关控制。
+ *
+ * 这些字段只传给 ESLint 插件用于理解项目的 React 语义，不会改变 JSX 编译方式、自动
+ * 导入 React、设置打包器别名或安装兼容运行时。
+ */
 export interface ReactConfigOptions {
 	/**
-	 * JSX 运行时的包入口；Preact 等 React 兼容运行时可传入自己的包名。
+	 * 提供 React API 与 JSX 运行时的包入口名称。
+	 *
+	 * 标准 React 项目保持 `"react"`；Preact 等兼容运行时可填写自身包名，使
+	 * `@eslint-react` 按正确的导入来源识别组件和 API。该设置不会修改 TypeScript
+	 * `jsxImportSource`、Babel、Vite 或其他构建工具配置，两侧需要由项目自行保持一致。
 	 * @default "react"
 	 */
 	importSource?: string;
 	/**
-	 * 用于多态组件底层元素切换的属性名。
+	 * 项目约定用于切换多态组件底层元素或组件类型的属性名。
+	 *
+	 * 例如 `<Button as="a" />` 中的 `as`。插件会据此理解多态组件最终渲染元素的语义，
+	 * 从而提高 DOM 与可访问性相关规则的判断准确度；未采用多态组件时通常无需修改。
 	 * @default "as"
 	 */
 	polymorphicPropName?: string;
 	/**
-	 * React 版本；默认从项目依赖自动检测，无法检测时可显式传入版本号。
+	 * 供插件选择版本相关行为的 React 版本号或自动检测标记。
+	 *
+	 * `"detect"` 会尝试从当前项目依赖解析已安装的 React 版本。monorepo、PnP、兼容运行时
+	 * 或依赖不可见的执行环境若无法可靠检测，可传入明确版本号，例如 `"19.1.0"`。
+	 * 该值只影响 lint 规则判断，不会限制或安装 React 依赖版本。
 	 * @default "detect"
 	 */
 	version?: string;
 }
 
+/**
+ * 工厂传给 React 配置生成器的内部语言状态。
+ *
+ * 用户不直接配置该接口。`fastConfig()` 会把顶层 JavaScript、TypeScript 开关以及
+ * TypeScript 类型感知状态转换为这里的三个布尔值，确保 React 不会重新接管已经关闭的
+ * 文件类型，并为 TypeScript 选择正确的 `@eslint-react` 推荐预置。
+ */
 interface ReactLanguageOptions {
+	/**
+	 * 是否为 `.js`、`.cjs`、`.mjs` 与 `.jsx` 文件创建 React 配置。
+	 *
+	 * 该值来自顶层 `FastConfigOptions.javascript`；为 `false` 时即使 React 已启用，
+	 * React 配置也不会声明这些文件范围。
+	 * @default true
+	 */
 	javascript?: boolean;
+	/**
+	 * 是否为 TypeScript/TSX 选择需要类型信息的 React 推荐预置。
+	 *
+	 * 该值来自 `FastConfigOptions.typescript.typeChecked`，只影响 TypeScript React 配置；
+	 * JavaScript 配置始终使用普通推荐预置。
+	 * @default false
+	 */
 	typeChecked?: boolean;
+	/**
+	 * 是否为 `.ts`、`.cts`、`.mts` 与 `.tsx` 文件创建 React 配置。
+	 *
+	 * 该值来自顶层 `FastConfigOptions.typescript`；为 `false` 时不会生成 TypeScript React
+	 * 片段，也不会仅因为 React 已启用而重新接管 TypeScript 文件。
+	 * @default true
+	 */
 	typescript?: boolean;
 }
 

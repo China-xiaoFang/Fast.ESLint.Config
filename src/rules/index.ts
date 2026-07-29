@@ -5,7 +5,6 @@
  * 同步更新 `docs/rules-risk.zh.md`、`docs/rules-risk.md` 与对应集成测试。
  * 这些记录可用于高级组合，但推荐大多数项目通过根入口的 `fastConfig()` 使用。
  */
-export { defineRules } from "../define-rules";
 export type { RuleOptions } from "../typegen";
 
 export { angularRules, angularTemplateAccessibilityRules, angularTemplateRules } from "./angular";

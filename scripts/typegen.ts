@@ -4,7 +4,7 @@ import process from "node:process";
 import { builtinRules } from "eslint/use-at-your-own-risk";
 import { flatConfigsToRulesDTS } from "eslint-typegen/core";
 
-import { fastConfig } from "../src/factory";
+import { fastConfig } from "../src/code";
 
 import type { ESLint, Linter } from "eslint";
 

@@ -1,11 +1,3 @@
-//#region src/define-rules.ts
-/**
-* 为项目规则提供精确的规则名、严重级别和规则选项自动补全。
-*
-* 该函数不会修改传入对象；它只在 TypeScript 编译阶段拒绝未知规则和无效选项。
-*/
-const defineRules = (rules) => rules;
-//#endregion
 //#region src/rules/angular.ts
 /**
 * Angular TypeScript 推荐规则。
@@ -480,6 +472,6 @@ const vueRules = {
 	] }]
 };
 //#endregion
-export { reactRules as a, javascriptRules as c, angularRules as d, angularTemplateAccessibilityRules as f, packageJsonSortRules as i, importRules as l, defineRules as m, typescriptRules as n, preferLodashRules as o, angularTemplateRules as p, tsconfigJsonSortRules as r, preferLodashUnifiedRules as s, vueRules as t, commonRules as u };
+export { reactRules as a, javascriptRules as c, angularRules as d, angularTemplateAccessibilityRules as f, packageJsonSortRules as i, importRules as l, typescriptRules as n, preferLodashRules as o, angularTemplateRules as p, tsconfigJsonSortRules as r, preferLodashUnifiedRules as s, vueRules as t, commonRules as u };
 
 //# sourceMappingURL=rules.mjs.map

@@ -1,4 +1,4 @@
-import { a as reactRules, c as javascriptRules, d as angularRules, f as angularTemplateAccessibilityRules, i as packageJsonSortRules, l as importRules, m as defineRules, n as typescriptRules, o as preferLodashRules, p as angularTemplateRules, r as tsconfigJsonSortRules, s as preferLodashUnifiedRules, t as vueRules, u as commonRules } from "./rules.mjs";
+import { a as reactRules, c as javascriptRules, d as angularRules, f as angularTemplateAccessibilityRules, i as packageJsonSortRules, l as importRules, n as typescriptRules, o as preferLodashRules, p as angularTemplateRules, r as tsconfigJsonSortRules, s as preferLodashUnifiedRules, t as vueRules, u as commonRules } from "./rules.mjs";
 import { defineConfig, globalIgnores } from "eslint/config";
 import angularPlugin from "@angular-eslint/eslint-plugin";
 import angularTemplatePlugin from "@angular-eslint/eslint-plugin-template";
@@ -103,6 +103,13 @@ const createBaseConfigs = (files = GLOBS_CODE) => defineConfig([{
 }]);
 //#endregion
 //#region src/configs/environment.ts
+/**
+* 创建运行时环境相关的 ESLint 配置。
+*
+* 返回两个相互独立的 Flat Config 片段：第一个为应用源码配置所选环境和项目级全局
+* 变量；第二个仅命中配置、脚本、测试与 CLI 等工程文件，为它们配置 Node.js 全局变量
+* 并允许使用 `console`。分离范围可以减少跨运行时的假阴性。
+*/
 const createEnvironmentConfigs = ({ environment = "browser", files = GLOBS_CODE, nodeFiles = GLOBS_JAVASCRIPT, globals: projectGlobals = {} } = {}) => {
 	const runtimeGlobals = {
 		...environment !== "node" ? globals.browser : {},
@@ -380,7 +387,7 @@ const createVueConfigs = ({ typescript = true, typescriptOptions = {} } = {}) =>
 	}]);
 };
 //#endregion
-//#region src/factory.ts
+//#region src/code/index.ts
 /** `fastConfig()` 使用的稳定默认值；对象被冻结，避免运行时被意外修改。 */
 const defaultConfigOptions = Object.freeze({
 	angular: false,
@@ -469,6 +476,14 @@ const fastConfig = (options = {}, ...overrides) => {
 		...overrides
 	]);
 };
+//#endregion
+//#region src/index.ts
+/**
+* 为项目规则提供精确的规则名、严重级别和规则选项自动补全。
+*
+* 该函数不会修改传入对象；它只在 TypeScript 编译阶段拒绝未知规则和无效选项。
+*/
+const defineRules = (rules) => rules;
 //#endregion
 export { fastConfig as default, fastConfig, defaultConfigOptions, defineRules };
 
