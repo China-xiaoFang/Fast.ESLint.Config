@@ -387,7 +387,7 @@ const createVueConfigs = ({ typescript = true, typescriptOptions = {} } = {}) =>
 	}]);
 };
 //#endregion
-//#region src/code/index.ts
+//#region src/core/index.ts
 /** `fastConfig()` 使用的稳定默认值；对象被冻结，避免运行时被意外修改。 */
 const defaultConfigOptions = Object.freeze({
 	angular: false,

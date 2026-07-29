@@ -51,9 +51,9 @@ pnpm publish --access public --registry https://registry.npmjs.org/
 
 ```sh
 pnpm view @fast-china/eslint-config version --registry https://registry.npmjs.org/
-git tag -a v2.0.2 -m "release: v2.0.2"
+git tag -a v2.0.3 -m "release: v2.0.3"
 git push origin master
-git push origin v2.0.2
+git push origin v2.0.3
 ```
 
 npm versions are immutable; never reuse an already published version.

@@ -22,7 +22,7 @@ import type { RuleOptions } from "../typegen";
 import type { Linter } from "eslint";
 
 /**
- * `fastConfig()` 的项目级 ESLint Flat Config 选项。
+ * 核心工厂 `fastConfig()` 的项目级 ESLint Flat Config 选项。
  *
  * 每个字段只控制一个相对独立的配置片段。未传入字段时使用下方 `@default` 标注的值；
  * 布尔选项传入 `false` 会让工厂完全跳过对应片段，支持对象形式的框架或 TypeScript

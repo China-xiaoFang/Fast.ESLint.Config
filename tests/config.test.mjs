@@ -419,7 +419,7 @@ test("published entry points exist and expose the typed factory contract", () =>
 	const ruleDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./rules"].types), "utf8");
 	const publicEntries = [manifest.exports["."], manifest.exports["./rules"]];
 
-	assert.equal(manifest.version, "2.0.2");
+	assert.equal(manifest.version, "2.0.3");
 	assert.equal(manifest.main, manifest.exports["."].import);
 	assert.equal(manifest.module, manifest.exports["."].import);
 	assert.equal(manifest.types, manifest.exports["."].types);

@@ -14,12 +14,12 @@ type RejectUnknownRuleNames<Rules extends RuleOptions> = Rules & Record<Exclude<
  */
 export const defineRules = <const Rules extends RuleOptions>(rules: RejectUnknownRuleNames<Rules>): Rules & Linter.RulesRecord => rules;
 
-export { defaultConfigOptions, fastConfig as default, fastConfig } from "./code";
+export { defaultConfigOptions, fastConfig as default, fastConfig } from "./core";
 
 export type { AngularConfigOptions } from "./configs/angular";
 export type { RuntimeEnvironment } from "./configs/environment";
 export type { LodashPreference } from "./configs/lodash";
 export type { ReactConfigOptions } from "./configs/react";
 export type { TypeScriptConfigOptions } from "./configs/typescript";
-export type { FastConfigOptions } from "./code";
+export type { FastConfigOptions } from "./core";
 export type { RuleOptions } from "./typegen";
