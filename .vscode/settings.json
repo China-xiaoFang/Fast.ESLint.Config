@@ -34,14 +34,12 @@
 	"testing.automaticallyOpenPeekView": "never",
 	"cSpell.words": ["Unplugin"],
 	"editor.fontSize": 14,
-	"typescript.tsdk": "node_modules/typescript/lib",
-	"typescript.enablePromptUseWorkspaceTsdk": true,
 	"prettier.endOfLine": "lf",
 
 	// Enable file nesting
 	"explorer.fileNesting.enabled": true,
 	"explorer.fileNesting.patterns": {
-		".prettierrc.cjs": ".eslintrc.cjs, eslint.config.mjs",
-		"package.json": "pnpm-lock.yaml"
+		".prettierrc.cjs": ".prettierignore, eslint.config.mjs",
+		"package.json": ".nvmrc, pnpm-lock.yaml, pnpm-workspace.yaml"
 	}
 }
