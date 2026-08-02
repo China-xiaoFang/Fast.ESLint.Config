@@ -5,9 +5,13 @@ import globals from "globals";
 /**
 * 创建运行时环境相关的 ESLint 配置。
 *
+* @remarks
 * 返回两个相互独立的 Flat Config 片段：第一个为应用源码配置所选环境和项目级全局
 * 变量；第二个仅命中配置、脚本、测试与 CLI 等工程文件，为它们配置 Node.js 全局变量
 * 并允许使用 `console`。分离范围可以减少跨运行时的假阴性。
+*
+* @param options - 运行时环境、目标文件范围与项目级全局变量。
+* @returns 依次包含应用运行时环境和 Node.js 工程文件环境的 Flat Config 数组。
 */
 const createEnvironmentConfigs = ({ environment = "browser", files = GLOBS_CODE, nodeFiles = GLOBS_JAVASCRIPT, globals: projectGlobals = {} } = {}) => {
 	const runtimeGlobals = {

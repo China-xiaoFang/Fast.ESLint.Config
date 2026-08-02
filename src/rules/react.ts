@@ -3,6 +3,7 @@ import type { RuleOptions } from "../typegen";
 /**
  * React 本地覆写规则。
  *
+ * @remarks
  * `@eslint-react/recommended*` 负责组件、JSX、DOM 与 Web API 正确性，
  * `react-hooks/recommended` 负责 React 官方 Hooks 与 Compiler 诊断。这里关闭两套
  * 预置间的重复诊断，并补充少量明确的 DOM 安全约束。

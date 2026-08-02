@@ -9,8 +9,8 @@ Fixes are not backported to unsupported versions.
 
 | Version   | Supported |
 | --------- | --------- |
-| `2.0.3`   | Yes       |
-| `< 2.0.3` | No        |
+| `2.0.5`   | Yes       |
+| `< 2.0.5` | No        |
 
 ## Reporting a vulnerability
 
@@ -86,8 +86,8 @@ data that is not yours, degrading services, or disrupting other users.
 
 | 版本      | 是否支持 |
 | --------- | -------- |
-| `2.0.3`   | 是       |
-| `< 2.0.3` | 否       |
+| `2.0.5`   | 是       |
+| `< 2.0.5` | 否       |
 
 ### 报告安全漏洞
 

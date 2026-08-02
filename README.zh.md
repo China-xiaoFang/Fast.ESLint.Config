@@ -343,7 +343,7 @@ pnpm check
 pnpm pack --dry-run
 ```
 
-升级 ESLint 或插件后运行 `pnpm typegen` 并提交 `src/typegen.d.ts`；不要手工编辑生成文件。`pnpm check` 会验证生成类型没有漂移，然后依次构建、类型检查、检查所有支持的文件类型、验证格式，并针对构建后的真实包运行运行时和消费者类型测试。
+升级 ESLint 或插件后运行 `pnpm typegen` 并提交 `src/typegen.d.ts`；不要手工编辑生成文件。`pnpm test` 会先重新构建发布产物，再分别执行消费者类型契约、运行时集成、规则治理和发布包契约测试。`pnpm check` 在此基础上增加源码类型检查、全仓 ESLint 和格式验证。
 
 贡献流程见 [CONTRIBUTING.md](./CONTRIBUTING.md)，规则维护约定见 [默认规则与风险指南](./docs/rules-risk.zh.md)，本次工程审查和质量基线见 [工程质量审查报告](./docs/engineering-audit.zh.md)。
 

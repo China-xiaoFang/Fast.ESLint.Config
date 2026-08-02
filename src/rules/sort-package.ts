@@ -3,6 +3,7 @@ import type { RuleOptions } from "../typegen";
 /**
  * package.json 属性排序规则。
  *
+ * @remarks
  * `[高影响][可自动修复]`：仅在 `sortPackageJson: true` 时启用，首次修复可能重排大量字段。
  * 注意：这里故意不排序 `exports` 内部键；条件导出的键顺序具有模块解析语义。
  */

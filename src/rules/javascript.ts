@@ -2,6 +2,8 @@ import type { RuleOptions } from "../typegen";
 
 /**
  * JavaScript 本地覆写规则。
+ *
+ * @remarks
  * 高影响规则的解释与关闭方式见 `docs/rules-risk.zh.md`。
  */
 export const javascriptRules = {

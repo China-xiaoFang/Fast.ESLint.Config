@@ -343,7 +343,7 @@ pnpm check
 pnpm pack --dry-run
 ```
 
-Run `pnpm typegen` after upgrading ESLint or a plugin and commit `src/typegen.d.ts`; never edit the generated file manually. `pnpm check` verifies that generated types are current, builds the package, type-checks source, lints all supported file types, checks formatting, and runs both runtime and consumer type tests against the built package.
+Run `pnpm typegen` after upgrading ESLint or a plugin and commit `src/typegen.d.ts`; never edit the generated file manually. `pnpm test` rebuilds the package before running consumer type-contract, runtime integration, rule-governance, and package-contract tests. `pnpm check` adds source type-checking, full-repository linting, and formatting verification.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the contribution workflow, the [default-rule and risk guide](./docs/rules-risk.md) for rule maintenance, and [the engineering audit](./docs/engineering-audit.zh.md) for the current quality baseline.
 

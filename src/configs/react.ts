@@ -10,6 +10,7 @@ import type { Linter } from "eslint";
 /**
  * React 与兼容 JSX 运行时的检测设置。
  *
+ * @remarks
  * 该对象通过 `fastConfig({ react: { ... } })` 传入。传入对象会启用 React 支持，并在
  * JavaScript/JSX 和 TypeScript/TSX 文件上加载对应的 `@eslint-react` 推荐预置、React
  * 官方 Hooks Flat Config 以及本库规则。实际文件范围仍受顶层 `javascript`、
@@ -25,7 +26,7 @@ export interface ReactConfigOptions {
 	 * 标准 React 项目保持 `"react"`；Preact 等兼容运行时可填写自身包名，使
 	 * `@eslint-react` 按正确的导入来源识别组件和 API。该设置不会修改 TypeScript
 	 * `jsxImportSource`、Babel、Vite 或其他构建工具配置，两侧需要由项目自行保持一致。
-	 * @default "react"
+	 * @defaultValue `"react"`
 	 */
 	importSource?: string;
 	/**
@@ -33,7 +34,7 @@ export interface ReactConfigOptions {
 	 *
 	 * 例如 `<Button as="a" />` 中的 `as`。插件会据此理解多态组件最终渲染元素的语义，
 	 * 从而提高 DOM 与可访问性相关规则的判断准确度；未采用多态组件时通常无需修改。
-	 * @default "as"
+	 * @defaultValue `"as"`
 	 */
 	polymorphicPropName?: string;
 	/**
@@ -42,7 +43,7 @@ export interface ReactConfigOptions {
 	 * `"detect"` 会尝试从当前项目依赖解析已安装的 React 版本。monorepo、PnP、兼容运行时
 	 * 或依赖不可见的执行环境若无法可靠检测，可传入明确版本号，例如 `"19.1.0"`。
 	 * 该值只影响 lint 规则判断，不会限制或安装 React 依赖版本。
-	 * @default "detect"
+	 * @defaultValue `"detect"`
 	 */
 	version?: string;
 }
@@ -50,6 +51,7 @@ export interface ReactConfigOptions {
 /**
  * React 配置生成器使用的语言状态。
  *
+ * @remarks
  * `fastConfig()` 会自动推导这些值；直接组合配置片段时由调用方显式传入。
  *
  * 用户不直接配置该接口。`fastConfig()` 会把顶层 JavaScript、TypeScript 开关以及
@@ -62,7 +64,7 @@ interface ReactLanguageOptions {
 	 *
 	 * 该值来自顶层 `FastConfigOptions.javascript`；为 `false` 时即使 React 已启用，
 	 * React 配置也不会声明这些文件范围。
-	 * @default true
+	 * @defaultValue `true`
 	 */
 	javascript?: boolean;
 	/**
@@ -70,7 +72,7 @@ interface ReactLanguageOptions {
 	 *
 	 * 该值来自 `FastConfigOptions.typescript.typeChecked`，只影响 TypeScript React 配置；
 	 * JavaScript 配置始终使用普通推荐预置。
-	 * @default false
+	 * @defaultValue `false`
 	 */
 	typeChecked?: boolean;
 	/**
@@ -78,7 +80,7 @@ interface ReactLanguageOptions {
 	 *
 	 * 该值来自顶层 `FastConfigOptions.typescript`；为 `false` 时不会生成 TypeScript React
 	 * 片段，也不会仅因为 React 已启用而重新接管 TypeScript 文件。
-	 * @default true
+	 * @defaultValue `true`
 	 */
 	typescript?: boolean;
 }
@@ -86,9 +88,14 @@ interface ReactLanguageOptions {
 /**
  * 创建 React、JSX/TSX 与 Hooks 配置。
  *
+ * @remarks
  * JavaScript 和 TypeScript 分别继承对应的 @eslint-react 推荐预置；Hooks 使用
  * React 官方 Flat Config。组件、Hooks 即使不返回 JSX 也能在普通 `.js`/`.ts` 中
  * 定义，因此规则覆盖全部已启用脚本扩展名，而不仅是 `.jsx`/`.tsx`。
+ *
+ * @param options - React 版本、运行时导入来源与多态组件属性设置。
+ * @param languages - 由调用方启用的脚本语言以及 TypeScript 类型感知状态。
+ * @returns 仅包含已启用语言的 React 与 Hooks Flat Config 数组。
  */
 export const createReactConfigs = (
 	{ importSource = "react", polymorphicPropName = "as", version = "detect" }: ReactConfigOptions = {},

@@ -1,6 +1,12 @@
 import type { RuleOptions } from "../typegen";
 
-/** 默认启用的模块导入正确性与排序规则。 */
+/**
+ * 默认启用的模块导入正确性与排序规则。
+ *
+ * @remarks
+ * 该记录补充 import-x 推荐预置，统一导入位置、重复导入及分组顺序。依赖项目 resolver
+ * 的静态导出分析默认关闭，避免共享配置误判路径别名或自定义模块解析方式。
+ */
 export const importRules = {
 	// import 必须位于其他语句之前，避免模块依赖散落在执行逻辑中。
 	"import-x/first": "error",

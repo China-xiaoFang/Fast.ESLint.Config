@@ -3,6 +3,7 @@ import type { RuleOptions } from "../typegen";
 /**
  * tsconfig.json 属性排序规则。
  *
+ * @remarks
  * `[高影响][可自动修复]`：仅在 `sortTsconfig: true` 时启用，首次修复会重排大量字段，
  * 但只改变 JSONC 的阅读顺序，不改变 TypeScript 编译选项值。
  */

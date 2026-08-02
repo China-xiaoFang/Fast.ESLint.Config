@@ -1,21 +1,11 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
 import test from "node:test";
 
 import { ESLint } from "eslint";
-import ts from "typescript";
 
 import fastConfig, * as publicApi from "@fast-china/eslint-config";
 import { createGlobalIgnores, createLodashConfigs } from "@fast-china/eslint-config/configs";
-import { GLOBS_CODE } from "@fast-china/eslint-config/constants";
 import { preferLodashRules, preferLodashUnifiedRules } from "@fast-china/eslint-config/rules";
-
-const rulesDirectory = new URL("../src/rules/", import.meta.url);
-const readRuleSources = () =>
-	fs
-		.readdirSync(rulesDirectory)
-		.filter((fileName) => fileName.endsWith(".ts") && fileName !== "index.ts")
-		.map((fileName) => ({ fileName, source: fs.readFileSync(new URL(fileName, rulesDirectory), "utf8") }));
 
 const createLinter = (config, options = {}) =>
 	new ESLint({
@@ -389,92 +379,4 @@ test("manifest sorting is opt-in and preserves semantic exports condition order"
 	assert.ok(fixed.indexOf('"name"') < fixed.indexOf('"version"'));
 	assert.ok(fixed.indexOf('"node"') < fixed.indexOf('"import"'));
 	assert.ok(fixed.indexOf('"import"') < fixed.indexOf('"default"'));
-});
-
-test("every local rule override has a nearby rationale comment", () => {
-	for (const { fileName, source } of readRuleSources()) {
-		const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-
-		const visit = (node) => {
-			if (ts.isVariableDeclaration(node) && node.initializer && ts.isSatisfiesExpression(node.initializer)) {
-				const { expression, type } = node.initializer;
-
-				if (type.getText(sourceFile) !== "RuleOptions" || !ts.isObjectLiteralExpression(expression)) {
-					ts.forEachChild(node, visit);
-					return;
-				}
-
-				for (const property of expression.properties) {
-					if (!ts.isPropertyAssignment(property)) continue;
-
-					const leadingTrivia = source.slice(property.getFullStart(), property.getStart(sourceFile));
-					assert.match(
-						leadingTrivia,
-						/\/\/[^\r\n]+|\/\*[\s\S]*?\*\//,
-						`${fileName}:${sourceFile.getLineAndCharacterOfPosition(property.getStart(sourceFile)).line + 1} needs a rationale comment`
-					);
-				}
-			}
-
-			ts.forEachChild(node, visit);
-		};
-
-		visit(sourceFile);
-	}
-});
-
-test("risk guide documents every high-impact local default", () => {
-	const riskGuide = fs.readFileSync(new URL("../docs/rules-risk.zh.md", import.meta.url), "utf8");
-	const highImpactRules = new Set();
-
-	for (const { source } of readRuleSources()) {
-		for (const match of source.matchAll(/\/\/([^\r\n]*\[高影响\][^\r\n]*)\r?\n\s*"([^"]+)"/g)) {
-			const [, comment, rule] = match;
-			if (!comment.includes("[按需启用]") && !comment.includes("[默认关闭]")) highImpactRules.add(rule);
-		}
-	}
-
-	assert.ok(highImpactRules.size > 0);
-	for (const rule of highImpactRules) {
-		assert.ok(riskGuide.includes(`\`${rule}\``), `${rule} is missing from the risk guide`);
-	}
-});
-
-test("published entry points exist and expose the typed factory contract", () => {
-	const manifest = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
-	const resolvePackageFile = (filePath) => new URL(`../${filePath.replace(/^\.\//, "")}`, import.meta.url);
-	const declarations = fs.readFileSync(resolvePackageFile(manifest.types), "utf8");
-	const configDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./configs"].types), "utf8");
-	const constantDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./constants"].types), "utf8");
-	const ruleDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./rules"].types), "utf8");
-	const publicEntries = [manifest.exports["."], manifest.exports["./configs"], manifest.exports["./constants"], manifest.exports["./rules"]];
-
-	assert.equal(manifest.version, "2.0.4");
-	assert.equal(manifest.main, manifest.exports["."].import);
-	assert.equal(manifest.module, manifest.exports["."].import);
-	assert.equal(manifest.types, manifest.exports["."].types);
-	assert.match(manifest.main, /\.mjs$/);
-	assert.match(manifest.types, /\.d\.mts$/);
-	assert.equal(fs.existsSync(resolvePackageFile(manifest.main)), true);
-	assert.equal("require" in manifest.exports["."], false);
-	assert.equal("require" in manifest.exports["./configs"], false);
-	assert.equal("require" in manifest.exports["./constants"], false);
-	assert.equal("require" in manifest.exports["./rules"], false);
-	assert.deepEqual(Object.keys(manifest.exports), [".", "./configs", "./constants", "./rules", "./package.json"]);
-	for (const entry of publicEntries) {
-		assert.match(entry.import, /\.mjs$/);
-		assert.match(entry.types, /\.d\.mts$/);
-		assert.equal(entry.default, entry.import);
-		assert.equal(fs.existsSync(resolvePackageFile(entry.import)), true);
-		assert.equal(fs.existsSync(resolvePackageFile(entry.types)), true);
-	}
-	assert.match(declarations, /RuleOptions/);
-	assert.match(declarations, /defineRules/);
-	assert.match(declarations, /fastConfig/);
-	assert.match(configDeclarations, /createCommonConfigs/);
-	assert.match(configDeclarations, /createTypeScriptConfigs/);
-	assert.match(configDeclarations, /AngularConfigOptions/);
-	assert.match(constantDeclarations, /GLOBS_CODE/);
-	assert.deepEqual(GLOBS_CODE, ["**/*.{js,cjs,mjs,jsx}", "**/*.{ts,cts,mts,tsx}", "**/*.vue"]);
-	assert.doesNotMatch(ruleDeclarations, /defineRules/);
 });

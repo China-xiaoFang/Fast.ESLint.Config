@@ -11,8 +11,12 @@ import vueEslintParser from "vue-eslint-parser";
 /**
 * 创建 Vue 3 单文件组件配置。
 *
+* @remarks
 * 本包只处理 Vue 3。启用 TypeScript 时，Vue 模板解析器通过 `parserOptions.parser`
 * 委托给 typescript-eslint；这是 Vue 官方推荐的自定义脚本解析器接入方式。
+*
+* @param options - SFC 脚本语言以及共享的 TypeScript 类型感知选项。
+* @returns 包含 Vue 模板、脚本解析器、推荐预置与本地规则的 Flat Config 数组。
 */
 const createVueConfigs = ({ typescript = true, typescriptOptions = {} } = {}) => {
 	const typeChecked = typescriptOptions.typeChecked ?? false;

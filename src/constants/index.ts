@@ -1,4 +1,12 @@
-/** `@fast-china/eslint-config/constants` 公开的文件匹配常量。 */
+/**
+ * `@fast-china/eslint-config/constants` 公开的文件匹配常量。
+ *
+ * @remarks
+ * 所有模式均使用 ESLint Flat Config 的 glob 语义，可直接用于配置的 `files` 或
+ * `ignores` 字段。数组常量使用只读元组类型，调用方组合时应复制而非原地修改。
+ *
+ * @packageDocumentation
+ */
 
 /** JavaScript 与 JSX 文件；扩展名列表与 Node.js ESM/CJS 约定保持一致。 */
 export const GLOBS_JAVASCRIPT = ["**/*.{js,cjs,mjs,jsx}"] as const;
@@ -15,9 +23,11 @@ export const GLOB_ANGULAR_TYPESCRIPT = "**/*.ts";
 /** Angular 外部模板；内联模板由 Angular 处理器提取后复用同一模板配置。 */
 export const GLOB_ANGULAR_TEMPLATE = "**/*.html";
 
-/** ESLint JSON language 支持的三种 JSON 方言。 */
+/** 严格 JSON 文件。 */
 export const GLOB_JSON = "**/*.json";
+/** 允许注释与尾随逗号的 JSONC 文件。 */
 export const GLOB_JSONC = "**/*.jsonc";
+/** 使用 JSON5 语法的配置文件。 */
 export const GLOB_JSON5 = "**/*.json5";
 
 /** Markdown 文档。 */

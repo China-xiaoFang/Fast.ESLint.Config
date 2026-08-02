@@ -1,6 +1,8 @@
 //#region src/rules/vue.ts
 /**
 * Vue SFC 本地覆写规则。
+*
+* @remarks
 * 上游 `flat/recommended` 已覆盖基础正确性，这里只记录项目取舍与附加约束。
 */
 const vueRules = {

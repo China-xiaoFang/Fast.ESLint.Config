@@ -3,6 +3,7 @@ import { Linter } from "eslint";
 /**
  * TypeScript 解析器、推荐预置与类型感知检查选项。
  *
+ * @remarks
  * 该对象通过 `fastConfig({ typescript: { ... } })` 传入。传入对象会启用 TypeScript
  * 支持，并检查 `.ts`、`.cts`、`.mts` 与 `.tsx`。相同的类型感知状态还会传递给已启用的
  * Vue 和 React 配置，使普通 TypeScript 文件、Vue SFC 与 TSX 使用一致的检查级别。
@@ -22,7 +23,7 @@ interface TypeScriptConfigOptions {
    *
    * 开启后 Vue 与 React 的 TypeScript 规则也会选择类型感知版本。大型 monorepo 建议评估
    * lint 启动耗时和内存占用，并确保各工作区 tsconfig 边界明确。
-   * @default false
+   * @defaultValue `false`
    */
   typeChecked?: boolean;
   /**
@@ -32,18 +33,28 @@ interface TypeScriptConfigOptions {
    * `eslint.config.*` 调用栈推断；复杂 monorepo、共享配置包装层或从其他目录启动 ESLint
    * 时，建议传入配置文件所在目录的绝对路径，例如 `import.meta.dirname`，避免发现错误的
    * tsconfig 或跨越预期的项目边界。
-   * @default undefined
+   * @defaultValue `undefined`
    */
   tsconfigRootDir?: string;
 }
 /**
  * 返回 typescript-eslint 推荐预置。
  *
+ * @remarks
  * Vue SFC 需要移除上游仅匹配 `.ts` 的文件范围，否则这些关闭核心规则的配置会与
  * `.vue` 外层范围形成不可能命中的 AND 条件。
+ *
+ * @param typeChecked - 是否选择依赖完整类型信息的推荐与风格预置。
+ * @param removeFileScopes - 是否从每个上游预置中移除 `files` 范围。
+ * @returns 新的预置数组；移除范围时会复制各配置对象，不修改 typescript-eslint 的导出。
  */
 declare const getTypeScriptPresetConfigs: (typeChecked: boolean, removeFileScopes?: boolean) => Linter.Config[];
-/** 创建启用 Project Service 时需要的解析器选项。 */
+/**
+ * 创建 TypeScript 解析器的 Project Service 选项。
+ *
+ * @param options - 类型感知开关及可选的 tsconfig 查找根目录。
+ * @returns 未启用类型感知时返回空对象；启用时返回 `projectService` 及可选的 `tsconfigRootDir`。
+ */
 declare const createTypeScriptParserOptions: ({ typeChecked, tsconfigRootDir }?: TypeScriptConfigOptions) => {
   tsconfigRootDir?: string | undefined;
   projectService?: boolean | undefined;
@@ -51,8 +62,13 @@ declare const createTypeScriptParserOptions: ({ typeChecked, tsconfigRootDir }?:
 /**
  * 创建 TypeScript 配置。
  *
+ * @remarks
  * 默认采用无需类型信息的 recommended + stylistic 预置；`typeChecked: true` 会切换为
  * 对应的类型感知预置并启动 Project Service。
+ *
+ * @param options - TypeScript 类型感知与 tsconfig 根目录选项。
+ * @param files - 应用 TypeScript 配置的 ESLint glob 列表。
+ * @returns 包含 TypeScript 预置、解析器选项与本地规则的 Flat Config 数组。
  */
 declare const createTypeScriptConfigs: (options?: TypeScriptConfigOptions, files?: readonly string[]) => import("eslint/config").ConfigObject[];
 //#endregion

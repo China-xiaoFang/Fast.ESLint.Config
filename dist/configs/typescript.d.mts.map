@@ -1,1 +1,1 @@
-{"version":3,"file":"typescript.d.mts","names":[],"sources":["../../src/configs/typescript.ts"],"mappings":";;;;;;;;;;;;;UAmBiB;;;;;;;;;;;;;EAahB;;;;;;;;;;EAUA;;;;;;;;cASY,6BAA8B,sBAAsB,+BAA2B,OAAO;;cAetF,kCAAiC,aAAA,oBAA0C;;;;;;;;;;cAW3E,0BAA2B,UAAS,yBAA8B,sDAA2C"}
+{"version":3,"file":"typescript.d.mts","names":[],"sources":["../../src/configs/typescript.ts"],"mappings":";;;;;;;;;;;;;;UAoBiB;;;;;;;;;;;;;EAahB;;;;;;;;;;EAUA;;;;;;;;;;;;;cAcY,6BAA8B,sBAAsB,+BAA2B,OAAO;;;;;;;cAoBtF,kCAAiC,aAAA,oBAA0C;;;;;;;;;;;;;;;cAgB3E,0BAA2B,UAAS,yBAA8B,sDAA2C"}

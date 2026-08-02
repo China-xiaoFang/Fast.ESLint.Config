@@ -3,6 +3,8 @@
  *
  * 根入口不会重复导出这些成员；需要绕过 `fastConfig()` 自行组合时，请使用
  * `@fast-china/eslint-config/configs`。
+ *
+ * @packageDocumentation
  */
 export * from "./angular";
 export * from "./common";

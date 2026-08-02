@@ -1,6 +1,8 @@
 //#region src/rules/typescript.d.ts
 /**
  * TypeScript 本地覆写规则。
+ *
+ * @remarks
  * 这里补充 typescript-eslint 预置；高影响规则需同步维护风险文档。
  */
 declare const typescriptRules: {

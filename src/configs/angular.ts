@@ -11,6 +11,7 @@ import type { ESLint, Linter } from "eslint";
 /**
  * Angular TypeScript 源码与 HTML 模板检查的细分选项。
  *
+ * @remarks
  * 该对象通过 `fastConfig({ angular: { ... } })` 传入。只要传入对象，Angular 支持就会
  * 被启用；未指定的字段继续使用各自默认值。Angular 配置始终包含框架 TypeScript 规则
  * 和外部 `.html` 模板基础规则，本接口只控制成本或迁移影响较高的可选部分。
@@ -25,7 +26,7 @@ export interface AngularConfigOptions {
 	 *
 	 * 关闭后仍会检查 Angular TypeScript 源码和外部 `.html` 模板，只是不再处理组件中的
 	 * 内联模板。大型项目若主要使用外部模板，或 processor 与其他工具发生冲突，可暂时关闭。
-	 * @default true
+	 * @defaultValue `true`
 	 */
 	inlineTemplates?: boolean;
 	/**
@@ -34,7 +35,7 @@ export interface AngularConfigOptions {
 	 * 该规则组检查替代文本、键盘交互、焦点、表单标签和 ARIA 等可访问性问题，适用于
 	 * 外部模板与已提取的内联模板。关闭后仍保留模板语法、严格比较和现代控制流等基础规则。
 	 * 对旧项目而言可能一次产生较多报告，建议在确认迁移计划后再决定是否临时关闭。
-	 * @default true
+	 * @defaultValue `true`
 	 */
 	templateAccessibility?: boolean;
 }
@@ -42,8 +43,12 @@ export interface AngularConfigOptions {
 /**
  * 创建 Angular TypeScript、外部 HTML 模板与内联模板配置。
  *
+ * @remarks
  * Angular 支持依赖工厂的 TypeScript 配置先注册 typescript-eslint 解析器；模板由
  * Angular 专用 parser 解析，内联模板通过官方 processor 复用同一套 HTML 规则。
+ *
+ * @param options - 控制内联模板处理与模板无障碍规则的 Angular 选项。
+ * @returns 按 TypeScript 源码、外部模板顺序排列的 ESLint Flat Config 数组。
  */
 export const createAngularConfigs = ({ inlineTemplates = true, templateAccessibility = true }: AngularConfigOptions = {}) =>
 	defineConfig([

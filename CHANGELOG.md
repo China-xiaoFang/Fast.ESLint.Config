@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.0.5 - 2026-08-02
+
+### Changed
+
+- Upgraded public API documentation to complete TSDoc, including standard defaults, parameters, return values, thrown errors, remarks, examples, and package-level documentation.
+- Separated runtime, type-contract, rule-governance, and package-contract tests, and replaced the hard-coded release version assertion with SemVer and changelog consistency checks.
+
 ## 2.0.4 - 2026-08-02
 
 ### Added

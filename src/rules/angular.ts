@@ -3,6 +3,7 @@ import type { RuleOptions } from "../typegen";
 /**
  * Angular TypeScript 推荐规则。
  *
+ * @remarks
  * Angular ESLint 的拆分插件不直接导出 Flat Config 预置；本记录与 angular-eslint
  * 22.x 的 `tsRecommended` 保持一致，并逐条说明启用理由。
  */
@@ -35,7 +36,13 @@ export const angularRules = {
 	"@angular-eslint/use-lifecycle-interface": "warn",
 } satisfies RuleOptions;
 
-/** Angular HTML 模板推荐规则，与 angular-eslint 22.x 的 `templateRecommended` 对齐。 */
+/**
+ * Angular HTML 模板推荐规则。
+ *
+ * @remarks
+ * 该记录与 angular-eslint 22.x 的 `templateRecommended` 对齐，并补充默认启用的现代
+ * 控制流约束。它同时应用于外部模板与 processor 提取的内联模板。
+ */
 export const angularTemplateRules = {
 	// 双向绑定必须使用 [(...)] 顺序，反写的“香蕉盒”通常是模板笔误。
 	"@angular-eslint/template/banana-in-box": "error",
@@ -47,7 +54,13 @@ export const angularTemplateRules = {
 	"@angular-eslint/template/prefer-control-flow": "error",
 } satisfies RuleOptions;
 
-/** Angular 模板无障碍规则；可通过 `angular.templateAccessibility` 整组关闭。 */
+/**
+ * Angular 模板无障碍规则。
+ *
+ * @remarks
+ * 规则覆盖替代文本、键盘交互、焦点、表单标签与 ARIA 合法性，可通过
+ * `angular.templateAccessibility` 整组关闭而不影响模板基础正确性规则。
+ */
 export const angularTemplateAccessibilityRules = {
 	// 图片和图像型元素需要替代文本，确保非视觉用户能获得等价信息。
 	"@angular-eslint/template/alt-text": "error",

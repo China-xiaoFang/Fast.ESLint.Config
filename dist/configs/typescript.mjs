@@ -6,8 +6,13 @@ import tseslint from "typescript-eslint";
 /**
 * 返回 typescript-eslint 推荐预置。
 *
+* @remarks
 * Vue SFC 需要移除上游仅匹配 `.ts` 的文件范围，否则这些关闭核心规则的配置会与
 * `.vue` 外层范围形成不可能命中的 AND 条件。
+*
+* @param typeChecked - 是否选择依赖完整类型信息的推荐与风格预置。
+* @param removeFileScopes - 是否从每个上游预置中移除 `files` 范围。
+* @returns 新的预置数组；移除范围时会复制各配置对象，不修改 typescript-eslint 的导出。
 */
 const getTypeScriptPresetConfigs = (typeChecked, removeFileScopes = false) => {
 	const configs = [...typeChecked ? tseslint.configs.recommendedTypeChecked : tseslint.configs.recommended, ...typeChecked ? tseslint.configs.stylisticTypeChecked : tseslint.configs.stylistic];
@@ -17,7 +22,12 @@ const getTypeScriptPresetConfigs = (typeChecked, removeFileScopes = false) => {
 		return configWithoutFiles;
 	});
 };
-/** 创建启用 Project Service 时需要的解析器选项。 */
+/**
+* 创建 TypeScript 解析器的 Project Service 选项。
+*
+* @param options - 类型感知开关及可选的 tsconfig 查找根目录。
+* @returns 未启用类型感知时返回空对象；启用时返回 `projectService` 及可选的 `tsconfigRootDir`。
+*/
 const createTypeScriptParserOptions = ({ typeChecked = false, tsconfigRootDir } = {}) => ({
 	...typeChecked ? { projectService: true } : {},
 	...typeChecked && tsconfigRootDir ? { tsconfigRootDir } : {}
@@ -25,8 +35,13 @@ const createTypeScriptParserOptions = ({ typeChecked = false, tsconfigRootDir } 
 /**
 * 创建 TypeScript 配置。
 *
+* @remarks
 * 默认采用无需类型信息的 recommended + stylistic 预置；`typeChecked: true` 会切换为
 * 对应的类型感知预置并启动 Project Service。
+*
+* @param options - TypeScript 类型感知与 tsconfig 根目录选项。
+* @param files - 应用 TypeScript 配置的 ESLint glob 列表。
+* @returns 包含 TypeScript 预置、解析器选项与本地规则的 Flat Config 数组。
 */
 const createTypeScriptConfigs = (options = {}, files = GLOBS_TYPESCRIPT) => defineConfig([{
 	name: options.typeChecked ? "@fast-china/typescript/type-checked" : "@fast-china/typescript",

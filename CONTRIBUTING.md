@@ -15,7 +15,7 @@ pnpm typegen
 pnpm check
 ```
 
-Use `pnpm lint:fix` and `pnpm format` for safe mechanical fixes. `pnpm check` is the same quality gate used by CI: it builds the actual package, type-checks source, lints every supported language, verifies formatting, and runs integration tests against `dist`.
+Use `pnpm lint:fix` and `pnpm format` for safe mechanical fixes. `pnpm test` first rebuilds `dist`, then runs consumer type-contract, runtime integration, rule-governance, and package-contract suites. `pnpm check` is the same quality gate used by CI and adds source type-checking, full-repository linting, and formatting verification.
 
 `src/typegen.d.ts` is generated from ESLint rule schemas and is part of the public type API. Run `pnpm typegen` after changing ESLint or plugin versions, inspect and commit the generated diff, and use `pnpm typegen:check` to verify it. Never edit the generated declaration manually.
 
@@ -51,9 +51,10 @@ pnpm publish --access public --registry https://registry.npmjs.org/
 
 ```sh
 pnpm view @fast-china/eslint-config version --registry https://registry.npmjs.org/
-git tag -a v2.0.3 -m "release: v2.0.3"
+VERSION=$(node -p "require('./package.json').version")
+git tag -a "v$VERSION" -m "release: v$VERSION"
 git push origin master
-git push origin v2.0.3
+git push origin "v$VERSION"
 ```
 
 npm versions are immutable; never reuse an already published version.

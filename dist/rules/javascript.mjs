@@ -1,6 +1,8 @@
 //#region src/rules/javascript.ts
 /**
 * JavaScript 本地覆写规则。
+*
+* @remarks
 * 高影响规则的解释与关闭方式见 `docs/rules-risk.zh.md`。
 */
 const javascriptRules = {
