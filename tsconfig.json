@@ -1,14 +1,24 @@
 {
 	"compilerOptions": {
+		// 按 ES2022 语义检查源码；发布产物的运行时目标由 tsdown 单独指定。
 		"target": "ES2022",
+		// 保留 ESM 语法交由 tsdown 打包。
 		"module": "ESNext",
+		// 按打包器规则解析模块，支持 package.json 的 exports 等现代能力。
 		"moduleResolution": "Bundler",
+		// 仅加载 Node.js 全局类型，避免无关环境类型污染。
 		"types": ["node"],
+		// 启用全部严格类型检查。
 		"strict": true,
+		// TypeScript 仅负责类型检查，构建产物统一由 tsdown 生成。
 		"noEmit": true,
+		// 兼容以默认导入方式使用 CommonJS 模块。
 		"esModuleInterop": true,
+		// 防止不同大小写的导入路径在跨平台构建时产生差异。
 		"forceConsistentCasingInFileNames": true,
+		// 跳过依赖声明文件检查，减少第三方类型对检查速度和结果的干扰。
 		"skipLibCheck": true
 	},
+	// 检查源码、辅助脚本和构建配置。
 	"include": ["src", "scripts", "tsdown.config.ts"]
 }
