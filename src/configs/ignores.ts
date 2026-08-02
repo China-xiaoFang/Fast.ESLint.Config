@@ -23,7 +23,7 @@ export const DEFAULT_IGNORE_PATTERNS = Object.freeze([
 
 /** 创建全局忽略配置，并在默认集合之后追加项目自定义模式。 */
 export const createGlobalIgnores = (additionalPatterns: readonly string[] = []) =>
-	globalIgnores([...DEFAULT_IGNORE_PATTERNS, ...additionalPatterns], "@fast-china/ignores/global");
+	defineConfig([globalIgnores([...DEFAULT_IGNORE_PATTERNS, ...additionalPatterns], "@fast-china/ignores/global")]);
 
 /** 读取运行 ESLint 的项目根目录中的 `.gitignore`。 */
 export const createGitignoreConfigs = () =>

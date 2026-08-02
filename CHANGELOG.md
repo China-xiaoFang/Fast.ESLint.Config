@@ -6,6 +6,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.0.4 - 2026-08-02
+
+### Added
+
+- Added dedicated `@fast-china/eslint-config/configs` and `@fast-china/eslint-config/constants` subpaths for advanced Flat Config composition.
+
+### Changed
+
+- Changed the `configs` and `rules` barrels to forward every module export, including configuration option types, while keeping configuration types out of the root entry.
+- Changed this repository's own ESLint configuration to compose focused config fragments and constants instead of calling the root `fastConfig()` factory.
+- Moved the `fastConfig()` implementation from `src/core/index.ts` directly into `src/index.ts` so the source root matches the package root entry.
+- Narrowed the default preset to conventional Vue 3 browser administration projects by making Markdown linting opt-in alongside React, Angular, and manifest sorting.
+- Removed Lodash policy selection from `fastConfig()` and the temporary `./lodash` subpath; optional Lodash restrictions now compose exclusively through `createLodashConfigs()` from `./configs`.
+- Changed `createGlobalIgnores()` to return a config array like the other fragment factories, so direct composition consistently uses spread syntax.
+- Updated `@eslint-react/eslint-plugin`, `@eslint/config-inspector`, and `globals` within their existing compatible version ranges.
+
 ## 2.0.3 - 2026-07-29
 
 ### Changed

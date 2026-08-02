@@ -15,7 +15,7 @@
 
 ## 内置预置来源
 
-`fastConfig()` 默认开启 Vue 3、TypeScript、JavaScript、import、RegExp、JSON、Markdown 与 Prettier 兼容层；React、Angular、TypeScript 类型感知和清单排序默认关闭。
+`fastConfig()` 默认面向普通 Vue 3 浏览器后台管理项目，开启 TypeScript、JavaScript、import、RegExp、JSON 与 Prettier 兼容层；React、Angular、Markdown、TypeScript 类型感知和清单排序按需启用。Lodash 策略通过 `configs` 子路径独立组合。
 
 | 范围             | 默认继承                                                                                  | 说明                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -27,7 +27,7 @@
 | import           | `eslint-plugin-import-x` 的 `recommended`                                                 | 本库额外配置导入位置、去重和排序。解析器相关规则默认关闭，避免绑定具体别名方案。 |
 | RegExp           | `eslint-plugin-regexp` 的 `flat/recommended`                                              | 部分规则可自动改写正则表达式，批量修复后需运行测试。                             |
 | JSON/JSONC/JSON5 | `eslint-plugin-jsonc` 对应方言的 `flat/recommended-*`                                     | 三种方言按扩展名隔离，不会互相叠加。                                             |
-| Markdown         | `@eslint/markdown` 的 `recommended`                                                       | 检查 Markdown 结构和语法。                                                       |
+| Markdown（按需） | `@eslint/markdown` 的 `recommended`                                                       | 检查 Markdown 结构和语法。                                                       |
 | Prettier 兼容    | `eslint-config-prettier/flat`                                                             | 只关闭冲突的格式规则，不会在 ESLint 内执行 Prettier。                            |
 
 上游预置的具体规则集合由锁文件中的依赖版本决定，升级 ESLint 或任一插件时都可能变化。审查实际生效配置时，应以配置检查器和 `pnpm-lock.yaml` 为准，而不是复制一份很快过期的上游规则列表。
@@ -61,7 +61,7 @@
 - React 仅在 `react: true` 时启用。其上游推荐预置和官方 Hooks 预置包含阻断级组件、Hooks 与 React Compiler 规则；接入旧项目时应重点审查自定义 Hook 和 memoization 写法。
 - Angular 仅在 `angular: true` 时启用。框架规则默认要求 `inject()`、OnPush 变更检测、独立组件、现代模板控制流和模板无障碍；这些约束不会进入默认 Vue 配置。
 - 清单排序规则 `jsonc/sort-keys`、`jsonc/sort-array-values` 分别仅在 `sortPackageJson: true`、`sortTsconfig: true` 时启用；首次修复应单独提交并核对发布清单。
-- Lodash 静态导入限制仅在 `lodash: "lodash"` 或 `lodash: "lodash-unified"` 时启用。该策略使用 `no-restricted-imports` 阻止混用包入口，但不会检查动态 `import()` 或 CommonJS `require()`。
+- Lodash 静态导入限制仅在从 `configs` 子路径调用 `createLodashConfigs("lodash")` 或 `createLodashConfigs("lodash-unified")` 时启用。该策略使用 `no-restricted-imports` 阻止混用包入口，但不会检查动态 `import()` 或 CommonJS `require()`。
 - `import-x/no-unresolved`、`import-x/named` 等依赖 resolver 的检查默认关闭。
 - `package.json` 的 `exports` 条件键永不自动排序。Node 条件导出按键顺序匹配，改写顺序可能改变实际加载文件。
 

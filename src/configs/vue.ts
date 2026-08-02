@@ -12,7 +12,8 @@ import { type TypeScriptConfigOptions, createTypeScriptParserOptions, getTypeScr
 /**
  * Vue 3 单文件组件生成器使用的脚本语言与类型感知选项。
  *
- * 该接口是 `fastConfig()` 组装 Vue 配置时使用的内部契约，不是根入口的独立用户选项。
+ * `fastConfig()` 会根据顶层选项推导这些值；直接组合配置片段时可从 `./configs`
+ * 子路径使用该接口。
  * 用户通过顶层 `vue` 决定是否接管 `.vue` 文件，通过顶层 `typescript` 决定 SFC 脚本
  * 是否启用 TypeScript 解析和类型感知能力；工厂会把两者转换为此对象。
  *

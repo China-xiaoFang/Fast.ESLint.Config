@@ -1,14 +1,10 @@
 import { defineConfig } from "eslint/config";
 
-import fastConfig, {
-	type AngularConfigOptions,
-	type FastConfigOptions,
-	type LodashPreference,
-	type ReactConfigOptions,
-	type RuleOptions,
-	defineRules,
-	fastConfig as namedFastConfig,
-} from "@fast-china/eslint-config";
+import fastConfig, { type FastConfigOptions, type RuleOptions, defineRules, fastConfig as namedFastConfig } from "@fast-china/eslint-config";
+import { type AngularConfigOptions, type LodashPreference, type ReactConfigOptions, createLodashConfigs } from "@fast-china/eslint-config/configs";
+
+// @ts-expect-error -- 配置片段类型只从独立的 configs 子路径导出。
+type RootAngularConfigOptions = import("@fast-china/eslint-config").AngularConfigOptions;
 
 const projectRules = defineRules({
 	"@angular-eslint/template/alt-text": "error",
@@ -23,7 +19,6 @@ const projectRules = defineRules({
 const options = {
 	angular: { inlineTemplates: true, templateAccessibility: true },
 	gitignore: false,
-	lodash: "lodash-unified",
 	rules: projectRules,
 	react: { importSource: "react", polymorphicPropName: "as", version: "detect" },
 	sortPackageJson: true,
@@ -47,12 +42,14 @@ const ruleOptions = {
 void ruleOptions;
 
 const lodashPreference: LodashPreference = "lodash";
+defineConfig(createLodashConfigs(lodashPreference));
 void lodashPreference;
 
 const angularOptions: AngularConfigOptions = { inlineTemplates: false, templateAccessibility: false };
 const reactOptions: ReactConfigOptions = { importSource: "preact", polymorphicPropName: "as", version: "10.0.0" };
 void angularOptions;
 void reactOptions;
+void (undefined as unknown as RootAngularConfigOptions);
 
 // @ts-expect-error -- Unknown rule names must be rejected.
 defineRules({ "vue/not-a-real-rule": "error" });
@@ -75,8 +72,8 @@ fastConfig({ angular: { templateAccessibility: "enabled" } });
 // @ts-expect-error -- Unknown factory options must be rejected.
 fastConfig({ unknownOption: true });
 
-// @ts-expect-error -- Only the documented Lodash package preferences are accepted.
-fastConfig({ lodash: "lodash-es" });
+// @ts-expect-error -- Lodash policies are composed through the configs subpath, not the root factory.
+fastConfig({ lodash: "lodash" });
 
 // @ts-expect-error -- Factory-level rules use the same exact generated rule types.
 fastConfig({ rules: { "vue/not-a-real-rule": "error" } });

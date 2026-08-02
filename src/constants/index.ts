@@ -1,3 +1,5 @@
+/** `@fast-china/eslint-config/constants` 公开的文件匹配常量。 */
+
 /** JavaScript 与 JSX 文件；扩展名列表与 Node.js ESM/CJS 约定保持一致。 */
 export const GLOBS_JAVASCRIPT = ["**/*.{js,cjs,mjs,jsx}"] as const;
 

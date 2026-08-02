@@ -48,7 +48,9 @@ export interface ReactConfigOptions {
 }
 
 /**
- * 工厂传给 React 配置生成器的内部语言状态。
+ * React 配置生成器使用的语言状态。
+ *
+ * `fastConfig()` 会自动推导这些值；直接组合配置片段时由调用方显式传入。
  *
  * 用户不直接配置该接口。`fastConfig()` 会把顶层 JavaScript、TypeScript 开关以及
  * TypeScript 类型感知状态转换为这里的三个布尔值，确保 React 不会重新接管已经关闭的

@@ -6,6 +6,8 @@ import { ESLint } from "eslint";
 import ts from "typescript";
 
 import fastConfig, * as publicApi from "@fast-china/eslint-config";
+import { createGlobalIgnores, createLodashConfigs } from "@fast-china/eslint-config/configs";
+import { GLOBS_CODE } from "@fast-china/eslint-config/constants";
 import { preferLodashRules, preferLodashUnifiedRules } from "@fast-china/eslint-config/rules";
 
 const rulesDirectory = new URL("../src/rules/", import.meta.url);
@@ -29,12 +31,31 @@ test("package exports the configuration factory and typed rule helper", () => {
 	assert.equal(fastConfig, publicApi.fastConfig);
 	assert.ok(Array.isArray(fastConfig({ gitignore: false })));
 	assert.equal(Object.isFrozen(publicApi.defaultConfigOptions), true);
-	assert.equal(publicApi.defaultConfigOptions.angular, false);
-	assert.equal(publicApi.defaultConfigOptions.lodash, false);
-	assert.equal(publicApi.defaultConfigOptions.react, false);
-	assert.equal(publicApi.defaultConfigOptions.sortPackageJson, false);
-	assert.equal(publicApi.defaultConfigOptions.sortTsconfig, false);
+	assert.deepEqual(publicApi.defaultConfigOptions, {
+		angular: false,
+		environment: "browser",
+		gitignore: true,
+		imports: true,
+		javascript: true,
+		json: true,
+		markdown: false,
+		prettier: true,
+		react: false,
+		regexp: true,
+		sortPackageJson: false,
+		sortTsconfig: false,
+		typescript: true,
+		vue: true,
+	});
 	assert.deepEqual(publicApi.defineRules({ "no-console": "warn" }), { "no-console": "warn" });
+});
+
+test("configuration fragment factories consistently return arrays", () => {
+	const globalIgnoreConfigs = createGlobalIgnores(["fixtures/generated/**"]);
+
+	assert.ok(Array.isArray(globalIgnoreConfigs));
+	assert.equal(globalIgnoreConfigs.length, 1);
+	assert.equal(globalIgnoreConfigs[0].name, "@fast-china/ignores/global");
 });
 
 test("factory disables optional language integrations without claiming their files", async () => {
@@ -129,7 +150,7 @@ test("project rules and trailing overrides take precedence in declaration order"
 	assert.ok(!allowedResult.messages.some((message) => message.ruleId === "no-console"));
 });
 
-test("lodash package preference is opt-in and rejects mixed static imports", async () => {
+test("Lodash config fragment rejects mixed static imports", async () => {
 	const baseOptions = {
 		gitignore: false,
 		imports: false,
@@ -146,7 +167,7 @@ test("lodash package preference is opt-in and rejects mixed static imports", asy
 	});
 	assert.ok(!defaultResult.messages.some((message) => message.ruleId === "no-restricted-imports"));
 
-	const unifiedLinter = createLinter(fastConfig({ ...baseOptions, lodash: "lodash-unified" }));
+	const unifiedLinter = createLinter([...fastConfig(baseOptions), ...createLodashConfigs("lodash-unified")]);
 	const [unifiedResult] = await unifiedLinter.lintText(
 		'import get from "lodash/get";\nimport { debounce } from "lodash-es";\nexport { default as pick } from "lodash/pick";\nvoid get;\nvoid debounce;\n',
 		{ filePath: "fixtures/prefer-lodash-unified.js" }
@@ -157,7 +178,7 @@ test("lodash package preference is opt-in and rejects mixed static imports", asy
 	});
 	assert.ok(!allowedUnifiedResult.messages.some((message) => message.ruleId === "no-restricted-imports"));
 
-	const lodashLinter = createLinter(fastConfig({ ...baseOptions, lodash: "lodash" }));
+	const lodashLinter = createLinter([...fastConfig(baseOptions), ...createLodashConfigs("lodash")]);
 	const [lodashResult] = await lodashLinter.lintText(
 		'import { debounce } from "lodash-unified";\nimport { get } from "lodash-es";\nexport * from "lodash-unified/fp";\nvoid debounce;\nvoid get;\n',
 		{ filePath: "fixtures/prefer-lodash.js" }
@@ -285,7 +306,7 @@ test("type-aware configuration can lint a file from the project service", async 
 	assert.ok(!result.messages.some((message) => message.message.includes("type information")));
 });
 
-test("representative JavaScript, TypeScript, Vue, JSON dialects, and Markdown parse without configuration errors", async () => {
+test("default Vue administration project files parse without configuration errors", async () => {
 	const linter = createLinter(fastConfig({ gitignore: false }));
 	const fixtures = [
 		{
@@ -312,10 +333,6 @@ test("representative JavaScript, TypeScript, Vue, JSON dialects, and Markdown pa
 			filePath: "fixtures/example.json5",
 			code: "{ enabled: true, }\n",
 		},
-		{
-			filePath: "fixtures/example.md",
-			code: "# Example\n\nA valid Markdown document.\n",
-		},
 	];
 
 	for (const fixture of fixtures) {
@@ -323,6 +340,17 @@ test("representative JavaScript, TypeScript, Vue, JSON dialects, and Markdown pa
 		assert.equal(result.fatalErrorCount, 0, `${fixture.filePath}: ${result.messages.map((message) => message.message).join(", ")}`);
 		assert.ok(!result.messages.some((message) => message.message.includes("could not find plugin")));
 	}
+});
+
+test("Markdown parsing is opt-in", async () => {
+	const defaultNames = fastConfig({ gitignore: false }).map((config) => config.name ?? "");
+	const markdownLinter = createLinter(fastConfig({ gitignore: false, markdown: true }));
+	const [result] = await markdownLinter.lintText("# Example\n\nA valid Markdown document.\n", {
+		filePath: "fixtures/example.md",
+	});
+
+	assert.ok(!defaultNames.some((name) => name.includes("markdown")));
+	assert.equal(result.fatalErrorCount, 0, result.messages.map((message) => message.message).join(", "));
 });
 
 test("quality rules are active for JavaScript and Vue", async () => {
@@ -416,10 +444,12 @@ test("published entry points exist and expose the typed factory contract", () =>
 	const manifest = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 	const resolvePackageFile = (filePath) => new URL(`../${filePath.replace(/^\.\//, "")}`, import.meta.url);
 	const declarations = fs.readFileSync(resolvePackageFile(manifest.types), "utf8");
+	const configDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./configs"].types), "utf8");
+	const constantDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./constants"].types), "utf8");
 	const ruleDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./rules"].types), "utf8");
-	const publicEntries = [manifest.exports["."], manifest.exports["./rules"]];
+	const publicEntries = [manifest.exports["."], manifest.exports["./configs"], manifest.exports["./constants"], manifest.exports["./rules"]];
 
-	assert.equal(manifest.version, "2.0.3");
+	assert.equal(manifest.version, "2.0.4");
 	assert.equal(manifest.main, manifest.exports["."].import);
 	assert.equal(manifest.module, manifest.exports["."].import);
 	assert.equal(manifest.types, manifest.exports["."].types);
@@ -427,8 +457,10 @@ test("published entry points exist and expose the typed factory contract", () =>
 	assert.match(manifest.types, /\.d\.mts$/);
 	assert.equal(fs.existsSync(resolvePackageFile(manifest.main)), true);
 	assert.equal("require" in manifest.exports["."], false);
+	assert.equal("require" in manifest.exports["./configs"], false);
+	assert.equal("require" in manifest.exports["./constants"], false);
 	assert.equal("require" in manifest.exports["./rules"], false);
-	assert.deepEqual(Object.keys(manifest.exports), [".", "./rules", "./package.json"]);
+	assert.deepEqual(Object.keys(manifest.exports), [".", "./configs", "./constants", "./rules", "./package.json"]);
 	for (const entry of publicEntries) {
 		assert.match(entry.import, /\.mjs$/);
 		assert.match(entry.types, /\.d\.mts$/);
@@ -439,8 +471,10 @@ test("published entry points exist and expose the typed factory contract", () =>
 	assert.match(declarations, /RuleOptions/);
 	assert.match(declarations, /defineRules/);
 	assert.match(declarations, /fastConfig/);
-	assert.match(declarations, /LodashPreference/);
-	assert.match(declarations, /AngularConfigOptions/);
-	assert.match(declarations, /ReactConfigOptions/);
+	assert.match(configDeclarations, /createCommonConfigs/);
+	assert.match(configDeclarations, /createTypeScriptConfigs/);
+	assert.match(configDeclarations, /AngularConfigOptions/);
+	assert.match(constantDeclarations, /GLOBS_CODE/);
+	assert.deepEqual(GLOBS_CODE, ["**/*.{js,cjs,mjs,jsx}", "**/*.{ts,cts,mts,tsx}", "**/*.vue"]);
 	assert.doesNotMatch(ruleDeclarations, /defineRules/);
 });

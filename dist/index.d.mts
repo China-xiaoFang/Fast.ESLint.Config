@@ -1,125 +1,18 @@
-import { t as RuleOptions } from "./typegen.mjs";
+import { AngularConfigOptions } from "./configs/angular.mjs";
+import { RuntimeEnvironment } from "./configs/environment.mjs";
+import { ReactConfigOptions } from "./configs/react.mjs";
+import { TypeScriptConfigOptions } from "./configs/typescript.mjs";
+import { RuleOptions } from "./typegen.mjs";
 import { Config } from "eslint/config";
 import { Linter } from "eslint";
-//#region src/configs/angular.d.ts
+//#region src/index.d.ts
+type RejectUnknownRuleNames<Rules extends RuleOptions> = Rules & Record<Exclude<keyof Rules, keyof RuleOptions>, never>;
 /**
- * Angular TypeScript 源码与 HTML 模板检查的细分选项。
+ * 为项目规则提供精确的规则名、严重级别和规则选项自动补全。
  *
- * 该对象通过 `fastConfig({ angular: { ... } })` 传入。只要传入对象，Angular 支持就会
- * 被启用；未指定的字段继续使用各自默认值。Angular 配置始终包含框架 TypeScript 规则
- * 和外部 `.html` 模板基础规则，本接口只控制成本或迁移影响较高的可选部分。
- *
- * Angular 支持依赖顶层 `typescript` 能力，不能与 `typescript: false` 同时使用。
- * 这些选项不会修改 Angular 编译器、CLI 或模板类型检查配置。
+ * 该函数不会修改传入对象；它只在 TypeScript 编译阶段拒绝未知规则和无效选项。
  */
-interface AngularConfigOptions {
-  /**
-   * 是否使用 Angular 官方 processor，从 TypeScript 文件的
-   * `@Component({ template: ... })` 元数据中提取内联 HTML 并复用模板规则进行检查。
-   *
-   * 关闭后仍会检查 Angular TypeScript 源码和外部 `.html` 模板，只是不再处理组件中的
-   * 内联模板。大型项目若主要使用外部模板，或 processor 与其他工具发生冲突，可暂时关闭。
-   * @default true
-   */
-  inlineTemplates?: boolean;
-  /**
-   * 是否在模板基础正确性规则之外启用 Angular 模板无障碍规则组。
-   *
-   * 该规则组检查替代文本、键盘交互、焦点、表单标签和 ARIA 等可访问性问题，适用于
-   * 外部模板与已提取的内联模板。关闭后仍保留模板语法、严格比较和现代控制流等基础规则。
-   * 对旧项目而言可能一次产生较多报告，建议在确认迁移计划后再决定是否临时关闭。
-   * @default true
-   */
-  templateAccessibility?: boolean;
-}
-//#endregion
-//#region src/configs/environment.d.ts
-type RuntimeEnvironment = "browser" | "node" | "universal";
-//#endregion
-//#region src/configs/lodash.d.ts
-/** 项目允许使用的 Lodash 导入来源。 */
-type LodashPreference = "lodash" | "lodash-unified";
-//#endregion
-//#region src/configs/react.d.ts
-/**
- * React 与兼容 JSX 运行时的检测设置。
- *
- * 该对象通过 `fastConfig({ react: { ... } })` 传入。传入对象会启用 React 支持，并在
- * JavaScript/JSX 和 TypeScript/TSX 文件上加载对应的 `@eslint-react` 推荐预置、React
- * 官方 Hooks Flat Config 以及本库规则。实际文件范围仍受顶层 `javascript`、
- * `typescript` 开关控制。
- *
- * 这些字段只传给 ESLint 插件用于理解项目的 React 语义，不会改变 JSX 编译方式、自动
- * 导入 React、设置打包器别名或安装兼容运行时。
- */
-interface ReactConfigOptions {
-  /**
-   * 提供 React API 与 JSX 运行时的包入口名称。
-   *
-   * 标准 React 项目保持 `"react"`；Preact 等兼容运行时可填写自身包名，使
-   * `@eslint-react` 按正确的导入来源识别组件和 API。该设置不会修改 TypeScript
-   * `jsxImportSource`、Babel、Vite 或其他构建工具配置，两侧需要由项目自行保持一致。
-   * @default "react"
-   */
-  importSource?: string;
-  /**
-   * 项目约定用于切换多态组件底层元素或组件类型的属性名。
-   *
-   * 例如 `<Button as="a" />` 中的 `as`。插件会据此理解多态组件最终渲染元素的语义，
-   * 从而提高 DOM 与可访问性相关规则的判断准确度；未采用多态组件时通常无需修改。
-   * @default "as"
-   */
-  polymorphicPropName?: string;
-  /**
-   * 供插件选择版本相关行为的 React 版本号或自动检测标记。
-   *
-   * `"detect"` 会尝试从当前项目依赖解析已安装的 React 版本。monorepo、PnP、兼容运行时
-   * 或依赖不可见的执行环境若无法可靠检测，可传入明确版本号，例如 `"19.1.0"`。
-   * 该值只影响 lint 规则判断，不会限制或安装 React 依赖版本。
-   * @default "detect"
-   */
-  version?: string;
-}
-//#endregion
-//#region src/configs/typescript.d.ts
-/**
- * TypeScript 解析器、推荐预置与类型感知检查选项。
- *
- * 该对象通过 `fastConfig({ typescript: { ... } })` 传入。传入对象会启用 TypeScript
- * 支持，并检查 `.ts`、`.cts`、`.mts` 与 `.tsx`。相同的类型感知状态还会传递给已启用的
- * Vue 和 React 配置，使普通 TypeScript 文件、Vue SFC 与 TSX 使用一致的检查级别。
- *
- * 默认模式不读取类型信息，启动快且不要求文件属于某个 tsconfig；类型感知模式会启动
- * typescript-eslint Project Service，能够执行更强的语义规则，但要求项目配置和执行目录
- * 正确，并会增加首次检查时间与内存占用。
- */
-interface TypeScriptConfigOptions {
-  /**
-   * 是否启用依赖完整 TypeScript 类型信息的规则。
-   *
-   * `false` 使用 typescript-eslint 的 `recommended` 与 `stylistic` 预置，不创建 TypeScript
-   * Program。`true` 切换到 `recommendedTypeChecked` 与 `stylisticTypeChecked`，并启用
-   * `parserOptions.projectService`。被检查文件通常需要包含在可发现的 tsconfig 中，否则
-   * Project Service 会报告文件不属于项目。
-   *
-   * 开启后 Vue 与 React 的 TypeScript 规则也会选择类型感知版本。大型 monorepo 建议评估
-   * lint 启动耗时和内存占用，并确保各工作区 tsconfig 边界明确。
-   * @default false
-   */
-  typeChecked?: boolean;
-  /**
-   * typescript-eslint 查找 tsconfig 与创建 Project Service 时使用的根目录。
-   *
-   * 仅在 `typeChecked: true` 时写入解析器选项。普通单仓库通常可让 typescript-eslint 从
-   * `eslint.config.*` 调用栈推断；复杂 monorepo、共享配置包装层或从其他目录启动 ESLint
-   * 时，建议传入配置文件所在目录的绝对路径，例如 `import.meta.dirname`，避免发现错误的
-   * tsconfig 或跨越预期的项目边界。
-   * @default undefined
-   */
-  tsconfigRootDir?: string;
-}
-//#endregion
-//#region src/core/index.d.ts
+declare const defineRules: <const Rules extends RuleOptions>(rules: RejectUnknownRuleNames<Rules>) => Rules & Linter.RulesRecord;
 /**
  * 核心工厂 `fastConfig()` 的项目级 ESLint Flat Config 选项。
  *
@@ -208,7 +101,7 @@ interface FastConfigOptions {
    * 是否让工厂接管 JavaScript、CommonJS、ES Module 与 JSX 文件。
    *
    * 启用时匹配 `.js`、`.cjs`、`.mjs` 与 `.jsx`；关闭后这些文件不会进入基础规则、
-   * 环境全局变量、import、regexp、Lodash 或 React 的 JavaScript 配置范围，但不会影响
+   * 环境全局变量、import、regexp 或 React 的 JavaScript 配置范围，但不会影响
    * 已启用的 TypeScript、Vue、JSON 或 Markdown 文件。
    * @default true
    */
@@ -222,23 +115,11 @@ interface FastConfigOptions {
    */
   json?: boolean;
   /**
-   * 是否统一项目中的 Lodash 静态 ESM 导入来源。
-   *
-   * - `false`：不限制 `lodash`、`lodash-es` 与 `lodash-unified` 的使用。
-   * - `"lodash"`：允许 `lodash` 及其子路径，禁止混用另外两个包。
-   * - `"lodash-unified"`：统一使用 `lodash-unified`，禁止另外两个包及其子路径。
-   *
-   * 该能力只约束静态 `import`/`export`，不会检查动态 `import()` 或 CommonJS
-   * `require()`，也不会安装、替换或迁移任何 Lodash 依赖。
-   * @default false
-   */
-  lodash?: false | LodashPreference;
-  /**
    * 是否使用 `@eslint/markdown` 推荐配置检查 `.md` 文档的结构和 Markdown 语法。
    *
    * 该配置关注 Markdown 文档本身，不会自动把项目的 JavaScript、TypeScript 或框架
    * 规则应用到围栏代码块；如需检查代码块，应通过项目覆盖配置明确指定。
-   * @default true
+   * @default false
    */
   markdown?: boolean;
   /**
@@ -322,8 +203,7 @@ declare const defaultConfigOptions: Readonly<{
   readonly imports: true;
   readonly javascript: true;
   readonly json: true;
-  readonly lodash: false;
-  readonly markdown: true;
+  readonly markdown: false;
   readonly prettier: true;
   readonly react: false;
   readonly regexp: true;
@@ -333,21 +213,14 @@ declare const defaultConfigOptions: Readonly<{
   readonly vue: true;
 }>;
 /**
- * 创建面向 Vue 3、React、Angular、Vite、TypeScript、JavaScript 与 Node.js 项目的 ESLint Flat Config。
+ * 创建面向 Vue 3、Vite、TypeScript 与浏览器后台管理项目的 ESLint Flat Config。
  *
- * 默认导出就是此函数。额外配置参数会放在内置配置之后，因此项目可以按文件范围
- * 覆盖任何默认规则，而无需再次调用 ESLint 的 `defineConfig()`。
+ * 默认启用浏览器环境、JavaScript、TypeScript、Vue 3、import、RegExp、JSON 和
+ * Prettier 兼容层。React、Angular、Markdown 与清单排序按需启用；Lodash 导入策略
+ * 通过 `@fast-china/eslint-config/configs` 独立组合。
+ * 额外配置参数会放在内置配置之后，因此项目可以按文件范围覆盖任何默认规则。
  */
 declare const fastConfig: (options?: FastConfigOptions, ...overrides: Config[]) => Config[];
 //#endregion
-//#region src/index.d.ts
-type RejectUnknownRuleNames<Rules extends RuleOptions> = Rules & Record<Exclude<keyof Rules, keyof RuleOptions>, never>;
-/**
- * 为项目规则提供精确的规则名、严重级别和规则选项自动补全。
- *
- * 该函数不会修改传入对象；它只在 TypeScript 编译阶段拒绝未知规则和无效选项。
- */
-declare const defineRules: <const Rules extends RuleOptions>(rules: RejectUnknownRuleNames<Rules>) => Rules & Linter.RulesRecord;
-//#endregion
-export { type AngularConfigOptions, type FastConfigOptions, type LodashPreference, type ReactConfigOptions, type RuleOptions, type RuntimeEnvironment, type TypeScriptConfigOptions, fastConfig as default, fastConfig, defaultConfigOptions, defineRules };
+export { FastConfigOptions, type RuleOptions, fastConfig as default, fastConfig, defaultConfigOptions, defineRules };
 //# sourceMappingURL=index.d.mts.map

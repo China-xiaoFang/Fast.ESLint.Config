@@ -4,7 +4,8 @@ import process from "node:process";
 import { builtinRules } from "eslint/use-at-your-own-risk";
 import { flatConfigsToRulesDTS } from "eslint-typegen/core";
 
-import { fastConfig } from "../src/core";
+import { createLodashConfigs } from "../src/configs/lodash";
+import { fastConfig } from "../src/index";
 
 import type { ESLint, Linter } from "eslint";
 
@@ -22,7 +23,9 @@ const configs: Linter.Config[] = [
 			"": corePlugin,
 		},
 	},
-	...fastConfig({ angular: true, gitignore: false, react: true }),
+	...fastConfig({ angular: true, gitignore: false, markdown: true, react: true }),
+	...createLodashConfigs("lodash"),
+	...createLodashConfigs("lodash-unified"),
 ];
 
 const declarations = await flatConfigsToRulesDTS(configs, {

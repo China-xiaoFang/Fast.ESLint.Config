@@ -21,9 +21,9 @@
 
 ## 环境要求
 
-- Node.js `^22.18.0` 或 `>=24.11.0`
+- Node.js `^22.18.0` 或 `^24.18.0`
 - ESLint `^10.0.0`
-- TypeScript `>=6.0.0 <6.1.0`
+- TypeScript `^6.0.0`
 
 这些版本范围与 ESLint 10 及内置语言插件的运行要求保持一致。
 
@@ -45,13 +45,15 @@ import fastChina from "@fast-china/eslint-config";
 export default fastChina();
 ```
 
-默认配置会启用 Vue 3、TypeScript、JavaScript、JSON 各方言、Markdown、导入排序、正则检查、`.gitignore` 与浏览器全局变量；常见配置文件、脚本、测试和 CLI 文件会额外获得 Node.js 全局变量。
+默认配置面向普通 Vue 3 浏览器后台管理项目，启用 Vue 3、TypeScript、JavaScript、JSON 各方言、导入排序、正则检查、`.gitignore` 与浏览器全局变量；常见配置文件、脚本、测试和 CLI 文件会额外获得 Node.js 全局变量。Markdown、React、Angular 和清单排序按需启用；Lodash 策略通过 `configs` 子路径独立组合。
 
 ## 适配其他项目
 
-通过默认导出的 `fastConfig()` 只保留项目真正需要的能力。
+其他项目可以配置根工厂，也可以完全绕过根工厂，直接组合所需片段。
 
-### React + Vite
+### 使用 `fastConfig()`
+
+#### React + Vite
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -64,7 +66,7 @@ export default fastChina({
 
 React 集成会应用现代 `@eslint-react` JavaScript/TypeScript 预置、React 官方 Hooks Flat Config，以及额外的 DOM 安全检查。JSX 与 TSX 分别复用现有 JavaScript、TypeScript 解析能力。Preact 等兼容 React 的 JSX 运行时可设置 `react: { importSource: "preact" }`。
 
-### Angular
+#### Angular
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -89,7 +91,7 @@ export default fastChina({
 
 Angular 依赖 TypeScript 集成；同时设置 `angular: true` 与 `typescript: false` 时会立即抛出清晰的配置错误。
 
-### Node.js + TypeScript
+#### Node.js + TypeScript
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -100,7 +102,7 @@ export default fastChina({
 });
 ```
 
-### 纯 JavaScript
+#### 纯 JavaScript
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -114,7 +116,7 @@ export default fastChina({
 });
 ```
 
-### 启用 TypeScript 类型感知规则
+#### 启用 TypeScript 类型感知规则
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -129,6 +131,45 @@ export default fastChina({
 
 类型感知模式使用 typescript-eslint Project Service，被检查的文件必须属于某个 `tsconfig.json`。普通项目通常可省略 `tsconfigRootDir`；复杂 monorepo 建议显式传入配置文件所在目录。
 
+### 直接组合配置片段
+
+不希望使用根工厂的项目可以只组装需要的片段。以下 React 浏览器项目示例完全不依赖 `fastConfig()`：
+
+```js
+import { defineConfig } from "eslint/config";
+
+import {
+	createCommonConfigs,
+	createEnvironmentConfigs,
+	createGitignoreConfigs,
+	createGlobalIgnores,
+	createImportConfigs,
+	createJavaScriptConfigs,
+	createPrettierConfigs,
+	createReactConfigs,
+	createRegexpConfigs,
+	createTypeScriptConfigs,
+} from "@fast-china/eslint-config/configs";
+import { GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT } from "@fast-china/eslint-config/constants";
+
+const codeFiles = [...GLOBS_JAVASCRIPT, ...GLOBS_TYPESCRIPT];
+
+export default defineConfig([
+	...createGlobalIgnores(),
+	...createGitignoreConfigs(),
+	...createEnvironmentConfigs({ environment: "browser", files: codeFiles, nodeFiles: codeFiles }),
+	...createCommonConfigs(codeFiles),
+	...createJavaScriptConfigs(),
+	...createImportConfigs(codeFiles),
+	...createRegexpConfigs(codeFiles),
+	...createTypeScriptConfigs(),
+	...createReactConfigs({}, { javascript: true, typescript: true }),
+	...createPrettierConfigs(),
+]);
+```
+
+Vue SFC 可增加 `createVueConfigs()`，Angular 可增加 `createAngularConfigs()`，Node.js 项目则将环境设为 `"node"`。配置片段的顺序具有语义，项目覆写应始终放在最后。
+
 ## 配置选项
 
 | 选项              | 默认值      | 作用                                                           |
@@ -141,8 +182,7 @@ export default fastChina({
 | `imports`         | `true`      | 启用 import-x 正确性与排序规则。                               |
 | `javascript`      | `true`      | 处理 JavaScript 与 JSX。                                       |
 | `json`            | `true`      | 启用 JSON、JSONC 与 JSON5 推荐规则。                           |
-| `lodash`          | `false`     | 可选 `"lodash"` 或 `"lodash-unified"`，统一静态导入来源。      |
-| `markdown`        | `true`      | 启用官方 Markdown 语言规则。                                   |
+| `markdown`        | `false`     | 启用官方 Markdown 语言规则。                                   |
 | `prettier`        | `true`      | 关闭与 Prettier 冲突的 ESLint 规则。                           |
 | `react`           | `false`     | 启用 React、JSX 与 Hooks，或传入运行时和 React 版本设置。      |
 | `regexp`          | `true`      | 启用推荐的正则表达式规则。                                     |
@@ -160,10 +200,10 @@ Svelte、Astro 与 Solid 具有不同的模板或编译器语义，目前不会�
 
 ## Lodash 导入策略
 
-默认值 `lodash: false` 不限制项目选择。需要统一依赖入口时，可选择以下任一策略：
+Lodash 策略不是 `fastConfig()` 选项。只有需要统一静态导入来源时，才从 `@fast-china/eslint-config/configs` 导入 `createLodashConfigs()`：
 
-- `lodash: "lodash-unified"`：禁止从 `lodash`、`lodash-es` 及其子路径静态导入或重新导出。
-- `lodash: "lodash"`：禁止从 `lodash-es`、`lodash-unified` 及其子路径静态导入或重新导出；允许 `lodash` 根入口和 `lodash/*` 按方法导入。
+- `createLodashConfigs("lodash-unified")`：禁止从 `lodash`、`lodash-es` 及其子路径静态导入或重新导出。
+- `createLodashConfigs("lodash")`：禁止从 `lodash-es`、`lodash-unified` 及其子路径静态导入或重新导出；允许 `lodash` 根入口和 `lodash/*` 按方法导入。
 
 选择 `lodash-unified`：
 
@@ -172,10 +212,13 @@ pnpm add lodash-unified
 ```
 
 ```js
+import { defineConfig } from "eslint/config";
+
 import fastChina from "@fast-china/eslint-config";
+import { createLodashConfigs } from "@fast-china/eslint-config/configs";
 import { cloneDeep, debounce } from "lodash-unified";
 
-export default fastChina({ lodash: "lodash-unified" });
+export default defineConfig([...fastChina(), ...createLodashConfigs("lodash-unified")]);
 ```
 
 选择标准 `lodash`：
@@ -186,13 +229,16 @@ pnpm add -D @types/lodash
 ```
 
 ```js
+import { defineConfig } from "eslint/config";
+
 import fastChina from "@fast-china/eslint-config";
+import { createLodashConfigs } from "@fast-china/eslint-config/configs";
 import debounce from "lodash/debounce";
 
-export default fastChina({ lodash: "lodash" });
+export default defineConfig([...fastChina(), ...createLodashConfigs("lodash")]);
 ```
 
-该能力使用 ESLint 核心 `no-restricted-imports`，不需要额外插件，也不会替项目安装 Lodash。它只检查静态 `import`/`export`，不检查动态 `import()` 或 CommonJS `require()`。`imports: false` 只关闭 import-x，不会关闭已经显式选择的 Lodash 策略。
+该片段使用 ESLint 核心 `no-restricted-imports`，不需要额外插件，也不会替项目安装 Lodash。它只检查静态 `import`/`export`，不检查动态 `import()` 或 CommonJS `require()`，并且独立于根工厂的 `imports` 选项。
 
 如果后续 `rules` 或文件级覆写再次设置 `no-restricted-imports`，ESLint 会用后面的完整规则替换这套策略，而不是合并选项。需要组合更多包限制时，可从 `@fast-china/eslint-config/rules` 导入原始 `preferLodashRules` 或 `preferLodashUnifiedRules`，统一维护一份完整规则。
 
@@ -262,7 +308,20 @@ export default fastChina(
 );
 ```
 
-根入口只公开 `fastConfig`、`defaultConfigOptions`、`defineRules` 及相关类型。高级使用者可以从 `@fast-china/eslint-config/rules` 导入有完整注释的原始规则记录。
+根入口只公开 `fastConfig`、`defaultConfigOptions`、`defineRules`、`FastConfigOptions` 和 `RuleOptions`。高级组合通过职责明确的子路径完成，避免扩大根入口：
+
+- `@fast-china/eslint-config/configs` 导出全部配置创建函数及其选项类型。
+- `@fast-china/eslint-config/constants` 导出项目维护的全部文件 glob。
+- `@fast-china/eslint-config/rules` 导出带完整注释的原始规则记录和 `RuleOptions`。
+
+```js
+import { defineConfig } from "eslint/config";
+
+import { createCommonConfigs, createTypeScriptConfigs } from "@fast-china/eslint-config/configs";
+import { GLOBS_TYPESCRIPT } from "@fast-china/eslint-config/constants";
+
+export default defineConfig([...createCommonConfigs(GLOBS_TYPESCRIPT), ...createTypeScriptConfigs({ typeChecked: true })]);
+```
 
 ## Prettier
 

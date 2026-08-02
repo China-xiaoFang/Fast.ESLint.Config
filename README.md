@@ -21,9 +21,9 @@ A practical, typed ESLint Flat Config for Vue 3, React, Angular, Vite, TypeScrip
 
 ## Requirements
 
-- Node.js `^22.18.0` or `>=24.11.0`
+- Node.js `^22.18.0` or `^24.18.0`
 - ESLint `^10.0.0`
-- TypeScript `>=6.0.0 <6.1.0`
+- TypeScript `^6.0.0`
 
 These versions follow the runtime requirements of ESLint 10 and the included language plugins.
 
@@ -45,13 +45,15 @@ import fastChina from "@fast-china/eslint-config";
 export default fastChina();
 ```
 
-The default enables Vue 3, TypeScript, JavaScript, JSON dialects, Markdown, import ordering, RegExp checks, `.gitignore`, browser globals, and Node globals for common config, script, test, and CLI files.
+The default targets a conventional Vue 3 browser-based administration project. It enables Vue 3, TypeScript, JavaScript, JSON dialects, import ordering, RegExp checks, `.gitignore`, browser globals, and Node globals for common config, script, test, and CLI files. Markdown, React, Angular, and manifest sorting remain opt-in. Lodash policies are composed separately from the `configs` subpath.
 
 ## Other project types
 
-Use the default `fastConfig()` factory to keep only what a project needs.
+Other projects can either configure the root factory or compose focused fragments directly.
 
-### React + Vite
+### Use `fastConfig()`
+
+#### React + Vite
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -64,7 +66,7 @@ export default fastChina({
 
 React support applies the modern `@eslint-react` JavaScript/TypeScript preset, the official React Hooks Flat Config, and additional DOM safety checks. JSX and TSX are parsed by the existing JavaScript and TypeScript integrations. For a React-compatible JSX runtime such as Preact, set `react: { importSource: "preact" }`.
 
-### Angular
+#### Angular
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -89,7 +91,7 @@ export default fastChina({
 
 Angular requires the TypeScript integration; `angular: true` together with `typescript: false` fails early with a clear configuration error.
 
-### Node.js + TypeScript
+#### Node.js + TypeScript
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -100,7 +102,7 @@ export default fastChina({
 });
 ```
 
-### JavaScript only
+#### JavaScript only
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -114,7 +116,7 @@ export default fastChina({
 });
 ```
 
-### Type-aware TypeScript rules
+#### Type-aware TypeScript rules
 
 ```js
 import fastChina from "@fast-china/eslint-config";
@@ -129,6 +131,45 @@ export default fastChina({
 
 Type-aware linting uses the typescript-eslint Project Service. Project files must belong to a `tsconfig.json`. Most projects can omit `tsconfigRootDir`; complex monorepos should pass the directory containing the ESLint config explicitly.
 
+### Compose config fragments directly
+
+Projects that do not want the root factory can assemble only the required fragments. This React browser example is fully independent of `fastConfig()`:
+
+```js
+import { defineConfig } from "eslint/config";
+
+import {
+	createCommonConfigs,
+	createEnvironmentConfigs,
+	createGitignoreConfigs,
+	createGlobalIgnores,
+	createImportConfigs,
+	createJavaScriptConfigs,
+	createPrettierConfigs,
+	createReactConfigs,
+	createRegexpConfigs,
+	createTypeScriptConfigs,
+} from "@fast-china/eslint-config/configs";
+import { GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT } from "@fast-china/eslint-config/constants";
+
+const codeFiles = [...GLOBS_JAVASCRIPT, ...GLOBS_TYPESCRIPT];
+
+export default defineConfig([
+	...createGlobalIgnores(),
+	...createGitignoreConfigs(),
+	...createEnvironmentConfigs({ environment: "browser", files: codeFiles, nodeFiles: codeFiles }),
+	...createCommonConfigs(codeFiles),
+	...createJavaScriptConfigs(),
+	...createImportConfigs(codeFiles),
+	...createRegexpConfigs(codeFiles),
+	...createTypeScriptConfigs(),
+	...createReactConfigs({}, { javascript: true, typescript: true }),
+	...createPrettierConfigs(),
+]);
+```
+
+Use `createVueConfigs()` for Vue SFCs, `createAngularConfigs()` for Angular, or set `environment: "node"` for Node.js. Fragment order is significant: project overrides should remain last.
+
 ## Options
 
 | Option            | Default     | Purpose                                                                    |
@@ -141,8 +182,7 @@ Type-aware linting uses the typescript-eslint Project Service. Project files mus
 | `imports`         | `true`      | Enable import-x correctness and ordering rules.                            |
 | `javascript`      | `true`      | Process JavaScript and JSX files.                                          |
 | `json`            | `true`      | Enable recommended JSON, JSONC, and JSON5 rules.                           |
-| `lodash`          | `false`     | Select `"lodash"` or `"lodash-unified"` for static imports.                |
-| `markdown`        | `true`      | Enable the official Markdown language rules.                               |
+| `markdown`        | `false`     | Enable the official Markdown language rules.                               |
 | `prettier`        | `true`      | Disable ESLint rules that conflict with Prettier.                          |
 | `react`           | `false`     | Enable React/JSX/Hooks, or pass runtime and React-version settings.        |
 | `regexp`          | `true`      | Enable recommended RegExp rules.                                           |
@@ -160,10 +200,10 @@ Svelte, Astro, and Solid use different template or compiler semantics and are no
 
 ## Lodash import policy
 
-The default, `lodash: false`, leaves the dependency choice to the project. Select one policy when every static import should use the same package:
+Lodash policy is not a `fastConfig()` option. Import `createLodashConfigs()` from `@fast-china/eslint-config/configs` only when every static import should use one package:
 
-- `lodash: "lodash-unified"` rejects static imports and re-exports from `lodash`, `lodash-es`, and their subpaths.
-- `lodash: "lodash"` rejects static imports and re-exports from `lodash-es`, `lodash-unified`, and their subpaths. The `lodash` root and `lodash/*` method imports remain valid.
+- `createLodashConfigs("lodash-unified")` rejects static imports and re-exports from `lodash`, `lodash-es`, and their subpaths.
+- `createLodashConfigs("lodash")` rejects static imports and re-exports from `lodash-es`, `lodash-unified`, and their subpaths. The `lodash` root and `lodash/*` method imports remain valid.
 
 Choose `lodash-unified`:
 
@@ -172,10 +212,13 @@ pnpm add lodash-unified
 ```
 
 ```js
+import { defineConfig } from "eslint/config";
+
 import fastChina from "@fast-china/eslint-config";
+import { createLodashConfigs } from "@fast-china/eslint-config/configs";
 import { cloneDeep, debounce } from "lodash-unified";
 
-export default fastChina({ lodash: "lodash-unified" });
+export default defineConfig([...fastChina(), ...createLodashConfigs("lodash-unified")]);
 ```
 
 Choose standard `lodash`:
@@ -186,13 +229,16 @@ pnpm add -D @types/lodash
 ```
 
 ```js
+import { defineConfig } from "eslint/config";
+
 import fastChina from "@fast-china/eslint-config";
+import { createLodashConfigs } from "@fast-china/eslint-config/configs";
 import debounce from "lodash/debounce";
 
-export default fastChina({ lodash: "lodash" });
+export default defineConfig([...fastChina(), ...createLodashConfigs("lodash")]);
 ```
 
-This feature uses ESLint core `no-restricted-imports`, adds no plugin, and does not install Lodash for the project. It checks static `import`/`export` only, not dynamic `import()` or CommonJS `require()`. Setting `imports: false` disables import-x but leaves an explicitly selected Lodash policy active.
+This fragment uses ESLint core `no-restricted-imports`, adds no plugin, and does not install Lodash for the project. It checks static `import`/`export` only, not dynamic `import()` or CommonJS `require()`. It is independent of the root factory's `imports` option.
 
 If a later `rules` record or file-scoped override sets `no-restricted-imports`, ESLint replaces this complete policy instead of merging its options. Projects that need additional package restrictions can import raw `preferLodashRules` or `preferLodashUnifiedRules` from `@fast-china/eslint-config/rules` and maintain one combined rule.
 
@@ -262,7 +308,20 @@ export default fastChina(
 );
 ```
 
-The root entry exports only `fastConfig`, `defaultConfigOptions`, `defineRules`, and their related types. Advanced consumers can import the fully commented raw rule records from `@fast-china/eslint-config/rules`.
+The root entry exports only `fastConfig`, `defaultConfigOptions`, `defineRules`, `FastConfigOptions`, and `RuleOptions`. Advanced composition uses focused subpaths instead of widening the root API:
+
+- `@fast-china/eslint-config/configs` exports every configuration creator and its option types.
+- `@fast-china/eslint-config/constants` exports all maintained file globs.
+- `@fast-china/eslint-config/rules` exports the fully commented raw rule records and `RuleOptions`.
+
+```js
+import { defineConfig } from "eslint/config";
+
+import { createCommonConfigs, createTypeScriptConfigs } from "@fast-china/eslint-config/configs";
+import { GLOBS_TYPESCRIPT } from "@fast-china/eslint-config/constants";
+
+export default defineConfig([...createCommonConfigs(GLOBS_TYPESCRIPT), ...createTypeScriptConfigs({ typeChecked: true })]);
+```
 
 ## Prettier
 

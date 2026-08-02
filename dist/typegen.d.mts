@@ -10491,5 +10491,5 @@ type Yoda = [] | [("always" | "never")] | [("always" | "never"), {
   onlyEquality?: boolean;
 }];
 //#endregion
-export { RuleOptions as t };
+export { RuleOptions };
 //# sourceMappingURL=typegen.d.mts.map

@@ -8,11 +8,11 @@ import type { Linter } from "eslint";
 export type RuntimeEnvironment = "browser" | "node" | "universal";
 
 /**
- * 运行时全局变量配置片段使用的内部选项。
+ * 运行时全局变量配置片段的选项。
  *
  * `fastConfig()` 会根据已启用的语言和框架计算 `files`、`nodeFiles`，再调用
  * `createEnvironmentConfigs()`。该接口仍保持独立，以便环境片段的输入、默认值和文件
- * 范围在源码中具有明确契约；它不是根入口公开的项目配置接口。
+ * 范围在源码中具有明确契约；直接组合配置片段时可从 `./configs` 子路径使用。
  *
  * 应用代码与 Node.js 工程文件使用两个独立 Flat Config 片段，避免浏览器源码无条件获得
  * `process`、`Buffer` 等 Node.js 全局变量，也避免配置文件误报这些合法全局变量未定义。
