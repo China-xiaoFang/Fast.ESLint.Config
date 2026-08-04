@@ -2,7 +2,7 @@
 
 审查日期：2026-08-02
 
-审查对象：`@fast-china/eslint-config` 2.0.5 工作区
+审查对象：`@fast-china/eslint-config` 2.0.6 工作区
 
 ## 结论
 
@@ -84,8 +84,7 @@ pnpm pack --dry-run
 5. Prettier 格式检查。
 6. 消费者类型契约测试。
 7. 运行时配置集成测试。
-8. 规则注释与风险文档治理测试。
-9. 发布元数据、入口文件和声明文件契约测试。
+8. 发布元数据、入口文件和声明文件契约测试。
 
 发布归档必须包含根入口和 `./configs`、`./constants`、`./rules` 子入口的 JavaScript 与声明文件，以及生成的 JavaScript、声明 source map；且不得包含源码缓存、测试缓存或本地依赖目录。
 

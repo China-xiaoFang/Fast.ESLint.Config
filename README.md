@@ -1,11 +1,16 @@
-[中文](./README.zh.md) | **English**
+<p align="left">
+	<a href="./README.zh.md">简体中文</a> | <strong>English</strong>
+</p>
+
+<p align="center">
+	<img src="./Fast.png" alt="logo" width="160" />
+</p>
 
 # @fast-china/eslint-config
 
 A practical, typed ESLint Flat Config for Vue 3, React, Angular, Vite, TypeScript, and JavaScript projects.
 
-[![npm version](https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange)](https://www.npmjs.com/package/@fast-china/eslint-config)
-[![license](https://img.shields.io/npm/l/@fast-china/eslint-config)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange)](https://www.npmjs.com/package/@fast-china/eslint-config) [![node](https://img.shields.io/badge/node-%5E22.18%20%7C%7C%20%5E24.18-brightgreen)](https://nodejs.org/) [![eslint](https://img.shields.io/badge/eslint-%5E10.0-4b32c3)](https://eslint.org/) [![license](https://img.shields.io/npm/l/@fast-china/eslint-config)](./LICENSE)
 
 ## Highlights
 
@@ -334,18 +339,26 @@ pnpm exec prettier --check .
 
 Set `prettier: false` if another formatter or stylistic rule set should remain fully in control.
 
+## Documentation
+
+- [Default rules and risk guide](./docs/rules-risk.md)
+- [Engineering audit (Chinese)](./docs/engineering-audit.zh.md)
+- [Contributing guide](./CONTRIBUTING.md)
+- [Security policy](./SECURITY.md)
+- [Changelog](./CHANGELOG.md)
+
 ## Development
 
 ```sh
-pnpm install
+pnpm install --frozen-lockfile
 pnpm typegen
 pnpm check
 pnpm pack --dry-run
 ```
 
-Run `pnpm typegen` after upgrading ESLint or a plugin and commit `src/typegen.d.ts`; never edit the generated file manually. `pnpm test` rebuilds the package before running consumer type-contract, runtime integration, rule-governance, and package-contract tests. `pnpm check` adds source type-checking, full-repository linting, and formatting verification.
+Use `pnpm dev` to inspect the active Flat Config interactively while changing factories or rules.
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the contribution workflow, the [default-rule and risk guide](./docs/rules-risk.md) for rule maintenance, and [the engineering audit](./docs/engineering-audit.zh.md) for the current quality baseline.
+Run `pnpm typegen` after upgrading ESLint or a plugin and commit `src/typegen.d.ts`; never edit the generated file manually. `pnpm test` rebuilds the package before running consumer type-contract, runtime integration, and package-contract tests. `pnpm check` adds source type-checking, full-repository linting, and formatting verification.
 
 ## License
 

@@ -1,11 +1,16 @@
-**中文** | [English](./README.md)
+<p align="left">
+	<strong>简体中文</strong> | <a href="./README.md">English</a>
+</p>
+
+<p align="center">
+	<img src="./Fast.png" alt="logo" width="160" />
+</p>
 
 # @fast-china/eslint-config
 
 面向 Vue 3、React、Angular、Vite、TypeScript 与 JavaScript 项目的实用型 ESLint Flat Config 规则库。
 
-[![npm version](https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange)](https://www.npmjs.com/package/@fast-china/eslint-config)
-[![license](https://img.shields.io/npm/l/@fast-china/eslint-config)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange)](https://www.npmjs.com/package/@fast-china/eslint-config) [![Node.js](https://img.shields.io/badge/node-%5E22.18%20%7C%7C%20%5E24.18-brightgreen)](https://nodejs.org/) [![ESLint](https://img.shields.io/badge/eslint-%5E10.0-4b32c3)](https://eslint.org/) [![license](https://img.shields.io/npm/l/@fast-china/eslint-config)](./LICENSE)
 
 ## 特性
 
@@ -334,18 +339,26 @@ pnpm exec prettier --check .
 
 如果使用其他格式化工具，或希望保留完整的样式类 ESLint 规则，请设置 `prettier: false`。
 
+## 文档
+
+- [默认规则与风险指南](./docs/rules-risk.zh.md)
+- [工程质量审查报告](./docs/engineering-audit.zh.md)
+- [贡献指南](./CONTRIBUTING.md)
+- [安全策略](./SECURITY.md)
+- [更新日志](./CHANGELOG.md)
+
 ## 开发与贡献
 
 ```sh
-pnpm install
+pnpm install --frozen-lockfile
 pnpm typegen
 pnpm check
 pnpm pack --dry-run
 ```
 
-升级 ESLint 或插件后运行 `pnpm typegen` 并提交 `src/typegen.d.ts`；不要手工编辑生成文件。`pnpm test` 会先重新构建发布产物，再分别执行消费者类型契约、运行时集成、规则治理和发布包契约测试。`pnpm check` 在此基础上增加源码类型检查、全仓 ESLint 和格式验证。
+修改配置工厂或规则时，可使用 `pnpm dev` 交互检查实际生效的 Flat Config。
 
-贡献流程见 [CONTRIBUTING.md](./CONTRIBUTING.md)，规则维护约定见 [默认规则与风险指南](./docs/rules-risk.zh.md)，本次工程审查和质量基线见 [工程质量审查报告](./docs/engineering-audit.zh.md)。
+升级 ESLint 或插件后运行 `pnpm typegen` 并提交 `src/typegen.d.ts`；不要手工编辑生成文件。`pnpm test` 会先重新构建发布产物，再分别执行消费者类型契约、运行时集成和发布包契约测试。`pnpm check` 在此基础上增加源码类型检查、全仓 ESLint 和格式验证。
 
 ## 开源协议
 

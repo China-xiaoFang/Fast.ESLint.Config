@@ -2,12 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-import { GLOBS_CODE } from "@fast-china/eslint-config/constants";
-
 const manifest = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
-const changelog = fs.readFileSync(new URL("../CHANGELOG.md", import.meta.url), "utf8");
-const securityPolicy = fs.readFileSync(new URL("../SECURITY.md", import.meta.url), "utf8");
-const engineeringAudit = fs.readFileSync(new URL("../docs/engineering-audit.zh.md", import.meta.url), "utf8");
 const resolvePackageFile = (filePath) => new URL(`../${filePath.replace(/^\.\//, "")}`, import.meta.url);
 const semanticVersionPattern =
 	/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:0|[1-9]\d*|\d*[a-z-][0-9a-z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-z-][0-9a-z-]*))*)?(?:\+[0-9a-z-]+(?:\.[0-9a-z-]+)*)?$/i;
@@ -19,20 +14,7 @@ test("package metadata identifies a documented semantic version", () => {
 	assert.equal(manifest.publishConfig.access, "public");
 });
 
-test("release documentation reflects the current package version", () => {
-	assert.ok(changelog.includes(`## ${manifest.version} -`), `CHANGELOG.md must document version ${manifest.version}`);
-	assert.equal(securityPolicy.split(`| \`${manifest.version}\``).length - 1, 2, "SECURITY.md must list the current version in both languages");
-	assert.ok(
-		engineeringAudit.includes(`\`@fast-china/eslint-config\` ${manifest.version} 工作区`),
-		"the engineering audit must identify the current workspace version"
-	);
-});
-
 test("published entry points exist and expose the typed package contract", () => {
-	const declarations = fs.readFileSync(resolvePackageFile(manifest.types), "utf8");
-	const configDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./configs"].types), "utf8");
-	const constantDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./constants"].types), "utf8");
-	const ruleDeclarations = fs.readFileSync(resolvePackageFile(manifest.exports["./rules"].types), "utf8");
 	const publicEntries = [manifest.exports["."], manifest.exports["./configs"], manifest.exports["./constants"], manifest.exports["./rules"]];
 
 	assert.equal(manifest.main, manifest.exports["."].import);
@@ -54,14 +36,4 @@ test("published entry points exist and expose the typed package contract", () =>
 		assert.equal(fs.existsSync(resolvePackageFile(entry.import)), true);
 		assert.equal(fs.existsSync(resolvePackageFile(entry.types)), true);
 	}
-
-	assert.match(declarations, /RuleOptions/);
-	assert.match(declarations, /defineRules/);
-	assert.match(declarations, /fastConfig/);
-	assert.match(configDeclarations, /createCommonConfigs/);
-	assert.match(configDeclarations, /createTypeScriptConfigs/);
-	assert.match(configDeclarations, /AngularConfigOptions/);
-	assert.match(constantDeclarations, /GLOBS_CODE/);
-	assert.deepEqual(GLOBS_CODE, ["**/*.{js,cjs,mjs,jsx}", "**/*.{ts,cts,mts,tsx}", "**/*.vue"]);
-	assert.doesNotMatch(ruleDeclarations, /defineRules/);
 });

@@ -6,6 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.0.6 - 2026-08-04
+
+### Changed
+
+- Standardized the bilingual README, repository ignores, editor settings, TypeScript checks, and tsdown output configuration across the Fast frontend SDK repositories.
+- Simplified the test pipeline to runtime, type-contract, and package-contract verification by removing documentation- and comment-governance tests.
+- Included contribution and security documents in the published package and refreshed the engineering guidance for the current workflow.
+
 ## 2.0.5 - 2026-08-02
 
 ### Changed

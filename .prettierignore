@@ -1,9 +1,7 @@
-# Prettier 会忽略的文件
-
+# 构建产物、依赖、缓存和生成类型由对应工具维护，不参与格式化。
 dist
 node_modules
-.eslint-config-inspector
 .pnpm-store
-coverage
 pnpm-lock.yaml
+.eslint-config-inspector
 src/typegen.d.ts

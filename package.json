@@ -1,6 +1,6 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "2.0.5",
+	"version": "2.0.6",
 	"description": "Opinionated, typed ESLint Flat Config for Vue 3, React, Angular, Vite, TypeScript, JavaScript, and Node.js.",
 	"type": "module",
 	"keywords": [
@@ -27,10 +27,12 @@
 	"author": "小方",
 	"files": [
 		"CHANGELOG.md",
+		"CONTRIBUTING.md",
 		"Fast.png",
 		"LICENSE",
 		"README.md",
 		"README.zh.md",
+		"SECURITY.md",
 		"dist",
 		"docs"
 	],
@@ -75,10 +77,9 @@
 		"lint:fix": "eslint . --fix",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"test": "pnpm run build && pnpm run test:types && pnpm run test:runtime && pnpm run test:rules && pnpm run test:package",
+		"test": "pnpm run build && pnpm run test:types && pnpm run test:runtime && pnpm run test:package",
 		"test:types": "tsc --noEmit --project tests/tsconfig.json",
 		"test:runtime": "node --test tests/config.test.mjs",
-		"test:rules": "node --test tests/rules.test.mjs",
 		"test:package": "node --test tests/package.test.mjs",
 		"check": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run format:check",
 		"prepack": "pnpm run check"

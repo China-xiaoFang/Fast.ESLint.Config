@@ -15,7 +15,9 @@ pnpm typegen
 pnpm check
 ```
 
-Use `pnpm lint:fix` and `pnpm format` for safe mechanical fixes. `pnpm test` first rebuilds `dist`, then runs consumer type-contract, runtime integration, rule-governance, and package-contract suites. `pnpm check` is the same quality gate used by CI and adds source type-checking, full-repository linting, and formatting verification.
+Use `pnpm dev` to inspect the active Flat Config interactively while changing factories or rules.
+
+Use `pnpm lint:fix` and `pnpm format` for safe mechanical fixes. `pnpm test` first rebuilds `dist`, then runs consumer type-contract, runtime integration, and package-contract suites. `pnpm check` is the same quality gate used by CI and adds source type-checking, full-repository linting, and formatting verification.
 
 `src/typegen.d.ts` is generated from ESLint rule schemas and is part of the public type API. Run `pnpm typegen` after changing ESLint or plugin versions, inspect and commit the generated diff, and use `pnpm typegen:check` to verify it. Never edit the generated declaration manually.
 
