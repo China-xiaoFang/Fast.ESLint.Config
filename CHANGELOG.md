@@ -6,6 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.0.7 - 2026-08-08
+
+### Changed
+
+- Added consistent `fast` and `fast-china` package keywords and aligned the npm publish allowlist with the other Fast packages.
+- Removed `src` and declaration maps that referenced unpublished source files while retaining self-contained runtime source maps.
+- Added package-contract coverage for the publish allowlist and source-map integrity.
+
 ## 2.0.6 - 2026-08-04
 
 ### Changed

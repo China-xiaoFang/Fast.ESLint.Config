@@ -20,8 +20,8 @@ export default defineConfig({
 	fixedExtension: true,
 	// 保留源码模块结构，使根入口直接复用 configs、constants 与 rules 下的内部模块。
 	unbundle: true,
-	// 生成类型声明及其映射，支持编辑器从声明文件跳转到源码。
-	dts: { sourcemap: true },
+	// 生成类型声明，不生成会指向未发布 src 的声明 Source Map。
+	dts: true,
 	// 生成 JavaScript 源码映射，便于定位运行时错误。
 	sourcemap: true,
 	// 每次构建前清空完整 dist，避免入口删除或重命名后残留陈旧产物。
