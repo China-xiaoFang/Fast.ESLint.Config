@@ -1,9 +1,7 @@
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
-
 import { GLOBS_TYPESCRIPT } from "../constants";
 import { typescriptRules } from "../rules";
-
 import type { Linter } from "eslint";
 
 /**

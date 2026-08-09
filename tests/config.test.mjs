@@ -1,11 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-
-import { ESLint } from "eslint";
-
 import fastConfig, * as publicApi from "@fast-china/eslint-config";
 import { createGlobalIgnores, createLodashConfigs } from "@fast-china/eslint-config/configs";
 import { preferLodashRules, preferLodashUnifiedRules } from "@fast-china/eslint-config/rules";
+import { ESLint } from "eslint";
 
 const createLinter = (config, options = {}) =>
 	new ESLint({

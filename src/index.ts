@@ -6,7 +6,6 @@
  * @packageDocumentation
  */
 import { type Config, defineConfig } from "eslint/config";
-
 import { type AngularConfigOptions, createAngularConfigs } from "./configs/angular";
 import { createCommonConfigs } from "./configs/common";
 import { type RuntimeEnvironment, createEnvironmentConfigs } from "./configs/environment";
@@ -23,7 +22,6 @@ import { createTsconfigSortConfigs } from "./configs/sort-tsconfig";
 import { type TypeScriptConfigOptions, createTypeScriptConfigs } from "./configs/typescript";
 import { createVueConfigs } from "./configs/vue";
 import { GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT, GLOB_VUE } from "./constants";
-
 import type { RuleOptions } from "./typegen";
 import type { Linter } from "eslint";
 

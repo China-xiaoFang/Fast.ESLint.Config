@@ -1,6 +1,5 @@
 import eslintMarkdown from "@eslint/markdown";
 import { defineConfig } from "eslint/config";
-
 import { GLOB_MARKDOWN } from "../constants";
 
 /**

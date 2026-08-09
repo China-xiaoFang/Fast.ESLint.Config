@@ -259,7 +259,7 @@ const projectRules = defineRules({
 	"@angular-eslint/template/alt-text": "error",
 	"@eslint-react/dom-no-missing-button-type": "error",
 	"@typescript-eslint/no-unused-vars": ["error", { args: "after-used" }],
-	"import-x/order": ["error", { "newlines-between": "always" }],
+	"import-x/order": ["error", { "newlines-between": "never" }],
 	"react-hooks/exhaustive-deps": "warn",
 	"vue/attributes-order": ["error", { order: ["DEFINITION", "EVENTS", "CONTENT"] }],
 });

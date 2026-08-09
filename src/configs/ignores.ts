@@ -1,6 +1,5 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import eslintConfigFlatGitignore from "eslint-config-flat-gitignore";
-
 import { GLOBS_LOCKFILES } from "../constants";
 
 /**

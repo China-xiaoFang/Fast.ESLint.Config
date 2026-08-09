@@ -1,8 +1,6 @@
 import { defineConfig } from "eslint/config";
 import globals from "globals";
-
 import { GLOBS_CODE, GLOBS_JAVASCRIPT, GLOBS_NODE_TOOLING } from "../constants";
-
 import type { Linter } from "eslint";
 
 /**

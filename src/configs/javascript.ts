@@ -1,6 +1,5 @@
 import eslint from "@eslint/js";
 import { defineConfig } from "eslint/config";
-
 import { GLOBS_JAVASCRIPT } from "../constants";
 import { javascriptRules } from "../rules";
 

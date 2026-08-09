@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.0.8 - 2026-08-09
+
+### Changed
+
+- Added prioritized import path groups for the uni-app, Vue, Element Plus, Fast Element Plus, Fast China, and Lodash ecosystems while keeping type-only imports in the dedicated type group.
+- Changed import group spacing to a compact no-blank-line style and normalized the repository imports to the new policy.
+
 ## 2.0.7 - 2026-08-08
 
 ### Changed

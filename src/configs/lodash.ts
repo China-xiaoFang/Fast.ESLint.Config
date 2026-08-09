@@ -1,5 +1,4 @@
 import { defineConfig } from "eslint/config";
-
 import { GLOBS_CODE } from "../constants";
 import { preferLodashRules, preferLodashUnifiedRules } from "../rules";
 

@@ -1,10 +1,8 @@
 import eslintReact from "@eslint-react/eslint-plugin";
 import { defineConfig } from "eslint/config";
 import eslintPluginReactHooks from "eslint-plugin-react-hooks";
-
 import { GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT } from "../constants";
 import { reactRules } from "../rules";
-
 import type { Linter } from "eslint";
 
 /**

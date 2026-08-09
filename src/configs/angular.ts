@@ -2,10 +2,8 @@ import angularPlugin from "@angular-eslint/eslint-plugin";
 import angularTemplatePlugin from "@angular-eslint/eslint-plugin-template";
 import angularTemplateParser from "@angular-eslint/template-parser";
 import { defineConfig } from "eslint/config";
-
 import { GLOB_ANGULAR_TEMPLATE, GLOB_ANGULAR_TYPESCRIPT } from "../constants";
 import { angularRules, angularTemplateAccessibilityRules, angularTemplateRules } from "../rules";
-
 import type { ESLint, Linter } from "eslint";
 
 /**

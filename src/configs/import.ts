@@ -1,6 +1,5 @@
 import { defineConfig } from "eslint/config";
 import eslintPluginImportX from "eslint-plugin-import-x";
-
 import { GLOBS_CODE } from "../constants";
 import { importRules } from "../rules";
 

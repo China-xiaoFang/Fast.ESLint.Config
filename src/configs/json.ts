@@ -1,6 +1,5 @@
 import { defineConfig } from "eslint/config";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
-
 import { GLOB_JSON, GLOB_JSON5, GLOB_JSONC } from "../constants";
 
 /**

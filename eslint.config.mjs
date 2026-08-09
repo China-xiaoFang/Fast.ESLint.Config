@@ -1,5 +1,3 @@
-import { defineConfig } from "eslint/config";
-
 import {
 	createCommonConfigs,
 	createEnvironmentConfigs,
@@ -16,6 +14,7 @@ import {
 	createTypeScriptConfigs,
 } from "@fast-china/eslint-config/configs";
 import { GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT } from "@fast-china/eslint-config/constants";
+import { defineConfig } from "eslint/config";
 
 export default defineConfig([
 	...createGlobalIgnores(),

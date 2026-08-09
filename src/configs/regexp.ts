@@ -1,6 +1,5 @@
 import { defineConfig } from "eslint/config";
 import eslintPluginRegexp from "eslint-plugin-regexp";
-
 import { GLOBS_CODE } from "../constants";
 
 /**

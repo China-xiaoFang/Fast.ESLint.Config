@@ -1,5 +1,4 @@
 import { defineConfig } from "eslint/config";
-
 import { GLOBS_TSCONFIG } from "../constants";
 import { tsconfigJsonSortRules } from "../rules";
 

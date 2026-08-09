@@ -1,12 +1,9 @@
 import fs from "node:fs/promises";
 import process from "node:process";
-
 import { builtinRules } from "eslint/use-at-your-own-risk";
 import { flatConfigsToRulesDTS } from "eslint-typegen/core";
-
 import { createLodashConfigs } from "../src/configs/lodash";
 import { fastConfig } from "../src/index";
-
 import type { ESLint, Linter } from "eslint";
 
 const outputUrl = new URL("../src/typegen.d.ts", import.meta.url);

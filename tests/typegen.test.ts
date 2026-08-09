@@ -1,7 +1,6 @@
-import { defineConfig } from "eslint/config";
-
 import fastConfig, { type FastConfigOptions, type RuleOptions, defineRules, fastConfig as namedFastConfig } from "@fast-china/eslint-config";
 import { type AngularConfigOptions, type LodashPreference, type ReactConfigOptions, createLodashConfigs } from "@fast-china/eslint-config/configs";
+import { defineConfig } from "eslint/config";
 
 // @ts-expect-error -- 配置片段类型只从独立的 configs 子路径导出。
 type RootAngularConfigOptions = import("@fast-china/eslint-config").AngularConfigOptions;
