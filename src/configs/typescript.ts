@@ -1,7 +1,7 @@
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 import { GLOBS_TYPESCRIPT } from "../constants";
-import { typescriptRules } from "../rules";
+import { typescriptRules, typescriptTypeCheckedRules } from "../rules";
 import type { Linter } from "eslint";
 
 /**
@@ -99,6 +99,9 @@ export const createTypeScriptConfigs = (options: TypeScriptConfigOptions = {}, f
 				ecmaVersion: "latest",
 				parserOptions: createTypeScriptParserOptions(options),
 			},
-			rules: typescriptRules,
+			rules: {
+				...typescriptRules,
+				...(options.typeChecked ? typescriptTypeCheckedRules : {}),
+			},
 		},
 	]);

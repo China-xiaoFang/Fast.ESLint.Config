@@ -53,7 +53,7 @@ The exact upstream rule set is defined by the dependency versions in `pnpm-lock.
 
 ## High-impact features not enabled by default
 
-- Type-aware TypeScript and Vue presets require `typeChecked: true`. They add project-service cost and rules such as `no-floating-promises`.
+- Type-aware TypeScript and Vue presets require `typeChecked: true`. They add project-service cost and rules such as `no-floating-promises`. `prefer-promise-reject-errors` permits transparent forwarding of `unknown` rejection reasons while still reporting statically known non-`Error` values such as strings and numbers.
 - React requires `react: true`. Its upstream recommended and official Hooks presets include blocking component, Hooks, and React Compiler rules; review existing custom hook and memoization patterns when adopting it.
 - Angular requires `angular: true`. The framework bundle enables `prefer-inject`, OnPush change detection, standalone components, modern template control flow, and template accessibility. These policies are intentionally not active in the default Vue configuration.
 - The `jsonc/sort-keys` and `jsonc/sort-array-values` manifest rules require `sortPackageJson: true` or `sortTsconfig: true`. Isolate the first fix and verify the publish manifest.

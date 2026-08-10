@@ -4,7 +4,7 @@ import eslintPluginVue from "eslint-plugin-vue";
 import tseslint from "typescript-eslint";
 import vueEslintParser from "vue-eslint-parser";
 import { GLOB_VUE } from "../constants";
-import { typescriptRules, vueRules } from "../rules";
+import { typescriptRules, typescriptTypeCheckedRules, vueRules } from "../rules";
 import { type TypeScriptConfigOptions, createTypeScriptParserOptions, getTypeScriptPresetConfigs } from "./typescript";
 
 /**
@@ -73,6 +73,7 @@ export const createVueConfigs = ({ typescript = true, typescriptOptions = {} }: 
 			},
 			rules: {
 				...(typescript ? typescriptRules : {}),
+				...(typescript && typeChecked ? typescriptTypeCheckedRules : {}),
 				...vueRules,
 			},
 		},

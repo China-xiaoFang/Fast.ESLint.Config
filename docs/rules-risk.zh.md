@@ -57,7 +57,7 @@
 
 ## 明确不默认启用的高影响能力
 
-- TypeScript 和 Vue 的类型感知预置仅在 `typeChecked: true` 时启用；它们会增加项目服务开销，并启用 `no-floating-promises` 等需要类型信息的规则。
+- TypeScript 和 Vue 的类型感知预置仅在 `typeChecked: true` 时启用；它们会增加项目服务开销，并启用 `no-floating-promises` 等需要类型信息的规则。`prefer-promise-reject-errors` 允许透明转发 `unknown` 拒绝原因，但静态可知的 string、number 等非 `Error` 值仍会被报告。
 - React 仅在 `react: true` 时启用。其上游推荐预置和官方 Hooks 预置包含阻断级组件、Hooks 与 React Compiler 规则；接入旧项目时应重点审查自定义 Hook 和 memoization 写法。
 - Angular 仅在 `angular: true` 时启用。框架规则默认要求 `inject()`、OnPush 变更检测、独立组件、现代模板控制流和模板无障碍；这些约束不会进入默认 Vue 配置。
 - 清单排序规则 `jsonc/sort-keys`、`jsonc/sort-array-values` 分别仅在 `sortPackageJson: true`、`sortTsconfig: true` 时启用；首次修复应单独提交并核对发布清单。

@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.0.9 - 2026-08-10
+
+### Changed
+
+- Allowed type-aware TypeScript configurations to forward `unknown` Promise rejection reasons without disabling `prefer-promise-reject-errors` for statically known non-`Error` values.
+
 ## 2.0.8 - 2026-08-09
 
 ### Changed

@@ -190,6 +190,7 @@ test("factory supports Vue 3 and type-aware TypeScript", () => {
 	assert.ok(config.some((item) => item.name?.includes("vue/type-checked")));
 	assert.ok(config.some((item) => item.languageOptions?.parserOptions?.projectService === true));
 	assert.ok(config.some((item) => item.languageOptions?.parserOptions?.tsconfigRootDir === process.cwd()));
+	assert.ok(config.some((item) => item.rules?.["@typescript-eslint/prefer-promise-reject-errors"]?.[1]?.allowThrowingUnknown === true));
 });
 
 test("factory enables React correctness, official Hooks, and DOM safety rules on demand", async () => {
@@ -292,6 +293,8 @@ test("type-aware configuration can lint a file from the project service", async 
 
 	assert.equal(result.fatalErrorCount, 0, result.messages.map((message) => message.message).join(", "));
 	assert.ok(!result.messages.some((message) => message.message.includes("type information")));
+	const calculated = await linter.calculateConfigForFile("src/index.ts");
+	assert.equal(calculated.rules["@typescript-eslint/prefer-promise-reject-errors"][1].allowThrowingUnknown, true);
 });
 
 test("default Vue administration project files parse without configuration errors", async () => {
