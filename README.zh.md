@@ -17,11 +17,11 @@
 - 基于 ESLint 10，仅提供原生 Flat Config。
 - 默认针对 Vue 3 + TypeScript + Vite；React 与 Angular 是完整但按需启用的框架集成，Vue 项目不会意外接管无关文件。
 - 完整覆盖 JavaScript、TypeScript、Vue SFC、JSX/TSX、Angular TypeScript 与模板、JSON 各方言、Markdown、正则表达式与导入规则。
-- 默认导出单一 `fastConfig()` 工厂，公共 API 清晰，并且不会在导入模块时读取项目文件。
+- 默认导出可直接使用或展开的 Flat Config 数组；具名 `fastConfig()` 工厂用于自定义选项和项目覆写。
 - 根据 ESLint 与内置插件的规则 schema 生成精确类型，提供规则名和规则选项自动补全。
 - 插件与解析器均由本包直接声明依赖，使用者不需要手工拼装插件依赖树。
 - Prettier 只负责格式化：默认配置仅关闭冲突规则，不在 ESLint 内重复运行 Prettier。
-- `package.json` 与 `tsconfig.json` 排序为显式 opt-in，避免安装后首次修复产生非预期大 diff。
+- 默认检查 Markdown，并安全排序 `package.json` 与 `tsconfig.json`；React 和 Angular 保持按需启用。
 - 可选统一使用 `lodash` 或 `lodash-unified`，避免同一项目混用多个 Lodash 入口。
 
 ## 环境要求
@@ -45,25 +45,27 @@ pnpm add -D eslint typescript @fast-china/eslint-config
 创建 `eslint.config.mjs`：
 
 ```js
+import { defineConfig } from "eslint/config";
+
 import fastChina from "@fast-china/eslint-config";
 
-export default fastChina();
+export default defineConfig([fastChina]);
 ```
 
-默认配置面向普通 Vue 3 浏览器后台管理项目，启用 Vue 3、TypeScript、JavaScript、JSON 各方言、导入排序、正则检查、`.gitignore` 与浏览器全局变量；常见配置文件、脚本、测试和 CLI 文件会额外获得 Node.js 全局变量。Markdown、React、Angular 和清单排序按需启用；Lodash 策略通过 `configs` 子路径独立组合。
+也可以直接 `export default fastChina`，或在组合其他配置时使用 `...fastChina`。默认配置面向普通 Vue 3 浏览器后台管理项目，启用 Vue 3、TypeScript、JavaScript、JSON 各方言、Markdown、清单排序、导入排序、正则检查、`.gitignore` 与浏览器全局变量；常见配置文件、脚本、测试和 CLI 文件会额外获得 Node.js 全局变量。React 与 Angular 按需启用；Lodash 策略通过 `configs` 子路径独立组合。
 
 ## 适配其他项目
 
-其他项目可以配置根工厂，也可以完全绕过根工厂，直接组合所需片段。
+其他项目可以通过具名 `fastConfig()` 工厂配置选项，也可以完全绕过根工厂，直接组合所需片段。
 
 ### 使用 `fastConfig()`
 
 #### React + Vite
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	react: true,
 	vue: false,
 });
@@ -74,9 +76,9 @@ React 集成会应用现代 `@eslint-react` JavaScript/TypeScript 预置、React
 #### Angular
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	angular: true,
 	vue: false,
 });
@@ -85,7 +87,7 @@ export default fastChina({
 Angular 集成会检查框架 TypeScript、外部 `.html` 模板和组件内联模板。模板无障碍规则与内联模板提取默认开启，也可以显式配置：
 
 ```js
-export default fastChina({
+export default fastConfig({
 	angular: {
 		inlineTemplates: true,
 		templateAccessibility: true,
@@ -99,9 +101,9 @@ Angular 依赖 TypeScript 集成；同时设置 `angular: true` 与 `typescript:
 #### Node.js + TypeScript
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	environment: "node",
 	vue: false,
 });
@@ -110,9 +112,9 @@ export default fastChina({
 #### 纯 JavaScript
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	environment: "node",
 	json: false,
 	markdown: false,
@@ -124,9 +126,9 @@ export default fastChina({
 #### 启用 TypeScript 类型感知规则
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	typescript: {
 		tsconfigRootDir: import.meta.dirname,
 		typeChecked: true,
@@ -187,13 +189,13 @@ Vue SFC 可增加 `createVueConfigs()`，Angular 可增加 `createAngularConfigs
 | `imports`         | `true`      | 启用 import-x 正确性与排序规则。                               |
 | `javascript`      | `true`      | 处理 JavaScript 与 JSX。                                       |
 | `json`            | `true`      | 启用 JSON、JSONC 与 JSON5 推荐规则。                           |
-| `markdown`        | `false`     | 启用官方 Markdown 语言规则。                                   |
+| `markdown`        | `true`      | 启用官方 Markdown 语言规则。                                   |
 | `prettier`        | `true`      | 关闭与 Prettier 冲突的 ESLint 规则。                           |
 | `react`           | `false`     | 启用 React、JSX 与 Hooks，或传入运行时和 React 版本设置。      |
 | `regexp`          | `true`      | 启用推荐的正则表达式规则。                                     |
 | `rules`           | 无          | 对所有已启用代码文件追加具有精确类型的项目规则。               |
-| `sortPackageJson` | `false`     | 按安全白名单排序 `package.json`，不会进入 `exports` 条件对象。 |
-| `sortTsconfig`    | `false`     | 按 TypeScript 文档主题排序 `tsconfig*.json`。                  |
+| `sortPackageJson` | `true`      | 按安全白名单排序 `package.json`，不会进入 `exports` 条件对象。 |
+| `sortTsconfig`    | `true`      | 按 TypeScript 文档主题排序 `tsconfig*.json`。                  |
 | `typescript`      | `true`      | 可关闭，或传入 `{ typeChecked: true, tsconfigRootDir }`。      |
 | `vue`             | `true`      | 启用 Vue 3 单文件组件支持。                                    |
 
@@ -223,7 +225,7 @@ import fastChina from "@fast-china/eslint-config";
 import { createLodashConfigs } from "@fast-china/eslint-config/configs";
 import { cloneDeep, debounce } from "lodash-unified";
 
-export default defineConfig([...fastChina(), ...createLodashConfigs("lodash-unified")]);
+export default defineConfig([...fastChina, ...createLodashConfigs("lodash-unified")]);
 ```
 
 选择标准 `lodash`：
@@ -240,7 +242,7 @@ import fastChina from "@fast-china/eslint-config";
 import { createLodashConfigs } from "@fast-china/eslint-config/configs";
 import debounce from "lodash/debounce";
 
-export default defineConfig([...fastChina(), ...createLodashConfigs("lodash")]);
+export default defineConfig([...fastChina, ...createLodashConfigs("lodash")]);
 ```
 
 该片段使用 ESLint 核心 `no-restricted-imports`，不需要额外插件，也不会替项目安装 Lodash。它只检查静态 `import`/`export`，不检查动态 `import()` 或 CommonJS `require()`，并且独立于根工厂的 `imports` 选项。
@@ -253,7 +255,7 @@ export default defineConfig([...fastChina(), ...createLodashConfigs("lodash")]);
 
 ```js
 // @ts-check
-import fastChina, { defineRules } from "@fast-china/eslint-config";
+import { defineRules, fastConfig } from "@fast-china/eslint-config";
 
 const projectRules = defineRules({
 	"@angular-eslint/template/alt-text": "error",
@@ -264,7 +266,7 @@ const projectRules = defineRules({
 	"vue/attributes-order": ["error", { order: ["DEFINITION", "EVENTS", "CONTENT"] }],
 });
 
-export default fastChina(
+export default fastConfig(
 	{ rules: projectRules },
 	{
 		files: ["**/*.generated.ts"],
@@ -288,7 +290,7 @@ const rules = {
 
 ## 规则风险与维护
 
-默认配置包含少量高影响规则：它们可能阻断特定写法，或要求复核 import 副作用、类型导入和组件公共事件。React 与 Angular 在全局默认关闭，但启用框架后也会启用文档中列出的现代框架约束和无障碍规则。清单排序同样属于高影响能力，但默认关闭。源码使用 `[高影响]`、`[可自动修复]`、`[安全关注]` 与 `[按需启用]` 标记这类规则。
+默认配置包含少量高影响规则：它们可能阻断特定写法，或要求复核 import 副作用、类型导入、组件公共事件和清单排序结果。React 与 Angular 在全局默认关闭，但启用框架后也会启用文档中列出的现代框架约束和无障碍规则。源码使用 `[高影响]`、`[可自动修复]` 与 `[安全关注]` 标记这类规则。
 
 完整的默认预置来源、高影响规则清单、关闭示例和维护约定见 [默认规则与风险指南](./docs/rules-risk.zh.md)。运行 `eslint --fix` 前建议先只检查，在独立提交中应用修复，并审查 import、`package.json`、组件事件和构建产物。
 
@@ -297,9 +299,9 @@ const rules = {
 最常用的全局覆盖可以直接放入 `rules`；按文件覆盖作为后续参数传入，后面的配置优先级更高：
 
 ```js
-import fastChina, { defineRules } from "@fast-china/eslint-config";
+import { defineRules, fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina(
+export default fastConfig(
 	{
 		rules: {
 			"no-console": "warn",

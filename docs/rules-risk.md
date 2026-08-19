@@ -13,7 +13,7 @@ High impact does not mean inherently unsafe. It means adoption or fix review is 
 
 ## Bundled preset sources
 
-`fastConfig()` defaults to a conventional Vue 3 browser administration project with TypeScript, JavaScript, import, RegExp, JSON, and the Prettier compatibility layer. React, Angular, Markdown, type-aware TypeScript linting, and manifest sorting are opt-in. Lodash policies are separate fragments from the `configs` subpath.
+The default export and `fastConfig()` defaults target a conventional Vue 3 browser administration project with TypeScript, JavaScript, import, RegExp, JSON, Markdown, manifest sorting, and the Prettier compatibility layer. React, Angular, and type-aware TypeScript linting are opt-in. Lodash policies are separate fragments from the `configs` subpath.
 
 | Scope                  | Inherited preset                                                                                   | Notes                                                                                                   |
 | ---------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
@@ -25,7 +25,7 @@ High impact does not mean inherently unsafe. It means adoption or fix review is 
 | Imports                | `eslint-plugin-import-x` `recommended`                                                             | Local rules add import placement, deduplication, and ordering. Resolver-dependent checks stay disabled. |
 | RegExp                 | `eslint-plugin-regexp` `flat/recommended`                                                          | Some rules can rewrite regular expressions; run tests after bulk fixes.                                 |
 | JSON dialects          | The matching `eslint-plugin-jsonc` `flat/recommended-*` preset                                     | JSON, JSONC, and JSON5 are scoped separately.                                                           |
-| Markdown (opt-in)      | `@eslint/markdown` `recommended`                                                                   | Checks Markdown structure and syntax.                                                                   |
+| Markdown               | `@eslint/markdown` `recommended`                                                                   | Checks Markdown structure and syntax.                                                                   |
 | Prettier compatibility | `eslint-config-prettier/flat`                                                                      | Disables conflicting rules only; it does not run Prettier through ESLint.                               |
 
 The exact upstream rule set is defined by the dependency versions in `pnpm-lock.yaml`. Review the effective config with the config inspector whenever ESLint or a plugin is upgraded instead of copying an upstream list that will become stale.
@@ -51,12 +51,12 @@ The exact upstream rule set is defined by the dependency versions in `pnpm-lock.
 
 `vue/no-v-html` is also enabled as a warning. It is a security signal rather than an automatic rewrite: HTML must be trusted or reliably sanitized.
 
-## High-impact features not enabled by default
+## High-impact and disabled-by-default features
 
 - Type-aware TypeScript and Vue presets require `typeChecked: true`. They add project-service cost and rules such as `no-floating-promises`. `prefer-promise-reject-errors` permits transparent forwarding of `unknown` rejection reasons while still reporting statically known non-`Error` values such as strings and numbers.
 - React requires `react: true`. Its upstream recommended and official Hooks presets include blocking component, Hooks, and React Compiler rules; review existing custom hook and memoization patterns when adopting it.
 - Angular requires `angular: true`. The framework bundle enables `prefer-inject`, OnPush change detection, standalone components, modern template control flow, and template accessibility. These policies are intentionally not active in the default Vue configuration.
-- The `jsonc/sort-keys` and `jsonc/sort-array-values` manifest rules require `sortPackageJson: true` or `sortTsconfig: true`. Isolate the first fix and verify the publish manifest.
+- The `jsonc/sort-keys` and `jsonc/sort-array-values` manifest rules are enabled by default and can be disabled with `sortPackageJson: false` or `sortTsconfig: false`. Isolate the first fix and verify the publish manifest.
 - Lodash import restrictions require `createLodashConfigs("lodash")` or `createLodashConfigs("lodash-unified")` from the `configs` subpath. They use `no-restricted-imports` to prevent mixed static package entry points but do not inspect dynamic `import()` or CommonJS `require()`.
 - Resolver-dependent import checks such as `import-x/no-unresolved` and `import-x/named` stay disabled.
 - Keys inside `package.json#exports` are never sorted. Node conditional exports use key order during matching, so reordering can change the loaded file.
@@ -68,9 +68,9 @@ When Angular is enabled, the highest-adoption-cost rules are `@angular-eslint/pr
 Overrides must follow the shared config and should target only the affected files:
 
 ```js
-import fastChina, { defineRules } from "@fast-china/eslint-config";
+import { defineRules, fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina(
+export default fastConfig(
 	{},
 	{
 		name: "project/typescript-exceptions",

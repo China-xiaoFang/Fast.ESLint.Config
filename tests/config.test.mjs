@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import fastConfig, * as publicApi from "@fast-china/eslint-config";
+import fastChina, * as publicApi from "@fast-china/eslint-config";
 import { createGlobalIgnores, createLodashConfigs } from "@fast-china/eslint-config/configs";
 import { preferLodashRules, preferLodashUnifiedRules } from "@fast-china/eslint-config/rules";
 import { ESLint } from "eslint";
+import { defineConfig } from "eslint/config";
+
+const { fastConfig } = publicApi;
 
 const createLinter = (config, options = {}) =>
 	new ESLint({
@@ -14,10 +17,13 @@ const createLinter = (config, options = {}) =>
 		...options,
 	});
 
-test("package exports the configuration factory and typed rule helper", () => {
-	assert.equal(typeof fastConfig, "function");
-	assert.equal(fastConfig, publicApi.fastConfig);
-	assert.ok(Array.isArray(fastConfig({ gitignore: false })));
+test("package exports the default configuration, factory, and typed rule helper", () => {
+	assert.ok(Array.isArray(fastChina));
+	assert.ok(Array.isArray(publicApi.fastConfig({ gitignore: false })));
+	assert.deepEqual(
+		fastChina.map((config) => config.name),
+		publicApi.fastConfig().map((config) => config.name)
+	);
 	assert.equal(Object.isFrozen(publicApi.defaultConfigOptions), true);
 	assert.deepEqual(publicApi.defaultConfigOptions, {
 		angular: false,
@@ -26,16 +32,24 @@ test("package exports the configuration factory and typed rule helper", () => {
 		imports: true,
 		javascript: true,
 		json: true,
-		markdown: false,
+		markdown: true,
 		prettier: true,
 		react: false,
 		regexp: true,
-		sortPackageJson: false,
-		sortTsconfig: false,
+		sortPackageJson: true,
+		sortTsconfig: true,
 		typescript: true,
 		vue: true,
 	});
 	assert.deepEqual(publicApi.defineRules({ "no-console": "warn" }), { "no-console": "warn" });
+});
+
+test("default configuration can be used directly or spread into defineConfig", async () => {
+	const directLinter = createLinter(defineConfig([fastChina]));
+	const spreadLinter = createLinter(defineConfig([...fastChina]));
+
+	assert.ok(await directLinter.calculateConfigForFile("fixtures/example.ts"));
+	assert.ok(await spreadLinter.calculateConfigForFile("fixtures/example.ts"));
 });
 
 test("configuration fragment factories consistently return arrays", () => {
@@ -54,6 +68,8 @@ test("factory disables optional language integrations without claiming their fil
 		markdown: false,
 		prettier: false,
 		regexp: false,
+		sortPackageJson: false,
+		sortTsconfig: false,
 		typescript: false,
 		vue: false,
 	});
@@ -333,14 +349,16 @@ test("default Vue administration project files parse without configuration error
 	}
 });
 
-test("Markdown parsing is opt-in", async () => {
+test("Markdown parsing is enabled by default and can be disabled", async () => {
 	const defaultNames = fastConfig({ gitignore: false }).map((config) => config.name ?? "");
-	const markdownLinter = createLinter(fastConfig({ gitignore: false, markdown: true }));
+	const markdownLinter = createLinter(fastConfig({ gitignore: false }));
 	const [result] = await markdownLinter.lintText("# Example\n\nA valid Markdown document.\n", {
 		filePath: "fixtures/example.md",
 	});
+	const disabledNames = fastConfig({ gitignore: false, markdown: false }).map((config) => config.name ?? "");
 
-	assert.ok(!defaultNames.some((name) => name.includes("markdown")));
+	assert.ok(defaultNames.some((name) => name.includes("markdown")));
+	assert.ok(!disabledNames.some((name) => name.includes("markdown")));
 	assert.equal(result.fatalErrorCount, 0, result.messages.map((message) => message.message).join(", "));
 });
 
@@ -356,7 +374,7 @@ test("quality rules are active for JavaScript and Vue", async () => {
 	assert.ok(vueResult.messages.some((message) => message.ruleId === "vue/no-v-html"));
 });
 
-test("manifest sorting is opt-in and preserves semantic exports condition order", async () => {
+test("manifest sorting is enabled by default, can be disabled, and preserves semantic exports condition order", async () => {
 	const source = `{
 	"version": "1.0.0",
 	"name": "fixture",
@@ -371,13 +389,13 @@ test("manifest sorting is opt-in and preserves semantic exports condition order"
 `;
 	const defaultLinter = createLinter(fastConfig({ gitignore: false }), { fix: true });
 	const [defaultResult] = await defaultLinter.lintText(source, { filePath: "fixtures/package.json" });
-	assert.ok(!defaultResult.messages.some((message) => message.ruleId === "jsonc/sort-keys"));
+	const defaultFixed = defaultResult.output ?? source;
+	assert.ok(defaultFixed.indexOf('"name"') < defaultFixed.indexOf('"version"'));
 
-	const sortingLinter = createLinter(fastConfig({ gitignore: false, sortPackageJson: true }), { fix: true });
-	const [result] = await sortingLinter.lintText(source, { filePath: "fixtures/package.json" });
-	const fixed = result.output ?? source;
+	const disabledLinter = createLinter(fastConfig({ gitignore: false, sortPackageJson: false }), { fix: true });
+	const [disabledResult] = await disabledLinter.lintText(source, { filePath: "fixtures/package.json" });
+	assert.ok(!disabledResult.messages.some((message) => message.ruleId === "jsonc/sort-keys"));
 
-	assert.ok(fixed.indexOf('"name"') < fixed.indexOf('"version"'));
-	assert.ok(fixed.indexOf('"node"') < fixed.indexOf('"import"'));
-	assert.ok(fixed.indexOf('"import"') < fixed.indexOf('"default"'));
+	assert.ok(defaultFixed.indexOf('"node"') < defaultFixed.indexOf('"import"'));
+	assert.ok(defaultFixed.indexOf('"import"') < defaultFixed.indexOf('"default"'));
 });

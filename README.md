@@ -17,11 +17,11 @@ A practical, typed ESLint Flat Config for Vue 3, React, Angular, Vite, TypeScrip
 - Built for ESLint 10 and the native Flat Config format.
 - Vue 3 + TypeScript + Vite defaults; React and Angular are first-class opt-in integrations, so existing Vue projects do not activate unrelated rules.
 - First-class JavaScript, TypeScript, Vue SFC, JSX/TSX, Angular TypeScript and templates, JSON dialects, Markdown, RegExp, and import rules.
-- One focused `fastConfig()` factory with a compact public API and no project-file reads at module import time.
+- A ready-to-use default Flat Config array that can be exported directly or spread, plus a named `fastConfig()` factory for customization.
 - Schema-generated rule types provide exact rule-name and rule-option completion.
 - Plugins and parsers are regular package dependencies, so consumers do not need to assemble the plugin graph.
 - Prettier stays a formatter: the default only disables conflicting ESLint rules and does not run Prettier inside ESLint.
-- Manifest sorting is explicit opt-in, preventing an unexpected large first-fix diff.
+- Markdown and safe manifest sorting are enabled by default; React and Angular remain opt-in.
 - An opt-in Lodash policy keeps projects on either `lodash` or `lodash-unified` without mixing package entry points.
 
 ## Requirements
@@ -45,25 +45,27 @@ Equivalent npm, Yarn, and Bun commands work as well.
 Create `eslint.config.mjs`:
 
 ```js
+import { defineConfig } from "eslint/config";
+
 import fastChina from "@fast-china/eslint-config";
 
-export default fastChina();
+export default defineConfig([fastChina]);
 ```
 
-The default targets a conventional Vue 3 browser-based administration project. It enables Vue 3, TypeScript, JavaScript, JSON dialects, import ordering, RegExp checks, `.gitignore`, browser globals, and Node globals for common config, script, test, and CLI files. Markdown, React, Angular, and manifest sorting remain opt-in. Lodash policies are composed separately from the `configs` subpath.
+You can also use `export default fastChina` directly, or `...fastChina` when composing other configs. The default targets a conventional Vue 3 browser-based administration project. It enables Vue 3, TypeScript, JavaScript, JSON dialects, Markdown, manifest sorting, import ordering, RegExp checks, `.gitignore`, browser globals, and Node globals for common config, script, test, and CLI files. React and Angular remain opt-in. Lodash policies are composed separately from the `configs` subpath.
 
 ## Other project types
 
-Other projects can either configure the root factory or compose focused fragments directly.
+Other projects can configure the named `fastConfig()` factory or compose focused fragments directly.
 
 ### Use `fastConfig()`
 
 #### React + Vite
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	react: true,
 	vue: false,
 });
@@ -74,9 +76,9 @@ React support applies the modern `@eslint-react` JavaScript/TypeScript preset, t
 #### Angular
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	angular: true,
 	vue: false,
 });
@@ -85,7 +87,7 @@ export default fastChina({
 Angular support checks framework TypeScript, external `.html` templates, and inline component templates. Template accessibility and inline-template extraction are enabled by default:
 
 ```js
-export default fastChina({
+export default fastConfig({
 	angular: {
 		inlineTemplates: true,
 		templateAccessibility: true,
@@ -99,9 +101,9 @@ Angular requires the TypeScript integration; `angular: true` together with `type
 #### Node.js + TypeScript
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	environment: "node",
 	vue: false,
 });
@@ -110,9 +112,9 @@ export default fastChina({
 #### JavaScript only
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	environment: "node",
 	json: false,
 	markdown: false,
@@ -124,9 +126,9 @@ export default fastChina({
 #### Type-aware TypeScript rules
 
 ```js
-import fastChina from "@fast-china/eslint-config";
+import { fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina({
+export default fastConfig({
 	typescript: {
 		tsconfigRootDir: import.meta.dirname,
 		typeChecked: true,
@@ -187,13 +189,13 @@ Use `createVueConfigs()` for Vue SFCs, `createAngularConfigs()` for Angular, or 
 | `imports`         | `true`      | Enable import-x correctness and ordering rules.                            |
 | `javascript`      | `true`      | Process JavaScript and JSX files.                                          |
 | `json`            | `true`      | Enable recommended JSON, JSONC, and JSON5 rules.                           |
-| `markdown`        | `false`     | Enable the official Markdown language rules.                               |
+| `markdown`        | `true`      | Enable the official Markdown language rules.                               |
 | `prettier`        | `true`      | Disable ESLint rules that conflict with Prettier.                          |
 | `react`           | `false`     | Enable React/JSX/Hooks, or pass runtime and React-version settings.        |
 | `regexp`          | `true`      | Enable recommended RegExp rules.                                           |
 | `rules`           | none        | Add exactly typed project rules to every enabled code file.                |
-| `sortPackageJson` | `false`     | Sort safe package.json keys without entering conditional `exports`.        |
-| `sortTsconfig`    | `false`     | Sort `tsconfig*.json` by TypeScript documentation topics.                  |
+| `sortPackageJson` | `true`      | Sort safe package.json keys without entering conditional `exports`.        |
+| `sortTsconfig`    | `true`      | Sort `tsconfig*.json` by TypeScript documentation topics.                  |
 | `typescript`      | `true`      | Disable it or pass `{ typeChecked: true, tsconfigRootDir }`.               |
 | `vue`             | `true`      | Enable Vue 3 single-file components.                                       |
 
@@ -223,7 +225,7 @@ import fastChina from "@fast-china/eslint-config";
 import { createLodashConfigs } from "@fast-china/eslint-config/configs";
 import { cloneDeep, debounce } from "lodash-unified";
 
-export default defineConfig([...fastChina(), ...createLodashConfigs("lodash-unified")]);
+export default defineConfig([...fastChina, ...createLodashConfigs("lodash-unified")]);
 ```
 
 Choose standard `lodash`:
@@ -240,7 +242,7 @@ import fastChina from "@fast-china/eslint-config";
 import { createLodashConfigs } from "@fast-china/eslint-config/configs";
 import debounce from "lodash/debounce";
 
-export default defineConfig([...fastChina(), ...createLodashConfigs("lodash")]);
+export default defineConfig([...fastChina, ...createLodashConfigs("lodash")]);
 ```
 
 This fragment uses ESLint core `no-restricted-imports`, adds no plugin, and does not install Lodash for the project. It checks static `import`/`export` only, not dynamic `import()` or CommonJS `require()`. It is independent of the root factory's `imports` option.
@@ -253,7 +255,7 @@ The package generates `RuleOptions` from the JSON Schemas published by ESLint co
 
 ```js
 // @ts-check
-import fastChina, { defineRules } from "@fast-china/eslint-config";
+import { defineRules, fastConfig } from "@fast-china/eslint-config";
 
 const projectRules = defineRules({
 	"@angular-eslint/template/alt-text": "error",
@@ -264,7 +266,7 @@ const projectRules = defineRules({
 	"vue/attributes-order": ["error", { order: ["DEFINITION", "EVENTS", "CONTENT"] }],
 });
 
-export default fastChina(
+export default fastConfig(
 	{ rules: projectRules },
 	{
 		files: ["**/*.generated.ts"],
@@ -288,7 +290,7 @@ The generated set covers ESLint core and plugins bundled by this package. Rules 
 
 ## Rule risk and maintenance
 
-The default includes a small set of high-impact rules. They can block particular patterns or require a review of import side effects, type-only imports, and public component events. React and Angular are disabled globally by default, but enabling them also enables their documented modern-framework and accessibility policies. Manifest sorting is high-impact and disabled by default. Source comments mark these decisions as `[高影响]`, `[可自动修复]`, `[安全关注]`, or `[按需启用]`.
+The default includes a small set of high-impact rules. They can block particular patterns or require a review of import side effects, type-only imports, public component events, and manifest sorting results. React and Angular are disabled globally by default, but enabling them also enables their documented modern-framework and accessibility policies. Source comments mark these decisions as `[High impact]`, `[Auto-fixable]`, or `[Security]`.
 
 See the [default-rule and risk guide](./docs/rules-risk.md) for inherited presets, the high-impact inventory, scoped override examples, and the maintenance contract. Run a read-only lint before `eslint --fix`, apply fixes in an isolated commit, and review imports, `package.json`, component events, and build output.
 
@@ -297,9 +299,9 @@ See the [default-rule and risk guide](./docs/rules-risk.md) for inherited preset
 Put common overrides in `rules`, and pass file-scoped overrides as later arguments. Later configurations take precedence:
 
 ```js
-import fastChina, { defineRules } from "@fast-china/eslint-config";
+import { defineRules, fastConfig } from "@fast-china/eslint-config";
 
-export default fastChina(
+export default fastConfig(
 	{
 		rules: {
 			"no-console": "warn",

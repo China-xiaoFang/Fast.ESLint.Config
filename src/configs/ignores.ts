@@ -10,7 +10,7 @@ import { GLOBS_LOCKFILES } from "../constants";
  * 应由项目维护的文件。
  */
 export const DEFAULT_IGNORE_PATTERNS = Object.freeze([
-	"**/node_modules/**",
+	"**/.pnpm-store,node_modules/**",
 	"**/{dist,build,coverage,output,temp,tmp}/**",
 	"**/{.cache,.nuxt,.output,.vercel,.nitro}/**",
 	"**/{.vitepress/cache,.vite-inspect}/**",

@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.0.10 - 2026-08-19
+
+### Changed
+
+- Changed the default export to a ready-to-use Flat Config array that can be exported directly or spread into another configuration; configurable usage remains available through the named `fastConfig()` export.
+- Enabled Markdown, `package.json` sorting, and `tsconfig*.json` sorting by default while keeping React and Angular disabled by default.
+
 ## 2.0.9 - 2026-08-10
 
 ### Changed

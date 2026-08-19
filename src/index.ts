@@ -149,7 +149,7 @@ export interface FastConfigOptions {
 	 *
 	 * 该配置关注 Markdown 文档本身，不会自动把项目的 JavaScript、TypeScript 或框架
 	 * 规则应用到围栏代码块；如需检查代码块，应通过项目覆盖配置明确指定。
-	 * @defaultValue `false`
+	 * @defaultValue `true`
 	 */
 	markdown?: boolean;
 	/**
@@ -194,7 +194,7 @@ export interface FastConfigOptions {
 	 * 规则只在执行 `eslint --fix` 时重排字段，并刻意不进入顺序具有运行时语义的
 	 * `exports` 条件对象。首次启用通常会产生较大的纯排序差异，建议单独提交并复核。
 	 * 启用此项会同时加载 JSON 解析配置。
-	 * @defaultValue `false`
+	 * @defaultValue `true`
 	 */
 	sortPackageJson?: boolean;
 	/**
@@ -202,7 +202,7 @@ export interface FastConfigOptions {
 	 *
 	 * 规则不会改变编译选项值，只在执行 `eslint --fix` 时调整字段顺序。首次启用可能产生
 	 * 较大差异，建议单独提交并确认继承关系仍清晰。启用此项会同时加载 JSON 解析配置。
-	 * @defaultValue `false`
+	 * @defaultValue `true`
 	 */
 	sortTsconfig?: boolean;
 	/**
@@ -240,12 +240,12 @@ export const defaultConfigOptions = Object.freeze({
 	imports: true,
 	javascript: true,
 	json: true,
-	markdown: false,
+	markdown: true,
 	prettier: true,
 	react: false,
 	regexp: true,
-	sortPackageJson: false,
-	sortTsconfig: false,
+	sortPackageJson: true,
+	sortTsconfig: true,
 	typescript: true,
 	vue: true,
 } as const satisfies Required<Omit<FastConfigOptions, "globals" | "ignores" | "rules">>);
@@ -254,9 +254,9 @@ export const defaultConfigOptions = Object.freeze({
  * 创建面向 Vue 3、Vite、TypeScript 与浏览器后台管理项目的 ESLint Flat Config。
  *
  * @remarks
- * 默认启用浏览器环境、JavaScript、TypeScript、Vue 3、import、RegExp、JSON 和
- * Prettier 兼容层。React、Angular、Markdown 与清单排序按需启用；Lodash 导入策略
- * 通过 `@fast-china/eslint-config/configs` 独立组合。
+ * 默认启用浏览器环境、JavaScript、TypeScript、Vue 3、import、RegExp、JSON、Markdown、
+ * 清单排序和 Prettier 兼容层。React 与 Angular 按需启用；Lodash 导入策略通过
+ * `@fast-china/eslint-config/configs` 独立组合。
  * 额外配置参数会放在内置配置之后，因此项目可以按文件范围覆盖任何默认规则。
  *
  * @param options - 控制内置语言、框架、插件与项目级规则的选项。
@@ -266,7 +266,7 @@ export const defaultConfigOptions = Object.freeze({
  *
  * @example
  * ```ts
- * import fastConfig from "@fast-china/eslint-config";
+ * import { fastConfig } from "@fast-china/eslint-config";
  *
  * export default fastConfig(
  *   { react: true, vue: false },
@@ -351,4 +351,19 @@ export const fastConfig = (options: FastConfigOptions = {}, ...overrides: Config
 	]);
 };
 
-export default fastConfig;
+/**
+ * 可直接导出或展开的默认 ESLint Flat Config。
+ *
+ * @remarks
+ * 需要修改选项或追加覆盖配置时，请使用具名导出的 {@link fastConfig} 工厂。
+ *
+ * @example
+ * ```ts
+ * import fastChina from "@fast-china/eslint-config";
+ *
+ * export default fastChina;
+ * ```
+ */
+const fastChina: Config[] = fastConfig();
+
+export default fastChina;

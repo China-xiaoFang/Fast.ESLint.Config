@@ -8,7 +8,7 @@
 
 当前仓库已经具备完整 ESLint Flat Config 开源库所需的核心能力：稳定且精简的公共 API、明确的语言作用域、可选类型感知检查、精确规则类型、可重复构建、集成测试、CI、发布归档检查和中英文文档。
 
-默认场景面向普通 Vue 3 + Vite + TypeScript 浏览器后台管理项目；React、Angular、Markdown 和清单排序按需启用，Lodash 策略通过 `configs` 子路径独立组合。配置仍支持 JavaScript、Node.js 工程文件、JSON 方言、正则表达式和模块导入检查，项目覆写始终位于内置配置之后。
+默认场景面向普通 Vue 3 + Vite + TypeScript 浏览器后台管理项目；Markdown 和清单排序默认启用，React 与 Angular 按需启用，Lodash 策略通过 `configs` 子路径独立组合。配置仍支持 JavaScript、Node.js 工程文件、JSON 方言、正则表达式和模块导入检查，项目覆写始终位于内置配置之后。
 
 ## 审查范围
 
@@ -34,7 +34,7 @@
 | 数据与文档文件 | 通过 | JSON、JSONC、JSON5 和 Markdown 分别使用对应语言配置                    |
 | 规则自动补全   | 通过 | 从 ESLint 核心和随包插件 schema 生成精确 `RuleOptions`                 |
 | Lodash 策略    | 通过 | 可选统一 `lodash` 或 `lodash-unified`，默认不限制项目依赖选择          |
-| 清单排序       | 通过 | 默认关闭；启用后不会重排 `package.json#exports` 条件键                 |
+| 清单排序       | 通过 | 默认启用；不会重排 `package.json#exports` 条件键                       |
 | Prettier       | 通过 | 只关闭冲突规则，格式化由 Prettier CLI 或编辑器负责                     |
 | 构建与发布     | 通过 | tsdown 生成 `.mjs`、`.d.mts` 和 source map，`prepack` 执行完整质量门禁 |
 | 自动化验证     | 通过 | 运行时测试、消费者类型测试、格式检查、静态检查和 Node.js 多版本 CI     |

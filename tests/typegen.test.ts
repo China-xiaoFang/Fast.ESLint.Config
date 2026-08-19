@@ -1,4 +1,4 @@
-import fastConfig, { type FastConfigOptions, type RuleOptions, defineRules, fastConfig as namedFastConfig } from "@fast-china/eslint-config";
+import fastChina, { type FastConfigOptions, type RuleOptions, defineRules, fastConfig } from "@fast-china/eslint-config";
 import { type AngularConfigOptions, type LodashPreference, type ReactConfigOptions, createLodashConfigs } from "@fast-china/eslint-config/configs";
 import { defineConfig } from "eslint/config";
 
@@ -25,6 +25,9 @@ const options = {
 	vue: false,
 } satisfies FastConfigOptions;
 
+defineConfig([fastChina]);
+defineConfig([...fastChina]);
+
 const config = fastConfig(options, {
 	files: ["**/*.generated.ts"],
 	name: "typegen/generated-files",
@@ -32,7 +35,7 @@ const config = fastConfig(options, {
 });
 
 defineConfig(config);
-namedFastConfig(options);
+fastConfig(options);
 
 const ruleOptions = {
 	"logical-assignment-operators": ["error", "always", { enforceForIfStatements: true }],
