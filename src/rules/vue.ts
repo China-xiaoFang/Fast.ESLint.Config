@@ -4,33 +4,36 @@ import type { RuleOptions } from "../typegen";
  * Vue SFC 本地覆写规则。
  *
  * @remarks
- * 上游 `flat/recommended` 已覆盖基础正确性，这里只记录项目取舍与附加约束。
+ * 上游 `flat/recommended` 负责 Vue 3 正确性与模板约定；本记录补充事件、属性命名和
+ * 闭合标签规则。Vue Web、Admin 与 UniApp 使用同一套严重级别。
  */
 export const vueRules = {
-	// [安全关注] v-html 可能引入 XSS；保留 warn 以兼容经过净化的富文本场景。
+	// v-html 可能引入 XSS；保留警告以兼容经过净化的富文本场景。
 	"vue/no-v-html": "warn",
 	// [默认关闭] TypeScript 类型 props 和 required 声明已能表达可选性，不强制每个可选 prop 提供默认值。
 	"vue/require-default-prop": "off",
-	// [高影响] 组件必须声明对外事件；首次启用时会暴露未建模的公共事件 API。
+	// 组件对外事件必须通过 emits 显式声明。
 	"vue/require-explicit-emits": "error",
 	// [默认关闭] 允许 App、Layout 等约定俗成的单词组件名。
 	"vue/multi-word-component-names": "off",
-	// 优先从 vue 入口导入由 Vue 重新导出的 API，避免依赖内部包边界。
-	"vue/prefer-import-from-vue": "warn",
+	// 允许直接使用 Vue 子包入口，兼容编译器与运行时等明确子模块导入。
+	"vue/prefer-import-from-vue": "off",
+	// 模板属性统一使用 Vue 官方推荐的 kebab-case；脚本中的 Props 仍使用 camelCase。
+	"vue/attribute-hyphenation": ["error", "always"],
 
-	// 防止 props、data、computed、methods 等组件命名空间出现冲突。
+	// 重复键、直接修改 props 和保留组件名会破坏组件数据流或运行时行为。
 	"vue/no-dupe-keys": "error",
-	// [高影响] 禁止组件直接修改 props，要求通过事件或本地状态维持单向数据流。
 	"vue/no-mutating-props": "error",
-	// 避免自定义组件名与 Vue 内置组件冲突。
 	"vue/no-reserved-component-names": "error",
-	// [安全关注] 禁止在组件节点上使用 v-text/v-html，避免覆盖组件内容和模糊数据边界。
+	// 禁止在组件节点使用 v-text/v-html，避免覆盖组件内容并模糊数据边界。
 	"vue/no-v-text-v-html-on-component": "error",
-	// 统一模板与脚本中的自定义事件名称为 camelCase。
+	// 自定义事件名称统一使用 camelCase。
 	"vue/custom-event-name-casing": ["error", "camelCase"],
 	// [默认关闭] 允许在一个 SFC 中声明仅供当前文件使用的小型辅助组件。
 	"vue/one-component-per-file": "off",
-	// [高影响][可自动修复] 统一模板属性分组；首次启用可能产生大量仅排序的模板差异。
+	// 多行标签的闭合括号独占一行，单行标签保持同行。
+	"vue/html-closing-bracket-newline": ["error", { multiline: "always", singleline: "never" }],
+	// 模板属性按语义分组并保持稳定顺序。
 	"vue/attributes-order": [
 		"error",
 		{

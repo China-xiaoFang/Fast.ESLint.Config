@@ -12,7 +12,7 @@ export const importRules = {
 	"import-x/first": "error",
 	// 合并同一模块的重复 import，避免绑定分散或副作用被误读。
 	"import-x/no-duplicates": "error",
-	// [高影响][可自动修复] 按来源分组并排序；带副作用的裸 import 仅报告，人工移动前必须确认执行顺序。
+	// 按来源分组并排序，保持所有项目一致的模块结构。
 	"import-x/order": [
 		"error",
 		{
@@ -60,7 +60,7 @@ export const importRules = {
 				order: "asc",
 				caseInsensitive: true,
 			},
-			// 对没有赋值给变量的副作用导入进行排序检查
+			// 副作用导入同样参与检查；修复前必须确认样式、polyfill 和注册器执行顺序
 			warnOnUnassignedImports: true,
 		},
 	],

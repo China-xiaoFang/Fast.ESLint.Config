@@ -11,7 +11,7 @@ import { GLOB_JSON, GLOB_JSON5, GLOB_JSONC } from "../constants";
  *
  * @returns 按 JSON、JSONC、JSON5 与 VS Code 设置覆盖顺序排列的 Flat Config 数组。
  */
-export const createJsonConfigs = () =>
+export const createJsonConfigs = (): ReturnType<typeof defineConfig> =>
 	defineConfig([
 		{
 			name: "@fast-china/json/json",

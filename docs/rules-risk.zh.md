@@ -1,109 +1,108 @@
-# 默认规则、风险分级与维护约定
+# 默认规则与风险指南
 
-本文档回答三个维护问题：默认配置到底继承了什么、哪些规则会显著影响已有项目、修改规则时必须同步检查什么。
+本文说明 2.1.0 当前配置模型、主要规则和迁移风险。规则源码注释只解释现行意图；历史差异统一记录在 `CHANGELOG.md`。
 
-## 风险标记如何理解
+## 配置模型
 
-源码中的标记采用以下含义：
+SDK、OA、Admin、Vue Web 与 UniApp 客户端共享同一套 JavaScript、TypeScript、Import 和 RegExp 规则，不提供严格度档位。
 
-- `[高影响]`：规则可能产生大面积差异、阻断既有写法，或要求人工确认运行时与公共 API 行为。
-- `[可自动修复]`：当前锁定的 ESLint/插件版本声明该规则可被 `eslint --fix` 修改；不代表无需代码审查。
-- `[安全关注]`：规则主要提示注入、信任边界等安全问题。
-- `[默认关闭]`、`[按需启用]`：规则记录存在，但默认配置不会启用。
+根入口固定面向 Vue 3 + TypeScript + UniApp：
 
-“高影响”不等于规则本身不安全。它表示规则的采用成本或修复审查成本较高。默认自动修复的目标仍是保持语义，但模块副作用、getter/Proxy、构建器约定和公共组件 API 都需要项目维护者复核。
+- `environment: "browser"`
+- `.gitignore`
+- JavaScript、类型感知 TypeScript
+- Vue 3、`.nvue`、UniApp globals 与清单适配
+- Import、RegExp、JSON/JSONC/JSON5
+- `package.json` 和 `tsconfig*.json` 排序
+- Prettier 冲突关闭层
+- Node.js 工程文件 globals 与末尾规则覆写
 
-## 内置预置来源
+`fastConfig()` 只保留 `environment`。React、Angular、Markdown 和 Lodash 通过 `./configs` 子路径组合；规则、globals、ignores 和解析器特殊设置使用后置 Flat Config。
 
-默认导出和 `fastConfig()` 默认面向普通 Vue 3 浏览器后台管理项目，开启 TypeScript、JavaScript、import、RegExp、JSON、Markdown、清单排序与 Prettier 兼容层；React、Angular 和 TypeScript 类型感知按需启用。Lodash 策略通过 `configs` 子路径独立组合。
+## 预置来源
 
-| 范围             | 默认继承                                                                                  | 说明                                                                             |
-| ---------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| JavaScript       | `@eslint/js` 的 `recommended`                                                             | 基础语法和运行时正确性，包括 `no-undef`、`no-unused-vars` 等。                   |
-| TypeScript       | typescript-eslint 的 `recommended` + `stylistic`                                          | 默认不读取类型信息；本库规则在预置之后覆写。                                     |
-| Vue 3            | `@eslint/js`、typescript-eslint 非类型感知预置、`eslint-plugin-vue` 的 `flat/recommended` | 处理 Vue 3 单文件组件，并让 TypeScript 规则正确作用于 `<script lang="ts">`。     |
-| React（按需）    | `@eslint-react/recommended*` 与 `eslint-plugin-react-hooks` 的 `flat/recommended`         | 检查组件、JSX/TSX、DOM API、Hooks 与稳定的 React Compiler 诊断。                 |
-| Angular（按需）  | angular-eslint 22.x 的 TypeScript、模板推荐与模板无障碍规则集                             | 检查 Angular TypeScript、外部模板和提取后的内联模板；必须启用 TypeScript。       |
-| import           | `eslint-plugin-import-x` 的 `recommended`                                                 | 本库额外配置导入位置、去重和排序。解析器相关规则默认关闭，避免绑定具体别名方案。 |
-| RegExp           | `eslint-plugin-regexp` 的 `flat/recommended`                                              | 部分规则可自动改写正则表达式，批量修复后需运行测试。                             |
-| JSON/JSONC/JSON5 | `eslint-plugin-jsonc` 对应方言的 `flat/recommended-*`                                     | 三种方言按扩展名隔离，不会互相叠加。                                             |
-| Markdown         | `@eslint/markdown` 的 `recommended`                                                       | 检查 Markdown 结构和语法。                                                       |
-| Prettier 兼容    | `eslint-config-prettier/flat`                                                             | 只关闭冲突的格式规则，不会在 ESLint 内执行 Prettier。                            |
+| 领域       | 预置或实现                                                              |
+| ---------- | ----------------------------------------------------------------------- |
+| JavaScript | `@eslint/js` recommended + 本地规则                                     |
+| TypeScript | typescript-eslint `recommendedTypeChecked` + Project Service            |
+| Vue        | `eslint-plugin-vue` `flat/recommended` + 类型感知 TypeScript            |
+| React      | `@eslint-react` recommended/type-checked + React Hooks Flat Recommended |
+| Angular    | Angular ESLint TypeScript、模板及无障碍 recommended                     |
+| JSON       | `eslint-plugin-jsonc` 三种方言 recommended                              |
+| Import     | `eslint-plugin-import-x` recommended + 固定顺序策略                     |
+| RegExp     | 显式正确性、安全和超线性回溯规则                                        |
+| Prettier   | `eslint-config-prettier` 冲突关闭层                                     |
 
-上游预置的具体规则集合由锁文件中的依赖版本决定，升级 ESLint 或任一插件时都可能变化。审查实际生效配置时，应以配置检查器和 `pnpm-lock.yaml` 为准，而不是复制一份很快过期的上游规则列表。
+## 主要规则
 
-## 默认启用的高影响规则
+### JavaScript
 
-下表覆盖本库主动设置的高影响规则，以及上游默认预置中采用成本较高、最需要审查的规则。
+- `camelcase: ["error", { properties: "never" }]`
+- `no-debugger: "error"`
+- `no-use-before-define` 为 `warn`；类和变量必须先声明，函数声明允许提升。
+- `prefer-arrow-callback`、`logical-assignment-operators`、`prefer-object-spread` 为 `error`。
+- `prefer-exponentiation-operator`、`prefer-object-has-own` 为 `error`。
+- `sort-imports` 为 `warn`，只排序同一 import 的成员。
+- `import-x/order` 为 `error`，并设置 `warnOnUnassignedImports: true`。
 
-| 规则                                                | 等级       | 自动修复           | 主要影响                                                                                            | 建议                                                   |
-| --------------------------------------------------- | ---------- | ------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `import-x/order`                                    | error      | 是                 | 重排并分组 import。带副作用的裸 import 会被报告但不会安全地自动移动，人工调整顺序可能改变启动行为。 | 先检查入口、polyfill、样式和注册器 import。            |
-| `@typescript-eslint/no-unused-vars`                 | error      | 是（当前插件版本） | 可能删除未使用的 import、变量或声明；以下划线开头是显式保留出口。                                   | 在独立提交中修复并运行类型检查、构建和测试。           |
-| `@typescript-eslint/consistent-type-imports`        | error      | 是                 | 将纯类型依赖改成内联 `type` import；若原 import 还承担模块副作用，编译后行为可能变化。              | 副作用应改成独立的 `import "module"`，并复核构建产物。 |
-| `@typescript-eslint/no-require-imports`             | error      | 否                 | 阻断 CommonJS、条件加载和部分工具链互操作写法。                                                     | 仅在确实需要的配置文件上按范围关闭，不要全局隐藏。     |
-| `no-var`                                            | error      | 是                 | 将 `var` 改为块级声明；声明提升和循环闭包行为需要关注。                                             | 先运行现有测试，重点复核循环内回调。                   |
-| `prefer-arrow-callback`                             | error      | 是                 | 批量改写回调形式，影响 `this`、`arguments` 或函数名调试体验的代码需要人工确认。                     | 检查事件处理器、类库回调和栈追踪。                     |
-| `logical-assignment-operators`                      | error      | 是                 | 将条件赋值改成 `\|\|=`、`&&=`、`??=`；getter 或 Proxy 场景要确认读取和写入次数。                    | 对状态容器和响应式对象运行行为测试。                   |
-| `no-restricted-syntax`（`LabeledStatement`）        | error      | 否                 | 禁止 labeled break/continue，可能要求重构多层循环控制流。                                           | 必要时按文件降级，重构后再恢复。                       |
-| `sort-imports`                                      | warn       | 是                 | 排序同一 import 声明中的成员，通常只产生文本差异。                                                  | 与 `import-x/order` 一起在独立整理提交中执行。         |
-| `vue/require-explicit-emits`                        | error      | 否                 | 要求组件声明事件，相当于补全组件公共 API；旧组件可能大量报错。                                      | 先补齐实际事件清单，不要盲目关闭。                     |
-| `vue/no-mutating-props`                             | error      | 否                 | 强制单向数据流，可能要求引入本地状态或事件。                                                        | 把修复当作组件设计变更审查。                           |
-| `vue/attributes-order`                              | error      | 是                 | 首次运行会重排大量模板属性，通常不改变运行逻辑但会形成大 diff。                                     | 单独提交模板排序，不与业务修改混合。                   |
-| `no-unused-vars`、`no-undef`（JavaScript 上游预置） | error      | 否                 | JavaScript 代码可能出现较多阻断错误；`no-undef` 还会暴露缺失的运行时全局变量声明。                  | 正确选择 `environment`，再逐步清理无用代码。           |
-| RegExp 推荐预置                                     | 由上游决定 | 部分规则是         | 可能改写字符类、量词或断言；语法等价不代表业务输入覆盖充分。                                        | 修复后运行覆盖真实输入的正则测试。                     |
+### TypeScript
 
-另外，`vue/no-v-html` 默认是 `warn`，属于安全关注而非自动重写规则。它提示调用方必须保证 HTML 来自可信来源或经过可靠净化。
+- 始终启用 `recommendedTypeChecked` 与 `projectService: true`。
+- `explicit-module-boundary-types` 为 `error`，模块导出边界必须显式声明类型，不允许用显式 `any` 参数规避。
+- `explicit-function-return-type` 不额外启用，内部函数和回调可以依赖推断。
+- `no-explicit-any` 为 `warn`。
+- `no-unused-vars` 为 `error`；`_` 前缀表示有意忽略，rest siblings 不误报。
+- `no-empty-function` 仅允许空构造函数和空覆写方法。
+- `consistent-type-imports` 使用行内 `type` 修复形式。
+- `no-non-null-assertion` 为 `error`。
 
-## 高影响能力与默认关闭能力
+### Vue
 
-- TypeScript 和 Vue 的类型感知预置仅在 `typeChecked: true` 时启用；它们会增加项目服务开销，并启用 `no-floating-promises` 等需要类型信息的规则。`prefer-promise-reject-errors` 允许透明转发 `unknown` 拒绝原因，但静态可知的 string、number 等非 `Error` 值仍会被报告。
-- React 仅在 `react: true` 时启用。其上游推荐预置和官方 Hooks 预置包含阻断级组件、Hooks 与 React Compiler 规则；接入旧项目时应重点审查自定义 Hook 和 memoization 写法。
-- Angular 仅在 `angular: true` 时启用。框架规则默认要求 `inject()`、OnPush 变更检测、独立组件、现代模板控制流和模板无障碍；这些约束不会进入默认 Vue 配置。
-- 清单排序规则 `jsonc/sort-keys`、`jsonc/sort-array-values` 默认启用，可分别通过 `sortPackageJson: false`、`sortTsconfig: false` 关闭；首次修复应单独提交并核对发布清单。
-- Lodash 静态导入限制仅在从 `configs` 子路径调用 `createLodashConfigs("lodash")` 或 `createLodashConfigs("lodash-unified")` 时启用。该策略使用 `no-restricted-imports` 阻止混用包入口，但不会检查动态 `import()` 或 CommonJS `require()`。
-- `import-x/no-unresolved`、`import-x/named` 等依赖 resolver 的检查默认关闭。
-- `package.json` 的 `exports` 条件键永不自动排序。Node 条件导出按键顺序匹配，改写顺序可能改变实际加载文件。
+- 使用 `flat/recommended`。
+- `attribute-hyphenation: ["error", "always"]`。
+- `no-v-html` 为 `warn`。
+- `no-v-text-v-html-on-component` 为 `error`。
+- `require-explicit-emits`、`attributes-order`、`no-mutating-props` 为 `error`。
+- `.vue` 与 `.nvue` 统一使用 TypeScript parser 和 Project Service。
 
-启用 Angular 后，采用成本最高的规则是 `@angular-eslint/prefer-inject`、`@angular-eslint/prefer-on-push-component-change-detection`、`@angular-eslint/prefer-standalone` 与 `@angular-eslint/template/prefer-control-flow`。应把修复视为框架迁移，而不是格式整理。只有项目已使用等效工具保障无障碍时，才建议设置 `angular: { templateAccessibility: false }`；个别例外通常应通过末尾的文件级覆写处理。
+## 类型感知要求
 
-## 按项目降低规则强度
+TypeScript、Vue 和 React TSX 始终依赖类型信息。被检查文件必须属于可发现的 `tsconfig.json`，否则 Project Service 会报告配置错误。
 
-覆盖项必须放在共享配置之后，并尽量限定文件范围：
+本包不再提供 `typeChecked` 或 `tsconfigRootDir` 包装选项。复杂 monorepo 可以通过后置 Flat Config 直接覆盖 `languageOptions.parserOptions`，但不应通过关闭类型检查绕过项目边界问题。
 
-```js
-import { defineRules, fastConfig } from "@fast-china/eslint-config";
+## UniApp 边界
 
-export default fastConfig(
-	{},
-	{
-		name: "project/typescript-exceptions",
-		files: ["**/*.{ts,tsx,mts,cts,vue}"],
-		rules: defineRules({
-			"@typescript-eslint/consistent-type-imports": "warn",
-			"@typescript-eslint/no-require-imports": "off",
-			"@typescript-eslint/no-unused-vars": "warn",
-		}),
-	},
-	{
-		name: "project/vue-exceptions",
-		files: ["**/*.vue"],
-		rules: defineRules({
-			"vue/attributes-order": "warn",
-			"vue/require-explicit-emits": "warn",
-		}),
-	}
-);
+根入口默认声明 `uni`、`uniCloud`、页面 API 及条件编译平台对象，并允许 `pages.json`、`manifest.json` 中的注释。
+
+ESLint 不执行条件编译，因此 `wx`、`plus` 等对象在根入口处理的全部代码文件中可见。这避免平台分支中的 `no-undef`，但不能验证对象是否位于正确的 `#ifdef` 分支。普通 Vue 项目如不希望获得这些 globals，应直接组合所需配置片段，而不是使用根入口。
+
+## 自动修复风险
+
+重点审查以下自动修复：
+
+- Import 分组、成员顺序和副作用导入位置。
+- TypeScript 行内 `type` 导入。
+- Vue 属性命名与排序。
+- `package.json` 和 `tsconfig*.json` 字段顺序。
+
+`package.json` 排序不会进入顺序具有运行时语义的条件 `exports` 对象。
+
+建议先运行：
+
+```sh
+pnpm exec eslint .
 ```
 
-建议先执行只读检查，再在独立分支或独立提交中运行 `eslint --fix`。重点审查 import、副作用入口、包导出、组件事件和清单文件，并运行项目的类型检查、构建与测试。
+确认问题范围后再运行：
 
-## 修改规则时的维护清单
+```sh
+pnpm exec eslint . --fix
+```
 
-1. 在 `src/rules/` 对每条本地规则写明“作用、为什么启用、例外或风险”，不要只翻译规则名。
-2. 新增或升级高影响规则时添加 `[高影响]`；可修复规则同时核对当前版本的 `meta.fixable`，不要凭印象标注。
-3. 同步更新本文件和英文版 `rules-risk.md`；默认行为变化还要更新两份 README 与 `CHANGELOG.md`。
-4. 排序规则不得触碰顺序具有语义的映射，例如 `package.json#exports` 条件对象。
-5. ESLint 或任一内置插件版本变化后运行 `pnpm typegen`，审查并提交 `src/typegen.d.ts`；不得手工修改生成声明。
-6. 为解析器、插件、作用域、自动修复、生成类型或公开导出的变化增加集成测试。
-7. 完成后运行 `pnpm check` 和 `pnpm pack --dry-run`，并检查自动修复后的真实 diff。
+## 维护约定
+
+1. 修改规则时解释当前行为、风险和例外，不在源码注释中引用历史版本。
+2. 升级 recommended 预置后检查最终生效规则，避免上游变化静默改变严重级别。
+3. 新增框架只增加解析器、文件范围和框架语义，不建立第二套语言规则档位。
+4. 新增公共配置工厂、解析器或自动修复行为时同步增加类型和运行时测试。

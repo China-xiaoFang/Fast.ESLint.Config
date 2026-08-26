@@ -21,4 +21,5 @@ export * from "./regexp";
 export * from "./sort-package";
 export * from "./sort-tsconfig";
 export * from "./typescript";
+export * from "./uniapp";
 export * from "./vue";

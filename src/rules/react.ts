@@ -4,28 +4,19 @@ import type { RuleOptions } from "../typegen";
  * React 本地覆写规则。
  *
  * @remarks
- * `@eslint-react/recommended*` 负责组件、JSX、DOM 与 Web API 正确性，
- * `react-hooks/recommended` 负责 React 官方 Hooks 与 Compiler 诊断。这里关闭两套
- * 预置间的重复诊断，并补充少量明确的 DOM 安全约束。
+ * `@eslint-react/recommended*` 负责组件、JSX、DOM 与 Web API 正确性，React 官方
+ * Hooks Recommended 负责 Hooks 与 React Compiler 正确性；这里仅消除重复报告并补充 DOM 规则。
  */
 export const reactRules = {
-	// React 官方 Hooks 插件提供更完整的 Error Boundary/Compiler 诊断，避免同一问题重复报告。
+	// 以下规则由 React 官方 Hooks Recommended 提供，关闭 @eslint-react 中的重复实现。
 	"@eslint-react/error-boundaries": "off",
-	// 依赖数组由 React 官方 exhaustive-deps 规则统一检查，避免重复警告。
 	"@eslint-react/exhaustive-deps": "off",
-	// 纯函数约束交给 React 官方 Compiler 规则维护，确保与 React 版本同步。
 	"@eslint-react/purity": "off",
-	// Hooks 调用顺序由 React 官方规则作为唯一来源，避免编辑器显示两个相同错误。
 	"@eslint-react/rules-of-hooks": "off",
-	// Effect 内同步更新状态由 React 官方 Compiler 规则判断，避免两套实现严重级别不一致。
 	"@eslint-react/set-state-in-effect": "off",
-	// 渲染期间更新状态由 React 官方 Compiler 规则判断，避免重复错误。
 	"@eslint-react/set-state-in-render": "off",
-	// 组件引用稳定性由 React 官方 Compiler 规则统一检查。
 	"@eslint-react/static-components": "off",
-	// Compiler 不支持的语法由 React 官方规则统一报告。
 	"@eslint-react/unsupported-syntax": "off",
-	// memoization 建议由 React 官方 Compiler 规则统一报告。
 	"@eslint-react/use-memo": "off",
 
 	// button 缺少 type 时在表单内默认为 submit，显式声明可避免意外提交。

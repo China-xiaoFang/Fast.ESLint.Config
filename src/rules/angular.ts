@@ -24,11 +24,11 @@ export const angularRules = {
 	"@angular-eslint/no-output-rename": "error",
 	// 统一使用 output()/@Output 声明输出，避免与 metadata 数组混用两套 API。
 	"@angular-eslint/no-outputs-metadata-property": "error",
-	// [高影响][按需启用] Angular 22 推荐 inject()，旧构造器注入代码启用框架后可能集中报错。
+	// Angular 推荐使用 inject() 统一依赖注入写法。
 	"@angular-eslint/prefer-inject": "error",
-	// [高影响][按需启用] OnPush 改变变更检测边界，修复时必须验证状态更新与视图刷新。
+	// OnPush 明确组件变更检测边界，减少不必要的检查。
 	"@angular-eslint/prefer-on-push-component-change-detection": "error",
-	// [高影响][按需启用] 独立组件是现代 Angular 默认模型，旧 NgModule 项目需规划后再迁移。
+	// 独立组件是现代 Angular 的默认模型。
 	"@angular-eslint/prefer-standalone": "error",
 	// Pipe 类实现接口后可由 TypeScript 检查 transform 签名，避免运行时才发现不一致。
 	"@angular-eslint/use-pipe-transform-interface": "error",
@@ -50,7 +50,7 @@ export const angularTemplateRules = {
 	"@angular-eslint/template/eqeqeq": "error",
 	// 对 async pipe 结果直接取反会让初始 null 状态产生反直觉分支。
 	"@angular-eslint/template/no-negated-async": "error",
-	// [高影响][按需启用] 统一采用现代 @if/@for 控制流，旧模板启用后需要规划迁移。
+	// 采用现代 @if/@for 控制流，与 Angular 推荐模板语法保持一致。
 	"@angular-eslint/template/prefer-control-flow": "error",
 } satisfies RuleOptions;
 
@@ -59,7 +59,7 @@ export const angularTemplateRules = {
  *
  * @remarks
  * 规则覆盖替代文本、键盘交互、焦点、表单标签与 ARIA 合法性，可通过
- * `angular.templateAccessibility` 整组关闭而不影响模板基础正确性规则。
+ * `createAngularConfigs({ templateAccessibility: false })` 整组关闭而不影响模板基础正确性规则。
  */
 export const angularTemplateAccessibilityRules = {
 	// 图片和图像型元素需要替代文本，确保非视觉用户能获得等价信息。

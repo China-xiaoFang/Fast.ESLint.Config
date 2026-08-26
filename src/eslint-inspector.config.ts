@@ -1,3 +1,3 @@
-import { fastConfig } from "./index";
+import fastChina from "./index";
 
-export default fastConfig({ gitignore: false });
+export default fastChina;

@@ -10,8 +10,9 @@ import { GLOBS_LOCKFILES } from "../constants";
  * 应由项目维护的文件。
  */
 export const DEFAULT_IGNORE_PATTERNS = Object.freeze([
-	"**/.pnpm-store,node_modules/**",
+	"**/{.pnpm-store,node_modules}/**",
 	"**/{dist,build,coverage,output,temp,tmp}/**",
+	"**/unpackage/**",
 	"**/{.cache,.nuxt,.output,.vercel,.nitro}/**",
 	"**/{.vitepress/cache,.vite-inspect}/**",
 	"**/__snapshots__/**",
@@ -27,7 +28,7 @@ export const DEFAULT_IGNORE_PATTERNS = Object.freeze([
  * @param additionalPatterns - 追加到 {@link DEFAULT_IGNORE_PATTERNS} 之后的 ESLint 全局忽略模式。
  * @returns 包含单个命名全局忽略片段的 Flat Config 数组。
  */
-export const createGlobalIgnores = (additionalPatterns: readonly string[] = []) =>
+export const createGlobalIgnores = (additionalPatterns: readonly string[] = []): ReturnType<typeof defineConfig> =>
 	defineConfig([globalIgnores([...DEFAULT_IGNORE_PATTERNS, ...additionalPatterns], "@fast-china/ignores/global")]);
 
 /**
@@ -39,10 +40,10 @@ export const createGlobalIgnores = (additionalPatterns: readonly string[] = []) 
  *
  * @returns 包含 `.gitignore` 转换结果的 Flat Config 数组。
  */
-export const createGitignoreConfigs = () =>
+export const createGitignoreConfigs = (): ReturnType<typeof defineConfig> =>
 	defineConfig([
 		{
-			name: "@fast-china/ignores/git",
 			...eslintConfigFlatGitignore({ strict: false }),
+			name: "@fast-china/ignores/git",
 		},
 	]);

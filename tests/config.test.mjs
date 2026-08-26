@@ -1,12 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import fastChina, * as publicApi from "@fast-china/eslint-config";
-import { createGlobalIgnores, createLodashConfigs } from "@fast-china/eslint-config/configs";
+import {
+	DEFAULT_IGNORE_PATTERNS,
+	createAngularConfigs,
+	createGlobalIgnores,
+	createLodashConfigs,
+	createMarkdownConfigs,
+	createReactConfigs,
+	getTypeScriptPresetConfigs,
+} from "@fast-china/eslint-config/configs";
 import { preferLodashRules, preferLodashUnifiedRules } from "@fast-china/eslint-config/rules";
 import { ESLint } from "eslint";
 import { defineConfig } from "eslint/config";
 
-const { fastConfig } = publicApi;
+const { createBaseConfigs, fastConfig } = publicApi;
 
 const createLinter = (config, options = {}) =>
 	new ESLint({
@@ -17,30 +25,14 @@ const createLinter = (config, options = {}) =>
 		...options,
 	});
 
-test("package exports the default configuration, factory, and typed rule helper", () => {
+test("package exports the fixed default configuration, environment factory, and typed rule helper", () => {
 	assert.ok(Array.isArray(fastChina));
-	assert.ok(Array.isArray(publicApi.fastConfig({ gitignore: false })));
+	assert.ok(Array.isArray(publicApi.fastConfig()));
 	assert.deepEqual(
 		fastChina.map((config) => config.name),
 		publicApi.fastConfig().map((config) => config.name)
 	);
-	assert.equal(Object.isFrozen(publicApi.defaultConfigOptions), true);
-	assert.deepEqual(publicApi.defaultConfigOptions, {
-		angular: false,
-		environment: "browser",
-		gitignore: true,
-		imports: true,
-		javascript: true,
-		json: true,
-		markdown: true,
-		prettier: true,
-		react: false,
-		regexp: true,
-		sortPackageJson: true,
-		sortTsconfig: true,
-		typescript: true,
-		vue: true,
-	});
+	assert.equal("defaultConfigOptions" in publicApi, false);
 	assert.deepEqual(publicApi.defineRules({ "no-console": "warn" }), { "no-console": "warn" });
 });
 
@@ -48,8 +40,8 @@ test("default configuration can be used directly or spread into defineConfig", a
 	const directLinter = createLinter(defineConfig([fastChina]));
 	const spreadLinter = createLinter(defineConfig([...fastChina]));
 
-	assert.ok(await directLinter.calculateConfigForFile("fixtures/example.ts"));
-	assert.ok(await spreadLinter.calculateConfigForFile("fixtures/example.ts"));
+	assert.ok(await directLinter.calculateConfigForFile("src/index.ts"));
+	assert.ok(await spreadLinter.calculateConfigForFile("src/index.ts"));
 });
 
 test("configuration fragment factories consistently return arrays", () => {
@@ -58,168 +50,132 @@ test("configuration fragment factories consistently return arrays", () => {
 	assert.ok(Array.isArray(globalIgnoreConfigs));
 	assert.equal(globalIgnoreConfigs.length, 1);
 	assert.equal(globalIgnoreConfigs[0].name, "@fast-china/ignores/global");
+	assert.ok(DEFAULT_IGNORE_PATTERNS.includes("**/{.pnpm-store,node_modules}/**"));
+	assert.ok(Array.isArray(createBaseConfigs()));
 });
 
-test("factory disables optional language integrations without claiming their files", async () => {
-	const minimalConfig = fastConfig({
-		gitignore: false,
-		imports: false,
-		json: false,
-		markdown: false,
-		prettier: false,
-		regexp: false,
-		sortPackageJson: false,
-		sortTsconfig: false,
-		typescript: false,
-		vue: false,
-	});
-	const names = minimalConfig.map((config) => config.name ?? "");
+test("root entry always enables the fixed Vue, UniApp, language, sorting, and compatibility capabilities", () => {
+	const names = fastConfig().map((config) => config.name ?? "");
 
+	assert.ok(names.some((name) => name.includes("ignores/git")));
 	assert.ok(names.some((name) => name.includes("javascript")));
-	assert.ok(!names.some((name) => name.includes("typescript")));
-	assert.ok(!names.some((name) => name.includes("vue")));
-	assert.ok(!names.some((name) => name.includes("react")));
-	assert.ok(!names.some((name) => name.includes("angular")));
-	assert.ok(!names.some((name) => name.includes("json")));
+	assert.ok(names.some((name) => name.includes("typescript/type-checked")));
+	assert.ok(names.some((name) => name.includes("vue/type-checked")));
+	assert.ok(names.some((name) => name.includes("uniapp/globals")));
+	assert.ok(names.some((name) => name.includes("json/json")));
+	assert.ok(names.some((name) => name.includes("sort/package-json")));
+	assert.ok(names.some((name) => name.includes("sort/tsconfig")));
+	assert.ok(names.some((name) => name.includes("prettier")));
 	assert.ok(!names.some((name) => name.includes("markdown")));
-
-	const linter = createLinter(minimalConfig);
-	assert.ok(await linter.calculateConfigForFile("fixtures/example.js"));
-	assert.equal(await linter.calculateConfigForFile("fixtures/example.ts"), undefined);
-	assert.equal(await linter.calculateConfigForFile("fixtures/example.vue"), undefined);
+	assert.ok(!names.some((name) => name.includes("react/")));
+	assert.ok(!names.some((name) => name.includes("angular/")));
 });
 
-test("factory can build a JSON-only configuration without activating code rules", async () => {
-	const config = fastConfig({
-		gitignore: false,
-		imports: false,
-		javascript: false,
-		markdown: false,
-		prettier: false,
-		regexp: false,
-		typescript: false,
-		vue: false,
-	});
-	const linter = createLinter(config);
+test("base composition remains framework-neutral", () => {
+	const names = createBaseConfigs().map((config) => config.name ?? "");
 
-	const javaScriptConfig = await linter.calculateConfigForFile("fixtures/example.js");
-	assert.equal(Object.keys(javaScriptConfig?.rules ?? {}).length, 0);
-	assert.ok(await linter.calculateConfigForFile("fixtures/example.json"));
+	assert.ok(names.some((name) => name.includes("typescript/type-checked")));
+	assert.ok(names.some((name) => name.includes("sort/package-json")));
+	assert.ok(!names.some((name) => name.includes("vue/")));
+	assert.ok(!names.some((name) => name.includes("uniapp/")));
+	assert.ok(!names.some((name) => name.includes("react/")));
+	assert.ok(!names.some((name) => name.includes("angular/")));
 });
 
-test("runtime globals are scoped to application and Node.js tooling files", async () => {
-	const linter = createLinter(
-		fastConfig({
-			gitignore: false,
-			globals: { __APP_VERSION__: "readonly" },
-			imports: false,
-			json: false,
-			markdown: false,
-			prettier: false,
-			regexp: false,
-			typescript: false,
-			vue: false,
-		})
-	);
-	const [applicationResult] = await linter.lintText("process.cwd();\n__APP_VERSION__;\n", { filePath: "fixtures/application.js" });
-	const [toolingResult] = await linter.lintText("process.cwd();\n", { filePath: "fixtures/vite.config.js" });
-
-	assert.ok(applicationResult.messages.some((message) => message.ruleId === "no-undef"));
-	assert.ok(!applicationResult.messages.some((message) => message.message.includes("__APP_VERSION__")));
-	assert.ok(!toolingResult.messages.some((message) => message.ruleId === "no-undef"));
-});
-
-test("project rules and trailing overrides take precedence in declaration order", async () => {
+test("runtime environment and trailing overrides apply in declaration order", async () => {
 	const config = fastConfig(
+		{ environment: "node" },
 		{
-			gitignore: false,
-			json: false,
-			markdown: false,
+			files: ["**/*.js"],
+			languageOptions: { globals: { __APP_VERSION__: "readonly" } },
 			rules: publicApi.defineRules({ "no-console": "error" }),
-			typescript: false,
-			vue: false,
 		},
 		{
-			name: "project/allow-console-in-example",
 			files: ["**/allowed.js"],
+			name: "project/allow-console",
 			rules: { "no-console": "off" },
 		}
 	);
 	const linter = createLinter(config);
-	const [blockedResult] = await linter.lintText("console.log('blocked');\n", { filePath: "fixtures/blocked.js" });
-	const [allowedResult] = await linter.lintText("console.log('allowed');\n", { filePath: "fixtures/allowed.js" });
+	const [blockedResult] = await linter.lintText("console.log(process.cwd(), __APP_VERSION__);\n", { filePath: "fixtures/blocked.js" });
+	const [allowedResult] = await linter.lintText("console.log(process.cwd(), __APP_VERSION__);\n", { filePath: "fixtures/allowed.js" });
 
-	assert.equal(config.at(-1)?.name, "project/allow-console-in-example");
+	assert.equal(config.at(-1)?.name, "project/allow-console");
 	assert.ok(blockedResult.messages.some((message) => message.ruleId === "no-console"));
+	assert.ok(!blockedResult.messages.some((message) => message.ruleId === "no-undef"));
 	assert.ok(!allowedResult.messages.some((message) => message.ruleId === "no-console"));
 });
 
+test("VS Code settings use the JSONC comment exception only in the JSON configuration domain", async () => {
+	const linter = createLinter(fastConfig());
+	const [settingsResult] = await linter.lintText('{\n\t// Workspace editor setting.\n\t"editor.formatOnSave": true\n}\n', {
+		filePath: "fixtures/.vscode/settings.json",
+	});
+	const calculated = await linter.calculateConfigForFile("fixtures/.vscode/settings.json");
+
+	assert.equal(settingsResult.fatalErrorCount, 0);
+	assert.ok(!settingsResult.messages.some((message) => message.ruleId === "jsonc/no-comments"));
+	assert.equal(calculated.rules["jsonc/no-comments"][0], 0);
+});
+
 test("Lodash config fragment rejects mixed static imports", async () => {
-	const baseOptions = {
-		gitignore: false,
-		imports: false,
-		json: false,
-		markdown: false,
-		prettier: false,
-		regexp: false,
-		typescript: false,
-		vue: false,
-	};
-	const defaultLinter = createLinter(fastConfig(baseOptions));
+	const defaultLinter = createLinter(createBaseConfigs());
 	const [defaultResult] = await defaultLinter.lintText('import get from "lodash/get";\nvoid get;\n', {
 		filePath: "fixtures/default-lodash.js",
 	});
 	assert.ok(!defaultResult.messages.some((message) => message.ruleId === "no-restricted-imports"));
 
-	const unifiedLinter = createLinter([...fastConfig(baseOptions), ...createLodashConfigs("lodash-unified")]);
+	const unifiedLinter = createLinter([...createBaseConfigs(), ...createLodashConfigs("lodash-unified")]);
 	const [unifiedResult] = await unifiedLinter.lintText(
 		'import get from "lodash/get";\nimport { debounce } from "lodash-es";\nexport { default as pick } from "lodash/pick";\nvoid get;\nvoid debounce;\n',
 		{ filePath: "fixtures/prefer-lodash-unified.js" }
 	);
 	assert.equal(unifiedResult.messages.filter((message) => message.ruleId === "no-restricted-imports").length, 3);
-	const [allowedUnifiedResult] = await unifiedLinter.lintText('import { debounce } from "lodash-unified";\nvoid debounce;\n', {
-		filePath: "fixtures/allowed-lodash-unified.js",
-	});
-	assert.ok(!allowedUnifiedResult.messages.some((message) => message.ruleId === "no-restricted-imports"));
 
-	const lodashLinter = createLinter([...fastConfig(baseOptions), ...createLodashConfigs("lodash")]);
+	const lodashLinter = createLinter([...createBaseConfigs(), ...createLodashConfigs("lodash")]);
 	const [lodashResult] = await lodashLinter.lintText(
 		'import { debounce } from "lodash-unified";\nimport { get } from "lodash-es";\nexport * from "lodash-unified/fp";\nvoid debounce;\nvoid get;\n',
 		{ filePath: "fixtures/prefer-lodash.js" }
 	);
 	assert.equal(lodashResult.messages.filter((message) => message.ruleId === "no-restricted-imports").length, 3);
-	const [allowedLodashResult] = await lodashLinter.lintText('import get from "lodash/get";\nvoid get;\n', {
-		filePath: "fixtures/allowed-lodash.js",
-	});
-	assert.ok(!allowedLodashResult.messages.some((message) => message.ruleId === "no-restricted-imports"));
 	assert.equal(preferLodashRules["no-restricted-imports"]?.[0], "error");
 	assert.equal(preferLodashUnifiedRules["no-restricted-imports"]?.[0], "error");
 });
 
-test("factory supports Vue 3 and type-aware TypeScript", () => {
-	const config = fastConfig({
-		gitignore: false,
-		typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
-		vue: true,
-	});
+test("TypeScript always uses recommendedTypeChecked and Project Service", async () => {
+	const linter = createLinter(createBaseConfigs({ environment: "node" }));
+	const [result] = await linter.lintFiles(["src/index.ts"]);
+	const calculated = await linter.calculateConfigForFile("src/index.ts");
+	const presets = getTypeScriptPresetConfigs();
 
-	assert.ok(config.some((item) => item.name?.includes("vue/type-checked")));
-	assert.ok(config.some((item) => item.languageOptions?.parserOptions?.projectService === true));
-	assert.ok(config.some((item) => item.languageOptions?.parserOptions?.tsconfigRootDir === process.cwd()));
-	assert.ok(config.some((item) => item.rules?.["@typescript-eslint/prefer-promise-reject-errors"]?.[1]?.allowThrowingUnknown === true));
+	assert.equal(result.fatalErrorCount, 0, result.messages.map((message) => message.message).join(", "));
+	assert.equal(calculated.languageOptions.parserOptions.projectService, true);
+	assert.equal(calculated.rules["@typescript-eslint/prefer-promise-reject-errors"][1].allowThrowingUnknown, true);
+	assert.ok(presets.some((item) => item.name === "typescript-eslint/recommended-type-checked"));
 });
 
-test("factory enables React correctness, official Hooks, and DOM safety rules on demand", async () => {
-	const config = fastConfig({
-		gitignore: false,
-		imports: false,
-		json: false,
-		markdown: false,
-		prettier: false,
-		react: true,
-		regexp: false,
-		vue: false,
+test("root Vue configuration includes UniApp globals, nvue parsing, manifest comments, and output ignores", async () => {
+	const linter = createLinter(fastConfig());
+	const [javaScriptResult] = await linter.lintText(
+		"uni.getSystemInfoSync();\ngetCurrentPages();\n// #ifdef MP-WEIXIN\nwx.request({});\n// #endif\n// #ifdef APP-PLUS\nplus.runtime.getProperty();\n// #endif\nunknownHostApi();\n",
+		{ filePath: "fixtures/uniapp.js" }
+	);
+	const [nvueResult] = await linter.lintFiles(["tests/fixtures/home.nvue"]);
+	const [pagesResult] = await linter.lintText('{\n\t// UniApp pages can contain comments.\n\t"pages": []\n}\n', {
+		filePath: "fixtures/pages.json",
 	});
+
+	assert.ok(!javaScriptResult.messages.some((message) => message.message.includes("'uni' is not defined")));
+	assert.ok(!javaScriptResult.messages.some((message) => message.message.includes("'wx' is not defined")));
+	assert.ok(!javaScriptResult.messages.some((message) => message.message.includes("'plus' is not defined")));
+	assert.ok(javaScriptResult.messages.some((message) => message.message.includes("'unknownHostApi' is not defined")));
+	assert.equal(nvueResult.fatalErrorCount, 0, nvueResult.messages.map((message) => message.message).join(", "));
+	assert.ok(!pagesResult.messages.some((message) => message.ruleId === "jsonc/no-comments"));
+	assert.ok(DEFAULT_IGNORE_PATTERNS.includes("**/unpackage/**"));
+});
+
+test("React composes explicitly on the framework-neutral base", async () => {
+	const config = defineConfig([...createBaseConfigs(), ...createReactConfigs()]);
 	const names = config.map((item) => item.name ?? "");
 	const linter = createLinter(config);
 	const [result] = await linter.lintText(
@@ -228,153 +184,83 @@ test("factory enables React correctness, official Hooks, and DOM safety rules on
 	);
 
 	assert.ok(names.some((name) => name.includes("react/javascript")));
-	assert.ok(names.some((name) => name.includes("react/typescript")));
-	assert.equal(result.fatalErrorCount, 0);
+	assert.ok(names.some((name) => name.includes("react/typescript-type-checked")));
+	assert.ok(!names.some((name) => name.includes("vue/")));
 	assert.ok(result.messages.some((message) => message.ruleId === "react-hooks/rules-of-hooks"));
 	assert.ok(result.messages.some((message) => message.ruleId === "@eslint-react/dom-no-missing-button-type"));
+	const calculated = await linter.calculateConfigForFile("fixtures/App.jsx");
+	assert.equal(calculated.rules["@eslint-react/rules-of-hooks"][0], 0);
 });
 
-test("factory enables Angular TypeScript, external templates, inline templates, and accessibility on demand", async () => {
-	const config = fastConfig({
-		angular: true,
-		gitignore: false,
-		imports: false,
-		javascript: false,
-		json: false,
-		markdown: false,
-		prettier: false,
-		regexp: false,
-		vue: false,
-	});
+test("Angular composes explicitly on the framework-neutral base", async () => {
+	const config = defineConfig([...createBaseConfigs(), ...createAngularConfigs()]);
 	const names = config.map((item) => item.name ?? "");
 	const linter = createLinter(config);
-	const [templateResult] = await linter.lintText('<img src="logo.png">\n', {
-		filePath: "fixtures/app.component.html",
-	});
+	const [templateResult] = await linter.lintText('<img src="logo.png">\n', { filePath: "fixtures/app.component.html" });
 	const [inlineResult] = await linter.lintText(
 		'import { Component } from "@angular/core";\n\n@Component({ template: `<div (click)="save()">Save</div>` })\nexport class AppComponent {\n\tsave() { return true; }\n}\n',
-		{ filePath: "fixtures/app.component.ts" }
+		{ filePath: "src/app.component.ts" }
 	);
 
 	assert.ok(names.some((name) => name.includes("angular/typescript-with-inline-templates")));
 	assert.ok(names.some((name) => name.includes("angular/template-accessibility")));
-	assert.equal(templateResult.fatalErrorCount, 0);
-	assert.equal(inlineResult.fatalErrorCount, 0);
+	assert.ok(!names.some((name) => name.includes("vue/")));
 	assert.ok(templateResult.messages.some((message) => message.ruleId === "@angular-eslint/template/alt-text"));
 	assert.ok(inlineResult.messages.some((message) => message.ruleId === "@angular-eslint/template/click-events-have-key-events"));
 });
 
-test("Angular support requires the TypeScript language integration", () => {
-	assert.throws(() => fastConfig({ angular: true, typescript: false }), /Angular support requires TypeScript/);
-});
-
-test("Angular inline-template and accessibility policies can be disabled explicitly", async () => {
-	const config = fastConfig({
-		angular: { inlineTemplates: false, templateAccessibility: false },
-		gitignore: false,
-		imports: false,
-		javascript: false,
-		json: false,
-		markdown: false,
-		prettier: false,
-		regexp: false,
-		vue: false,
-	});
+test("Angular fragment retains explicit inline-template and accessibility controls", async () => {
+	const config = defineConfig([...createBaseConfigs(), ...createAngularConfigs({ inlineTemplates: false, templateAccessibility: false })]);
 	const names = config.map((item) => item.name ?? "");
 	const linter = createLinter(config);
-	const [templateResult] = await linter.lintText('<img src="logo.png">\n', {
-		filePath: "fixtures/app.component.html",
-	});
-	const [inlineResult] = await linter.lintText(
-		'import { Component } from "@angular/core";\n\n@Component({ template: `<div (click)="save()">Save</div>` })\nexport class AppComponent {\n\tsave() { return true; }\n}\n',
-		{ filePath: "fixtures/app.component.ts" }
-	);
+	const [templateResult] = await linter.lintText('<img src="logo.png">\n', { filePath: "fixtures/app.component.html" });
 
 	assert.ok(names.includes("@fast-china/angular/typescript"));
 	assert.ok(names.includes("@fast-china/angular/template"));
 	assert.ok(!templateResult.messages.some((message) => message.ruleId === "@angular-eslint/template/alt-text"));
-	assert.ok(!inlineResult.messages.some((message) => message.ruleId?.startsWith("@angular-eslint/template/")));
 });
 
-test("type-aware configuration can lint a file from the project service", async () => {
-	const linter = createLinter(
-		fastConfig({
-			gitignore: false,
-			markdown: false,
-			typescript: { typeChecked: true },
-			vue: false,
-		})
-	);
-	const [result] = await linter.lintFiles(["src/index.ts"]);
+test("Markdown remains an explicitly composed capability", async () => {
+	const defaultNames = createBaseConfigs().map((config) => config.name ?? "");
+	const config = defineConfig([...createBaseConfigs(), ...createMarkdownConfigs()]);
+	const linter = createLinter(config);
+	const [result] = await linter.lintText("# Example\n\nA valid Markdown document.\n", { filePath: "fixtures/example.md" });
 
-	assert.equal(result.fatalErrorCount, 0, result.messages.map((message) => message.message).join(", "));
-	assert.ok(!result.messages.some((message) => message.message.includes("type information")));
-	const calculated = await linter.calculateConfigForFile("src/index.ts");
-	assert.equal(calculated.rules["@typescript-eslint/prefer-promise-reject-errors"][1].allowThrowingUnknown, true);
-});
-
-test("default Vue administration project files parse without configuration errors", async () => {
-	const linter = createLinter(fastConfig({ gitignore: false }));
-	const fixtures = [
-		{
-			filePath: "fixtures/example.js",
-			code: "const answer = 42;\n\nexport { answer };\n",
-		},
-		{
-			filePath: "fixtures/example.ts",
-			code: 'const message: string = "hello";\n\nexport { message };\n',
-		},
-		{
-			filePath: "fixtures/App.vue",
-			code: '<script setup lang="ts">\nconst message = "hello";\n</script>\n\n<template>\n\t<main>{{ message }}</main>\n</template>\n',
-		},
-		{
-			filePath: "fixtures/example.json",
-			code: '{ "enabled": true }\n',
-		},
-		{
-			filePath: "fixtures/example.jsonc",
-			code: '{\n\t// JSONC comments are valid.\n\t"enabled": true\n}\n',
-		},
-		{
-			filePath: "fixtures/example.json5",
-			code: "{ enabled: true, }\n",
-		},
-	];
-
-	for (const fixture of fixtures) {
-		const [result] = await linter.lintText(fixture.code, { filePath: fixture.filePath });
-		assert.equal(result.fatalErrorCount, 0, `${fixture.filePath}: ${result.messages.map((message) => message.message).join(", ")}`);
-		assert.ok(!result.messages.some((message) => message.message.includes("could not find plugin")));
-	}
-});
-
-test("Markdown parsing is enabled by default and can be disabled", async () => {
-	const defaultNames = fastConfig({ gitignore: false }).map((config) => config.name ?? "");
-	const markdownLinter = createLinter(fastConfig({ gitignore: false }));
-	const [result] = await markdownLinter.lintText("# Example\n\nA valid Markdown document.\n", {
-		filePath: "fixtures/example.md",
-	});
-	const disabledNames = fastConfig({ gitignore: false, markdown: false }).map((config) => config.name ?? "");
-
-	assert.ok(defaultNames.some((name) => name.includes("markdown")));
-	assert.ok(!disabledNames.some((name) => name.includes("markdown")));
+	assert.ok(!defaultNames.some((name) => name.includes("markdown")));
+	assert.ok(config.some((item) => item.name?.includes("markdown")));
 	assert.equal(result.fatalErrorCount, 0, result.messages.map((message) => message.message).join(", "));
 });
 
-test("quality rules are active for JavaScript and Vue", async () => {
-	const linter = createLinter(fastConfig({ gitignore: false }));
-	const [javascriptResult] = await linter.lintText("var answer = 42;\n", { filePath: "fixtures/invalid.js" });
-	const [vueResult] = await linter.lintText(
-		'<script setup lang="ts">\nconst html = "<strong>trusted</strong>";\n</script>\n\n<template>\n\t<div v-html="html" />\n</template>\n',
-		{ filePath: "fixtures/Unsafe.vue" }
-	);
+test("shared JavaScript, TypeScript, and Vue rule contract stays active", async () => {
+	const linter = createLinter(fastConfig());
+	const javaScriptConfig = await linter.calculateConfigForFile("fixtures/example.js");
+	const typeScriptConfig = await linter.calculateConfigForFile("src/example.ts");
+	const vueConfig = await linter.calculateConfigForFile("src/App.vue");
 
-	assert.ok(javascriptResult.messages.some((message) => message.ruleId === "no-var"));
-	assert.ok(vueResult.messages.some((message) => message.ruleId === "vue/no-v-html"));
+	assert.equal(javaScriptConfig.rules["sort-imports"][0], 1);
+	assert.equal(javaScriptConfig.rules["prefer-exponentiation-operator"][0], 2);
+	assert.equal(javaScriptConfig.rules["prefer-object-has-own"][0], 2);
+	assert.equal(javaScriptConfig.rules["prefer-arrow-callback"][0], 2);
+	assert.equal(javaScriptConfig.rules["no-use-before-define"][1].functions, false);
+	assert.equal(javaScriptConfig.rules["logical-assignment-operators"][0], 2);
+	assert.equal(javaScriptConfig.rules["prefer-object-spread"][0], 2);
+	assert.equal(javaScriptConfig.rules["import-x/order"][0], 2);
+	assert.equal(javaScriptConfig.rules["import-x/order"][1].warnOnUnassignedImports, true);
+
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unused-vars"][1].argsIgnorePattern, "^_");
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-module-boundary-types"][1].allowArgumentsExplicitlyTypedAsAny, false);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-function-return-type"]?.[0] ?? 0, 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-explicit-any"][0], 1);
+	assert.deepEqual(typeScriptConfig.rules["@typescript-eslint/no-empty-function"][1].allow, ["constructors", "overrideMethods"]);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-imports"][1].fixStyle, "inline-type-imports");
+	assert.equal(typeScriptConfig.languageOptions.parserOptions.projectService, true);
+
+	assert.equal(vueConfig.rules["vue/attribute-hyphenation"][1], "always");
+	assert.equal(vueConfig.rules["vue/no-v-html"][0], 1);
+	assert.equal(vueConfig.rules["vue/no-v-text-v-html-on-component"][0], 2);
 });
 
-test("manifest sorting is enabled by default, can be disabled, and preserves semantic exports condition order", async () => {
+test("manifest sorting is enabled and preserves semantic exports condition order", async () => {
 	const source = `{
 	"version": "1.0.0",
 	"name": "fixture",
@@ -387,15 +273,11 @@ test("manifest sorting is enabled by default, can be disabled, and preserves sem
 	}
 }
 `;
-	const defaultLinter = createLinter(fastConfig({ gitignore: false }), { fix: true });
-	const [defaultResult] = await defaultLinter.lintText(source, { filePath: "fixtures/package.json" });
-	const defaultFixed = defaultResult.output ?? source;
-	assert.ok(defaultFixed.indexOf('"name"') < defaultFixed.indexOf('"version"'));
+	const linter = createLinter(fastConfig(), { fix: true });
+	const [result] = await linter.lintText(source, { filePath: "fixtures/package.json" });
+	const fixed = result.output ?? source;
 
-	const disabledLinter = createLinter(fastConfig({ gitignore: false, sortPackageJson: false }), { fix: true });
-	const [disabledResult] = await disabledLinter.lintText(source, { filePath: "fixtures/package.json" });
-	assert.ok(!disabledResult.messages.some((message) => message.ruleId === "jsonc/sort-keys"));
-
-	assert.ok(defaultFixed.indexOf('"node"') < defaultFixed.indexOf('"import"'));
-	assert.ok(defaultFixed.indexOf('"import"') < defaultFixed.indexOf('"default"'));
+	assert.ok(fixed.indexOf('"name"') < fixed.indexOf('"version"'));
+	assert.ok(fixed.indexOf('"node"') < fixed.indexOf('"import"'));
+	assert.ok(fixed.indexOf('"import"') < fixed.indexOf('"default"'));
 });

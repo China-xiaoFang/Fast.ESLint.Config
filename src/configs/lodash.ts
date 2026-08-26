@@ -20,7 +20,7 @@ export type LodashPreference = "lodash" | "lodash-unified";
  * @param files - 应用导入约束的 ESLint glob 列表。
  * @returns 包含对应 Lodash 导入限制规则的 Flat Config 数组。
  */
-export const createLodashConfigs = (preference: LodashPreference, files: readonly string[] = GLOBS_CODE) =>
+export const createLodashConfigs = (preference: LodashPreference, files: readonly string[] = GLOBS_CODE): ReturnType<typeof defineConfig> =>
 	defineConfig([
 		{
 			name: `@fast-china/lodash/${preference}`,

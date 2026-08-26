@@ -13,7 +13,7 @@ import { javascriptRules } from "../rules";
  * @param files - 应用 JavaScript 基础规则的 ESLint glob 列表。
  * @returns 包含 JavaScript 推荐预置、本地规则与 JSX 解析设置的 Flat Config 数组。
  */
-export const createJavaScriptConfigs = (files: readonly string[] = GLOBS_JAVASCRIPT) =>
+export const createJavaScriptConfigs = (files: readonly string[] = GLOBS_JAVASCRIPT): ReturnType<typeof defineConfig> =>
 	defineConfig([
 		{
 			name: "@fast-china/javascript",

@@ -8,21 +8,20 @@
 
 # @fast-china/eslint-config
 
-A practical, typed ESLint Flat Config for Vue 3, React, Angular, Vite, TypeScript, and JavaScript projects.
+A practical ESLint Flat Config for Vue 3, UniApp, React, Angular, Vite, TypeScript, and JavaScript projects.
 
-[![npm version](https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange)](https://www.npmjs.com/package/@fast-china/eslint-config) [![node](https://img.shields.io/badge/node-%5E22.18%20%7C%7C%20%5E24.18-brightgreen)](https://nodejs.org/) [![eslint](https://img.shields.io/badge/eslint-%5E10.0-4b32c3)](https://eslint.org/) [![license](https://img.shields.io/npm/l/@fast-china/eslint-config)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/@fast-china/eslint-config?color=orange)](https://www.npmjs.com/package/@fast-china/eslint-config) [![Node.js](https://img.shields.io/badge/node-%5E22.18%20%7C%7C%20%5E24.18-brightgreen)](https://nodejs.org/) [![ESLint](https://img.shields.io/badge/eslint-%5E10.0-4b32c3)](https://eslint.org/) [![license](https://img.shields.io/npm/l/@fast-china/eslint-config)](./LICENSE)
 
-## Highlights
+## Features
 
-- Built for ESLint 10 and the native Flat Config format.
-- Vue 3 + TypeScript + Vite defaults; React and Angular are first-class opt-in integrations, so existing Vue projects do not activate unrelated rules.
-- First-class JavaScript, TypeScript, Vue SFC, JSX/TSX, Angular TypeScript and templates, JSON dialects, Markdown, RegExp, and import rules.
-- A ready-to-use default Flat Config array that can be exported directly or spread, plus a named `fastConfig()` factory for customization.
-- Schema-generated rule types provide exact rule-name and rule-option completion.
-- Plugins and parsers are regular package dependencies, so consumers do not need to assemble the plugin graph.
-- Prettier stays a formatter: the default only disables conflicting ESLint rules and does not run Prettier inside ESLint.
-- Markdown and safe manifest sorting are enabled by default; React and Angular remain opt-in.
-- An opt-in Lodash policy keeps projects on either `lodash` or `lodash-unified` without mixing package entry points.
+- Built for ESLint 10 and native Flat Config only.
+- The root entry is a fixed Vue 3 + TypeScript + UniApp preset with no language or plugin switches.
+- TypeScript, Vue, and React TypeScript always use type-aware recommended rules and Project Service.
+- SDKs, OA systems, administration apps, and clients use one JavaScript, TypeScript, Import, and RegExp rule set with no strictness tiers.
+- JavaScript, TypeScript, Vue/`.nvue`, UniApp globals, JSON dialects, Import, RegExp, manifest sorting, `.gitignore`, and Prettier compatibility are enabled by default.
+- React, Angular, Markdown, and Lodash policies compose explicitly from `@fast-china/eslint-config/configs`.
+- Schema-generated `RuleOptions` provides exact rule-name and option completion.
+- Plugins and parsers are direct package dependencies, so consumers do not assemble a plugin dependency tree.
 
 ## Requirements
 
@@ -30,321 +29,194 @@ A practical, typed ESLint Flat Config for Vue 3, React, Angular, Vite, TypeScrip
 - ESLint `^10.0.0`
 - TypeScript `^6.0.0`
 
-These versions follow the runtime requirements of ESLint 10 and the included language plugins.
-
 ## Installation
 
 ```sh
 pnpm add -D eslint typescript @fast-china/eslint-config
 ```
 
-Equivalent npm, Yarn, and Bun commands work as well.
-
-## Quick start: Vue 3 + Vite
+## Vue 3 / UniApp quick start
 
 Create `eslint.config.mjs`:
 
 ```js
-import { defineConfig } from "eslint/config";
-
 import fastChina from "@fast-china/eslint-config";
 
-export default defineConfig([fastChina]);
+export default fastChina;
 ```
 
-You can also use `export default fastChina` directly, or `...fastChina` when composing other configs. The default targets a conventional Vue 3 browser-based administration project. It enables Vue 3, TypeScript, JavaScript, JSON dialects, Markdown, manifest sorting, import ordering, RegExp checks, `.gitignore`, browser globals, and Node globals for common config, script, test, and CLI files. React and Angular remain opt-in. Lodash policies are composed separately from the `configs` subpath.
+The default entry includes:
 
-## Other project types
+- Browser globals plus dedicated Node.js globals for tooling files.
+- JavaScript, type-aware TypeScript, Vue 3, and `.nvue`.
+- `uni`, `uniCloud`, page APIs, and conditional-platform globals such as `wx`, `plus`, `my`, and `tt`.
+- JSON, JSONC, JSON5, comment-compatible `pages.json`, `manifest.json`, and VS Code `settings.json`.
+- Import, RegExp, `package.json`/`tsconfig*.json` sorting, `.gitignore`, and Prettier conflict handling.
 
-Other projects can configure the named `fastConfig()` factory or compose focused fragments directly.
+ESLint does not execute UniApp `#ifdef`/`#endif` directives. It recognizes platform objects but cannot verify that they are used in the correct platform branch. `.uvue` and `.uts`, which require dedicated parsers, are not handled.
 
-### Use `fastConfig()`
+## `fastConfig()`
 
-#### React + Vite
+The root factory retains only `environment`, whose default is `"browser"`:
 
 ```js
 import { fastConfig } from "@fast-china/eslint-config";
 
 export default fastConfig({
-	react: true,
-	vue: false,
+	environment: "universal",
 });
 ```
 
-React support applies the modern `@eslint-react` JavaScript/TypeScript preset, the official React Hooks Flat Config, and additional DOM safety checks. JSX and TSX are parsed by the existing JavaScript and TypeScript integrations. For a React-compatible JSX runtime such as Preact, set `react: { importSource: "preact" }`.
+| Value         | Application globals |
+| ------------- | ------------------- |
+| `"browser"`   | Browser             |
+| `"node"`      | Node.js             |
+| `"universal"` | Browser and Node.js |
 
-#### Angular
-
-```js
-import { fastConfig } from "@fast-china/eslint-config";
-
-export default fastConfig({
-	angular: true,
-	vue: false,
-});
-```
-
-Angular support checks framework TypeScript, external `.html` templates, and inline component templates. Template accessibility and inline-template extraction are enabled by default:
-
-```js
-export default fastConfig({
-	angular: {
-		inlineTemplates: true,
-		templateAccessibility: true,
-	},
-	vue: false,
-});
-```
-
-Angular requires the TypeScript integration; `angular: true` together with `typescript: false` fails early with a clear configuration error.
-
-#### Node.js + TypeScript
-
-```js
-import { fastConfig } from "@fast-china/eslint-config";
-
-export default fastConfig({
-	environment: "node",
-	vue: false,
-});
-```
-
-#### JavaScript only
-
-```js
-import { fastConfig } from "@fast-china/eslint-config";
-
-export default fastConfig({
-	environment: "node",
-	json: false,
-	markdown: false,
-	typescript: false,
-	vue: false,
-});
-```
-
-#### Type-aware TypeScript rules
-
-```js
-import { fastConfig } from "@fast-china/eslint-config";
-
-export default fastConfig({
-	typescript: {
-		tsconfigRootDir: import.meta.dirname,
-		typeChecked: true,
-	},
-});
-```
-
-Type-aware linting uses the typescript-eslint Project Service. Project files must belong to a `tsconfig.json`. Most projects can omit `tsconfigRootDir`; complex monorepos should pass the directory containing the ESLint config explicitly.
-
-### Compose config fragments directly
-
-Projects that do not want the root factory can assemble only the required fragments. This React browser example is fully independent of `fastConfig()`:
-
-```js
-import { defineConfig } from "eslint/config";
-
-import {
-	createCommonConfigs,
-	createEnvironmentConfigs,
-	createGitignoreConfigs,
-	createGlobalIgnores,
-	createImportConfigs,
-	createJavaScriptConfigs,
-	createPrettierConfigs,
-	createReactConfigs,
-	createRegexpConfigs,
-	createTypeScriptConfigs,
-} from "@fast-china/eslint-config/configs";
-import { GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT } from "@fast-china/eslint-config/constants";
-
-const codeFiles = [...GLOBS_JAVASCRIPT, ...GLOBS_TYPESCRIPT];
-
-export default defineConfig([
-	...createGlobalIgnores(),
-	...createGitignoreConfigs(),
-	...createEnvironmentConfigs({ environment: "browser", files: codeFiles, nodeFiles: codeFiles }),
-	...createCommonConfigs(codeFiles),
-	...createJavaScriptConfigs(),
-	...createImportConfigs(codeFiles),
-	...createRegexpConfigs(codeFiles),
-	...createTypeScriptConfigs(),
-	...createReactConfigs({}, { javascript: true, typescript: true }),
-	...createPrettierConfigs(),
-]);
-```
-
-Use `createVueConfigs()` for Vue SFCs, `createAngularConfigs()` for Angular, or set `environment: "node"` for Node.js. Fragment order is significant: project overrides should remain last.
-
-## Options
-
-| Option            | Default     | Purpose                                                                    |
-| ----------------- | ----------- | -------------------------------------------------------------------------- |
-| `angular`         | `false`     | Enable Angular TypeScript and templates, or pass Angular-specific options. |
-| `environment`     | `"browser"` | Use `"browser"`, `"node"`, or `"universal"` globals.                       |
-| `globals`         | none        | Add globals supplied by a host platform or test runner.                    |
-| `gitignore`       | `true`      | Read ignore patterns from the project `.gitignore`.                        |
-| `ignores`         | `[]`        | Append project-specific global ignore patterns.                            |
-| `imports`         | `true`      | Enable import-x correctness and ordering rules.                            |
-| `javascript`      | `true`      | Process JavaScript and JSX files.                                          |
-| `json`            | `true`      | Enable recommended JSON, JSONC, and JSON5 rules.                           |
-| `markdown`        | `true`      | Enable the official Markdown language rules.                               |
-| `prettier`        | `true`      | Disable ESLint rules that conflict with Prettier.                          |
-| `react`           | `false`     | Enable React/JSX/Hooks, or pass runtime and React-version settings.        |
-| `regexp`          | `true`      | Enable recommended RegExp rules.                                           |
-| `rules`           | none        | Add exactly typed project rules to every enabled code file.                |
-| `sortPackageJson` | `true`      | Sort safe package.json keys without entering conditional `exports`.        |
-| `sortTsconfig`    | `true`      | Sort `tsconfig*.json` by TypeScript documentation topics.                  |
-| `typescript`      | `true`      | Disable it or pass `{ typeChecked: true, tsconfigRootDir }`.               |
-| `vue`             | `true`      | Enable Vue 3 single-file components.                                       |
-
-## Framework coverage
-
-Vue 3, React, and Angular have dedicated parsers or processors, presets, options, generated rule types, and integration tests. Nuxt can use the Vue base; Next.js and Remix can use the React base, then append their framework-specific Flat Config after `fastConfig()` when needed. React-compatible JSX runtimes can use `react.importSource`.
-
-Svelte, Astro, and Solid use different template or compiler semantics and are not presented as first-class integrations yet. Their official Flat Config can already be appended as a trailing override, but first-class switches should only be added together with the correct parser, processor, rule schemas, documentation, and runtime fixtures.
-
-## Lodash import policy
-
-Lodash policy is not a `fastConfig()` option. Import `createLodashConfigs()` from `@fast-china/eslint-config/configs` only when every static import should use one package:
-
-- `createLodashConfigs("lodash-unified")` rejects static imports and re-exports from `lodash`, `lodash-es`, and their subpaths.
-- `createLodashConfigs("lodash")` rejects static imports and re-exports from `lodash-es`, `lodash-unified`, and their subpaths. The `lodash` root and `lodash/*` method imports remain valid.
-
-Choose `lodash-unified`:
-
-```sh
-pnpm add lodash-unified
-```
-
-```js
-import { defineConfig } from "eslint/config";
-
-import fastChina from "@fast-china/eslint-config";
-import { createLodashConfigs } from "@fast-china/eslint-config/configs";
-import { cloneDeep, debounce } from "lodash-unified";
-
-export default defineConfig([...fastChina, ...createLodashConfigs("lodash-unified")]);
-```
-
-Choose standard `lodash`:
-
-```sh
-pnpm add lodash
-pnpm add -D @types/lodash
-```
-
-```js
-import { defineConfig } from "eslint/config";
-
-import fastChina from "@fast-china/eslint-config";
-import { createLodashConfigs } from "@fast-china/eslint-config/configs";
-import debounce from "lodash/debounce";
-
-export default defineConfig([...fastChina, ...createLodashConfigs("lodash")]);
-```
-
-This fragment uses ESLint core `no-restricted-imports`, adds no plugin, and does not install Lodash for the project. It checks static `import`/`export` only, not dynamic `import()` or CommonJS `require()`. It is independent of the root factory's `imports` option.
-
-If a later `rules` record or file-scoped override sets `no-restricted-imports`, ESLint replaces this complete policy instead of merging its options. Projects that need additional package restrictions can import raw `preferLodashRules` or `preferLodashUnifiedRules` from `@fast-china/eslint-config/rules` and maintain one combined rule.
-
-## Exact rule types and completion
-
-The package generates `RuleOptions` from the JSON Schemas published by ESLint core and every bundled plugin. The identity helper `defineRules()` adds editor completion for rule names, severities, and options while rejecting misspelled rules and invalid options at type-checking time.
-
-```js
-// @ts-check
-import { defineRules, fastConfig } from "@fast-china/eslint-config";
-
-const projectRules = defineRules({
-	"@angular-eslint/template/alt-text": "error",
-	"@eslint-react/dom-no-missing-button-type": "error",
-	"@typescript-eslint/no-unused-vars": ["error", { args: "after-used" }],
-	"import-x/order": ["error", { "newlines-between": "never" }],
-	"react-hooks/exhaustive-deps": "warn",
-	"vue/attributes-order": ["error", { order: ["DEFINITION", "EVENTS", "CONTENT"] }],
-});
-
-export default fastConfig(
-	{ rules: projectRules },
-	{
-		files: ["**/*.generated.ts"],
-		name: "project/generated",
-		rules: defineRules({ "@typescript-eslint/no-unused-vars": "off" }),
-	}
-);
-```
-
-TypeScript configuration and tooling code can use the generated interface directly:
-
-```ts
-import type { RuleOptions } from "@fast-china/eslint-config";
-
-const rules = {
-	"no-console": ["warn", { allow: ["warn", "error"] }],
-} satisfies RuleOptions;
-```
-
-The generated set covers ESLint core and plugins bundled by this package. Rules from additional project-installed plugins are outside this type set, and precision ultimately depends on the schema published by each rule.
-
-## Rule risk and maintenance
-
-The default includes a small set of high-impact rules. They can block particular patterns or require a review of import side effects, type-only imports, public component events, and manifest sorting results. React and Angular are disabled globally by default, but enabling them also enables their documented modern-framework and accessibility policies. Source comments mark these decisions as `[High impact]`, `[Auto-fixable]`, or `[Security]`.
-
-See the [default-rule and risk guide](./docs/rules-risk.md) for inherited presets, the high-impact inventory, scoped override examples, and the maintenance contract. Run a read-only lint before `eslint --fix`, apply fixes in an isolated commit, and review imports, `package.json`, component events, and build output.
+Config, script, test, and CLI files always receive Node.js globals and allow necessary logging and CommonJS interoperability.
 
 ## Project overrides
 
-Put common overrides in `rules`, and pass file-scoped overrides as later arguments. Later configurations take precedence:
+Rules, globals, ignores, and special parser settings use trailing Flat Config objects instead of root factory options:
 
 ```js
 import { defineRules, fastConfig } from "@fast-china/eslint-config";
 
 export default fastConfig(
+	{ environment: "browser" },
 	{
-		rules: {
-			"no-console": "warn",
+		ignores: ["public/vendor/**"],
+		languageOptions: {
+			globals: {
+				__APP_VERSION__: "readonly",
+			},
 		},
+		rules: defineRules({
+			"no-console": "warn",
+		}),
 	},
 	{
-		files: ["**/{scripts,tests}/**/*.{js,ts}"],
-		name: "project/node-files",
-		rules: defineRules({ "no-console": "off" }),
+		files: ["**/*.generated.ts"],
+		rules: defineRules({
+			"@typescript-eslint/no-unused-vars": "off",
+		}),
 	}
 );
 ```
 
-The root entry exports only `fastConfig`, `defaultConfigOptions`, `defineRules`, `FastConfigOptions`, and `RuleOptions`. Advanced composition uses focused subpaths instead of widening the root API:
+Trailing configs have the highest precedence. `defineRules()` leaves the object unchanged and only adds exact type checking.
 
-- `@fast-china/eslint-config/configs` exports every configuration creator and its option types.
-- `@fast-china/eslint-config/constants` exports all maintained file globs.
-- `@fast-china/eslint-config/rules` exports the fully commented raw rule records and `RuleOptions`.
+## TypeScript
+
+`createTypeScriptConfigs()`, Vue SFCs, and React TSX always use `recommendedTypeChecked` with:
 
 ```js
+parserOptions: {
+	projectService: true,
+}
+```
+
+Linted files must belong to a discoverable `tsconfig.json`. The `typeChecked` and `tsconfigRootDir` wrapper options have been removed. Complex monorepos can override `languageOptions.parserOptions` in a trailing Flat Config when necessary.
+
+## React
+
+React projects compose from the framework-neutral base:
+
+```js
+import { createBaseConfigs } from "@fast-china/eslint-config";
+import { createReactConfigs } from "@fast-china/eslint-config/configs";
 import { defineConfig } from "eslint/config";
 
-import { createCommonConfigs, createTypeScriptConfigs } from "@fast-china/eslint-config/configs";
-import { GLOBS_TYPESCRIPT } from "@fast-china/eslint-config/constants";
-
-export default defineConfig([...createCommonConfigs(GLOBS_TYPESCRIPT), ...createTypeScriptConfigs({ typeChecked: true })]);
+export default defineConfig([...createBaseConfigs(), ...createReactConfigs()]);
 ```
+
+The base provides the shared JavaScript, type-aware TypeScript, JSON, Import, RegExp, manifest sorting, and Prettier compatibility. The React fragment adds `@eslint-react`, the official Hooks Recommended preset, and DOM safety rules without loading Vue or UniApp globals.
+
+React-compatible runtimes can pass recognition settings:
+
+```js
+export default defineConfig([...createBaseConfigs(), ...createReactConfigs({ importSource: "preact", version: "detect" })]);
+```
+
+## Angular
+
+```js
+import { createBaseConfigs } from "@fast-china/eslint-config";
+import { createAngularConfigs } from "@fast-china/eslint-config/configs";
+import { defineConfig } from "eslint/config";
+
+export default defineConfig([...createBaseConfigs(), ...createAngularConfigs()]);
+```
+
+The Angular fragment checks TypeScript source, external HTML templates, and component inline templates. Official template accessibility rules are enabled by default. Exceptional projects can still configure:
+
+```js
+createAngularConfigs({
+	inlineTemplates: false,
+	templateAccessibility: false,
+});
+```
+
+## Node.js / SDK
+
+Projects that do not need Vue, UniApp, React, or Angular use the base directly:
+
+```js
+import { createBaseConfigs } from "@fast-china/eslint-config";
+
+export default createBaseConfigs({ environment: "node" });
+```
+
+`createBaseConfigs()` always enables JavaScript, type-aware TypeScript, JSON, Import, RegExp, manifest sorting, `.gitignore`, and Prettier compatibility, but does not claim framework files.
+
+## Markdown and Lodash
+
+Markdown composes explicitly:
+
+```js
+import { createBaseConfigs } from "@fast-china/eslint-config";
+import { createMarkdownConfigs } from "@fast-china/eslint-config/configs";
+import { defineConfig } from "eslint/config";
+
+export default defineConfig([...createBaseConfigs(), ...createMarkdownConfigs()]);
+```
+
+Lodash static-import policies are also standalone:
+
+```js
+import { createLodashConfigs } from "@fast-china/eslint-config/configs";
+
+createLodashConfigs("lodash");
+createLodashConfigs("lodash-unified");
+```
+
+## Public entries
+
+The root entry exports only:
+
+- The default Vue 3 + TypeScript + UniApp Flat Config.
+- `fastConfig`, `createBaseConfigs`, and `FastConfigOptions`.
+- `defineRules` and `RuleOptions`.
+
+Focused subpaths provide advanced composition:
+
+- `@fast-china/eslint-config/configs`: framework and capability fragments.
+- `@fast-china/eslint-config/constants`: file globs and UniApp globals.
+- `@fast-china/eslint-config/rules`: typed raw rule records.
 
 ## Prettier
 
-Prettier is intentionally not a peer dependency and is not executed as an ESLint rule. Install and run it separately if the project uses it:
+Prettier does not run as an ESLint rule. The default only loads `eslint-config-prettier` to disable conflicting rules. Install and run formatting separately:
 
 ```sh
 pnpm add -D prettier
 pnpm exec prettier --check .
 ```
 
-Set `prettier: false` if another formatter or stylistic rule set should remain fully in control.
-
 ## Documentation
 
 - [Default rules and risk guide](./docs/rules-risk.md)
-- [Engineering audit (Chinese)](./docs/engineering-audit.zh.md)
+- [Engineering quality audit](./docs/engineering-audit.zh.md)
 - [Contributing guide](./CONTRIBUTING.md)
 - [Security policy](./SECURITY.md)
 - [Changelog](./CHANGELOG.md)
@@ -358,9 +230,7 @@ pnpm check
 pnpm pack --dry-run
 ```
 
-Use `pnpm dev` to inspect the active Flat Config interactively while changing factories or rules.
-
-Run `pnpm typegen` after upgrading ESLint or a plugin and commit `src/typegen.d.ts`; never edit the generated file manually. `pnpm test` rebuilds the package before running consumer type-contract, runtime integration, and package-contract tests. `pnpm check` adds source type-checking, full-repository linting, and formatting verification.
+Run `pnpm typegen` after upgrading ESLint or plugins and commit `src/typegen.d.ts`. `pnpm check` verifies types, builds, runtime behavior, package contracts, ESLint, and formatting.
 
 ## License
 

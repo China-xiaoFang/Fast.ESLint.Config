@@ -12,7 +12,7 @@ import { commonRules } from "../rules";
  * @param files - 应用公共规则的 ESLint glob 列表。
  * @returns 包含公共规则与无效禁用指令检查的 Flat Config 数组。
  */
-export const createCommonConfigs = (files: readonly string[] = GLOBS_CODE) =>
+export const createCommonConfigs = (files: readonly string[] = GLOBS_CODE): ReturnType<typeof defineConfig> =>
 	defineConfig([
 		{
 			name: "@fast-china/common",

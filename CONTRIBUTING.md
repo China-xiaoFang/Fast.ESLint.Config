@@ -27,13 +27,14 @@ Use `pnpm lint:fix` and `pnpm format` for safe mechanical fixes. `pnpm test` fir
 2. Scope every rule group with `files` unless it is intentionally global.
 3. Register each plugin in a configuration that matches the same files as its rules.
 4. Prefer upstream recommended configs before adding local overrides.
-5. Keep organization-specific dependency restrictions out of this general-purpose package; projects should own those policies.
-6. Explain the purpose, rationale, and important exception or risk immediately above every local rule override.
-7. Mark disruptive defaults with `[高影响]`; verify `meta.fixable` before using `[可自动修复]`, and keep `docs/rules-risk.md` plus `docs/rules-risk.zh.md` synchronized.
-8. Never sort a map whose key order has semantics, including conditional objects under `package.json#exports`.
-9. Regenerate `src/typegen.d.ts` whenever ESLint or a bundled plugin changes; confirm new rules and changed option schemas intentionally.
-10. Add or update an integration test for every parser, plugin, option, auto-fix, generated type, or public export change. The root API is intentionally limited to `fastConfig`, `defaultConfigOptions`, `defineRules`, and related types.
-11. Document behavior changes in `CHANGELOG.md` and both README files.
+5. Preserve the documented JavaScript, TypeScript, and Vue behavior unless a release explicitly changes it; keep historical comparisons in the changelog rather than source comments.
+6. Keep organization-specific dependency restrictions out of this general-purpose package; projects should own those policies.
+7. Explain the purpose, rationale, and important exception or risk immediately above every local rule override.
+8. Document every default rule's severity and valid exceptions; verify `meta.fixable` before using `[可自动修复]`, and keep `docs/rules-risk.md` plus `docs/rules-risk.zh.md` synchronized.
+9. Never sort a map whose key order has semantics, including conditional objects under `package.json#exports`.
+10. Regenerate `src/typegen.d.ts` whenever ESLint or a bundled plugin changes; confirm new rules and changed option schemas intentionally.
+11. Add or update an integration test for every parser, plugin, option, auto-fix, generated type, or public export change. The root API is intentionally limited to the default config, `fastConfig`, `defineRules`, and related types.
+12. Document behavior changes in `CHANGELOG.md` and both README files.
 
 ## Pull requests
 

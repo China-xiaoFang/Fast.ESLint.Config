@@ -9,10 +9,9 @@ import type { Linter } from "eslint";
  * React 与兼容 JSX 运行时的检测设置。
  *
  * @remarks
- * 该对象通过 `fastConfig({ react: { ... } })` 传入。传入对象会启用 React 支持，并在
+ * 该对象直接传给 `createReactConfigs()`，用于调整 React 运行时识别设置。配置会在
  * JavaScript/JSX 和 TypeScript/TSX 文件上加载对应的 `@eslint-react` 推荐预置、React
- * 官方 Hooks Flat Config 以及本库规则。实际文件范围仍受顶层 `javascript`、
- * `typescript` 开关控制。
+ * 官方 Hooks 推荐预置以及本库 DOM 安全规则。
  *
  * 这些字段只传给 ESLint 插件用于理解项目的 React 语义，不会改变 JSX 编译方式、自动
  * 导入 React、设置打包器别名或安装兼容运行时。
@@ -47,82 +46,38 @@ export interface ReactConfigOptions {
 }
 
 /**
- * React 配置生成器使用的语言状态。
- *
- * @remarks
- * `fastConfig()` 会自动推导这些值；直接组合配置片段时由调用方显式传入。
- *
- * 用户不直接配置该接口。`fastConfig()` 会把顶层 JavaScript、TypeScript 开关以及
- * TypeScript 类型感知状态转换为这里的三个布尔值，确保 React 不会重新接管已经关闭的
- * 文件类型，并为 TypeScript 选择正确的 `@eslint-react` 推荐预置。
- */
-interface ReactLanguageOptions {
-	/**
-	 * 是否为 `.js`、`.cjs`、`.mjs` 与 `.jsx` 文件创建 React 配置。
-	 *
-	 * 该值来自顶层 `FastConfigOptions.javascript`；为 `false` 时即使 React 已启用，
-	 * React 配置也不会声明这些文件范围。
-	 * @defaultValue `true`
-	 */
-	javascript?: boolean;
-	/**
-	 * 是否为 TypeScript/TSX 选择需要类型信息的 React 推荐预置。
-	 *
-	 * 该值来自 `FastConfigOptions.typescript.typeChecked`，只影响 TypeScript React 配置；
-	 * JavaScript 配置始终使用普通推荐预置。
-	 * @defaultValue `false`
-	 */
-	typeChecked?: boolean;
-	/**
-	 * 是否为 `.ts`、`.cts`、`.mts` 与 `.tsx` 文件创建 React 配置。
-	 *
-	 * 该值来自顶层 `FastConfigOptions.typescript`；为 `false` 时不会生成 TypeScript React
-	 * 片段，也不会仅因为 React 已启用而重新接管 TypeScript 文件。
-	 * @defaultValue `true`
-	 */
-	typescript?: boolean;
-}
-
-/**
  * 创建 React、JSX/TSX 与 Hooks 配置。
  *
  * @remarks
- * JavaScript 和 TypeScript 分别继承对应的 @eslint-react 推荐预置；Hooks 使用
- * React 官方 Flat Config。组件、Hooks 即使不返回 JSX 也能在普通 `.js`/`.ts` 中
+ * JavaScript 和 TypeScript 分别继承对应的 @eslint-react 推荐预置；Hooks 使用 React
+ * 官方 Flat Recommended。组件、Hooks 即使不返回 JSX 也能在普通 `.js`/`.ts` 中
  * 定义，因此规则覆盖全部已启用脚本扩展名，而不仅是 `.jsx`/`.tsx`。
  *
  * @param options - React 版本、运行时导入来源与多态组件属性设置。
- * @param languages - 由调用方启用的脚本语言以及 TypeScript 类型感知状态。
- * @returns 仅包含已启用语言的 React 与 Hooks Flat Config 数组。
+ * @returns React JavaScript、类型感知 TypeScript 与 Hooks Flat Config 数组。
  */
-export const createReactConfigs = (
-	{ importSource = "react", polymorphicPropName = "as", version = "detect" }: ReactConfigOptions = {},
-	{ javascript = true, typeChecked = false, typescript = true }: ReactLanguageOptions = {}
-) => {
-	const createConfig = (name: string, files: readonly string[], preset: Linter.Config) => ({
-		name,
-		files: [...files],
-		extends: [preset, eslintPluginReactHooks.configs.flat.recommended],
-		settings: {
-			"react-x": {
-				importSource,
-				polymorphicPropName,
-				version,
+export const createReactConfigs = ({ importSource = "react", polymorphicPropName = "as", version = "detect" }: ReactConfigOptions = {}): ReturnType<
+	typeof defineConfig
+> => {
+	const createConfig = (name: string, files: readonly string[], preset: Linter.Config): ReturnType<typeof defineConfig> =>
+		defineConfig([
+			{
+				name,
+				files: [...files],
+				extends: [preset, eslintPluginReactHooks.configs.flat.recommended],
+				settings: {
+					"react-x": {
+						importSource,
+						polymorphicPropName,
+						version,
+					},
+				},
+				rules: reactRules,
 			},
-		},
-		rules: reactRules,
-	});
+		]);
 
 	return defineConfig([
-		...(javascript ? [createConfig("@fast-china/react/javascript", GLOBS_JAVASCRIPT, eslintReact.configs.recommended)] : []),
-		...(typescript
-			? [
-					createConfig(
-						typeChecked ? "@fast-china/react/typescript-type-checked" : "@fast-china/react/typescript",
-						GLOBS_TYPESCRIPT,
-						typeChecked ? eslintReact.configs["recommended-type-checked"] : eslintReact.configs["recommended-typescript"]
-					),
-				]
-			: []),
+		...createConfig("@fast-china/react/javascript", GLOBS_JAVASCRIPT, eslintReact.configs.recommended),
+		...createConfig("@fast-china/react/typescript-type-checked", GLOBS_TYPESCRIPT, eslintReact.configs["recommended-type-checked"]),
 	]);
 };

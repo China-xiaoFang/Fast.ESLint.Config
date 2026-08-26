@@ -1,0 +1,7 @@
+<script setup lang="ts">
+const title = "Home";
+</script>
+
+<template>
+	<view>{{ title }}</view>
+</template>

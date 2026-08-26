@@ -10,7 +10,7 @@ import { GLOB_MARKDOWN } from "../constants";
  *
  * @returns 包含 `@eslint/markdown` 推荐预置的 Flat Config 数组。
  */
-export const createMarkdownConfigs = () =>
+export const createMarkdownConfigs = (): ReturnType<typeof defineConfig> =>
 	defineConfig([
 		{
 			name: "@fast-china/markdown",

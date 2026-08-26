@@ -1,104 +1,80 @@
 # 工程质量审查报告
 
-审查日期：2026-08-02
+审查日期：2026-08-26
 
-审查对象：`@fast-china/eslint-config` 2.0.6 工作区
+审查对象：`@fast-china/eslint-config` 2.1.0 工作区
 
 ## 结论
 
-当前仓库已经具备完整 ESLint Flat Config 开源库所需的核心能力：稳定且精简的公共 API、明确的语言作用域、可选类型感知检查、精确规则类型、可重复构建、集成测试、CI、发布归档检查和中英文文档。
+仓库继续使用 ESLint 10 Flat Config、精确规则类型、可重复构建和发布包契约，并将根入口收敛为固定的 Vue 3 + TypeScript + UniApp 配置。SDK、React、Angular、Node.js 等其他项目通过不绑定框架的基础组合和对应框架片段接入，不继承 Vue 或 UniApp globals。
 
-默认场景面向普通 Vue 3 + Vite + TypeScript 浏览器后台管理项目；Markdown 和清单排序默认启用，React 与 Angular 按需启用，Lodash 策略通过 `configs` 子路径独立组合。配置仍支持 JavaScript、Node.js 工程文件、JSON 方言、正则表达式和模块导入检查，项目覆写始终位于内置配置之后。
+## 当前规则模型
 
-## 审查范围
+- JavaScript、TypeScript、Import 和 RegExp 只有一套共享规则。
+- TypeScript、Vue 和 React TypeScript 始终使用 `recommendedTypeChecked` 与 Project Service。
+- Vue 使用 `flat/recommended`，并叠加事件声明、kebab-case 属性、闭合标签和排序规则。
+- RegExp 使用显式审查过的正确性与安全规则，不继承完整偏好型推荐集合。
+- React 使用 `@eslint-react` 推荐预置和 React 官方 Hooks Recommended，并关闭重复实现。
+- Angular 与官方 TypeScript、模板和无障碍推荐规则保持一致。
+- 规则源码注释只说明当前意图；历史版本差异由更新日志维护。
 
-- npm 包元数据、ESM 入口、公开子路径与发布文件
-- TypeScript 6、tsdown、类型生成与声明文件
-- ESLint Flat Config 顺序、文件作用域、解析器和插件注册
-- JavaScript、TypeScript、Vue、React、Angular、JSON 方言、Markdown、RegExp 与 import 集成
-- 浏览器、Node.js、通用环境和项目自定义全局变量
-- Lodash 静态导入策略、清单排序与 Prettier 职责边界
-- README、规则风险说明、贡献流程、CI、测试和发布前检查
+## 公共 API
 
-## 当前工程基线
+根入口公开：
 
-| 领域           | 状态 | 质量保障                                                               |
-| -------------- | ---- | ---------------------------------------------------------------------- |
-| 公共 API       | 通过 | 根入口保持精简，配置片段、glob 常量和原始规则由独立子路径提供          |
-| Flat Config    | 通过 | 所有语言和插件配置限定到明确文件范围，项目覆写最后应用                 |
-| Vue 3          | 通过 | `vue-eslint-parser` 处理 SFC，TypeScript 解析器正确嵌套                |
-| React          | 通过 | 按需覆盖 JSX/TSX、组件、官方 Hooks、Compiler 诊断与 DOM 安全           |
-| Angular        | 通过 | 按需覆盖框架 TypeScript、外部 HTML、内联模板与模板无障碍               |
-| TypeScript     | 通过 | 默认使用推荐规则，可选 Project Service 类型感知模式                    |
-| JavaScript     | 通过 | 应用 `@eslint/js` 推荐规则并区分应用环境与 Node.js 工程文件            |
-| 数据与文档文件 | 通过 | JSON、JSONC、JSON5 和 Markdown 分别使用对应语言配置                    |
-| 规则自动补全   | 通过 | 从 ESLint 核心和随包插件 schema 生成精确 `RuleOptions`                 |
-| Lodash 策略    | 通过 | 可选统一 `lodash` 或 `lodash-unified`，默认不限制项目依赖选择          |
-| 清单排序       | 通过 | 默认启用；不会重排 `package.json#exports` 条件键                       |
-| Prettier       | 通过 | 只关闭冲突规则，格式化由 Prettier CLI 或编辑器负责                     |
-| 构建与发布     | 通过 | tsdown 生成 `.mjs`、`.d.mts` 和 source map，`prepack` 执行完整质量门禁 |
-| 自动化验证     | 通过 | 运行时测试、消费者类型测试、格式检查、静态检查和 Node.js 多版本 CI     |
+- 默认 Vue 3 + TypeScript + UniApp Flat Config。
+- 只接收 `environment` 的 `fastConfig()`。
+- `defineRules()`、`FastConfigOptions` 和 `RuleOptions`。
 
-## 配置组合模型
+`defaultConfigOptions`、语言和插件布尔开关、`typeChecked`、`tsconfigRootDir`、工厂级 rules/globals/ignores 已删除。项目覆写使用原生后置 Flat Config。
 
-`fastConfig()` 按以下顺序生成配置：
+根入口新增固定 `createBaseConfigs()`，供 React、Angular、Node.js 和 SDK 组合。框架、Markdown、Lodash 及其他低层片段仍从 `./configs` 显式引用。
 
-1. 内置忽略项、项目附加忽略项和可选 `.gitignore`。
-2. 应用运行环境、项目全局变量和 Node.js 工程文件全局变量。
-3. JavaScript、import-x、RegExp、TypeScript、JSON 方言、Vue、React、Angular 和 Markdown 配置。
-4. 可选 `package.json`、`tsconfig*.json` 排序配置。
-5. Prettier 冲突关闭配置。
-6. 工厂级 `rules` 与调用方传入的文件级覆写。
+## 工程能力
 
-这一顺序保证调用方可以覆盖任何内置规则，同时避免语言规则进入不支持的文件类型。
+| 领域          | 状态 | 质量保障                                           |
+| ------------- | ---- | -------------------------------------------------- |
+| 公共 API      | 通过 | 根入口固定、其他能力由独立子路径组合               |
+| JavaScript    | 通过 | 核心 recommended + 统一现代语法规则                |
+| TypeScript    | 通过 | 固定 `recommendedTypeChecked` 与 Project Service   |
+| Vue 3         | 通过 | `vue-eslint-parser` + `flat/recommended`           |
+| UniApp        | 通过 | 默认 `.nvue`、globals、清单注释和 `unpackage` 忽略 |
+| React         | 通过 | 显式组合 JSX/TSX、Hooks Recommended 与 DOM 安全    |
+| Angular       | 通过 | 显式组合源码、外部/内联模板和无障碍规则            |
+| Import        | 通过 | 正确性和排序为 error，副作用导入参与检查           |
+| RegExp        | 通过 | 显式正确性、安全和超线性回溯规则                   |
+| JSON          | 通过 | 三种方言、VS Code 与 UniApp 注释例外               |
+| 清单排序      | 通过 | 默认启用并保留 `exports` 条件顺序                  |
+| Markdown      | 通过 | 作为独立片段显式组合                               |
+| Node 工具文件 | 通过 | Node globals、console 和 CommonJS 末尾覆写         |
+| 类型生成      | 通过 | 插件 schema 生成精确 `RuleOptions`                 |
+| 构建发布      | 通过 | TypeScript 6、tsdown、ESM 和根目录 `dist/`         |
 
-## 规则与类型维护
+## 根入口配置顺序
 
-- 每条本地规则旁必须说明作用、启用理由和重要风险。
-- 高影响、可自动修复、安全相关和按需启用规则使用统一标签。
-- 默认高影响规则同步记录在中英文风险指南中。
-- `src/typegen.d.ts` 由规则 schema 生成，不允许手工编辑。
-- React、Angular 插件也参与类型生成，因此框架规则名与选项可获得同样的精确自动补全。
-- ESLint 或插件升级后必须运行 `pnpm typegen` 并审查类型差异。
-- `@fast-china/eslint-config/configs` 提供全部配置创建函数及其选项类型，支持高级调用方自行组合。
-- `@fast-china/eslint-config/constants` 集中提供配置片段使用的文件 glob，避免调用方复制字符串。
-- `@fast-china/eslint-config/rules` 提供有完整注释的原始规则记录，便于高级组合。
+1. 内置忽略项和 `.gitignore`。
+2. 应用运行环境与 Node.js 工程文件 globals。
+3. Common、JavaScript、Import、RegExp、TypeScript 与 JSON。
+4. `package.json` 和 `tsconfig*.json` 排序。
+5. Vue、UniApp globals 与清单适配。
+6. Prettier 冲突关闭层。
+7. Node.js 工程文件末尾规则覆写。
+8. 调用方后置 Flat Config。
 
-`createLodashConfigs()` 使用 ESLint 核心 `no-restricted-imports`，因此无需增加插件依赖。它通过 `configs` 子路径按需组合，负责防止静态 import/export 混用包入口，不负责安装目标包，也不检查动态 `import()` 或 CommonJS `require()`。
-
-## 质量门禁
-
-发布前必须全部通过：
+## 发布前验证
 
 ```sh
+pnpm typegen
 pnpm check
 pnpm pack --dry-run
 ```
 
-`pnpm check` 包含：
-
-1. 生成类型漂移检查。
-2. 正式 ESM 与声明文件构建。
-3. TypeScript 源码类型检查。
-4. ESLint 全仓检查。
-5. Prettier 格式检查。
-6. 消费者类型契约测试。
-7. 运行时配置集成测试。
-8. 发布元数据、入口文件和声明文件契约测试。
-
-发布归档必须包含根入口和 `./configs`、`./constants`、`./rules` 子入口的 JavaScript 与声明文件，以及生成的 JavaScript、声明 source map；且不得包含源码缓存、测试缓存或本地依赖目录。
-
-## CI 与发布边界
-
-GitHub Actions 在 `master`、`main` 推送和 Pull Request 上运行，覆盖 Node.js 22.18 和 24.18。CI 使用 pnpm 11.x、冻结锁文件安装、完整质量门禁和发布归档预览。
-
-CI 只验证代码和发布包，不自动发布 npm。正式发布仍由维护者确认版本、Changelog、归档内容和 npm 身份后执行。
+发布归档必须包含根入口和 `./configs`、`./constants`、`./rules` 子入口，不得包含源码缓存或本地依赖目录。CI 只负责验证，不自动发布 npm。
 
 ## 剩余风险
 
-- ESLint 和插件推荐预置会随依赖升级变化，每次升级都要检查实际生效配置和生成类型差异。
-- React 与 Angular 默认关闭；启用 Angular 时必须同时启用 TypeScript，并把现代组件、变更检测、控制流和无障碍规则作为框架接入成本审查。
-- 类型感知模式依赖项目 `tsconfig.json` 覆盖被检查文件，复杂 monorepo 应显式设置 `tsconfigRootDir`。
-- 自动修复可能调整 import、模板属性、正则表达式和清单字段，应在独立提交中审查结果。
-- Lodash 策略只覆盖静态模块语法；需要限制 CommonJS 或动态导入的项目应追加自己的文件级规则或代码审查约定。
-- npm 发布自动化尚未启用，后续应在可信发布、分支保护和维护者审批策略确定后单独设计。
+- 上游 recommended 会随依赖升级变化，升级 ESLint 或插件后必须检查实际生效配置。
+- 类型感知依赖 tsconfig 覆盖和 Project Service，复杂 monorepo 需要维护清晰的项目边界。
+- Import、类型导入、Vue 属性和清单排序可能被 `eslint --fix` 修改，需要审查副作用顺序和纯排序差异。
+- 根入口默认声明 UniApp 条件编译 globals，不能验证平台分支；普通 Vue 项目如需避免 globals 扩散应改用片段组合。
+- `.uvue` 与 `.uts` 仍不在支持范围。

@@ -1,7 +1,7 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "2.0.10",
-	"description": "Opinionated, typed ESLint Flat Config for Vue 3, React, Angular, Vite, TypeScript, JavaScript, and Node.js.",
+	"version": "2.1.0",
+	"description": "Practical, typed ESLint Flat Config for Vue 3, UniApp, React, Angular, Vite, TypeScript, JavaScript, and Node.js.",
 	"type": "module",
 	"keywords": [
 		"fast",
@@ -12,6 +12,7 @@
 		"flat-config",
 		"react",
 		"typescript",
+		"uniapp",
 		"vite",
 		"vue",
 		"vue3"

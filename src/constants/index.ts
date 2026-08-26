@@ -17,6 +17,9 @@ export const GLOBS_TYPESCRIPT = ["**/*.{ts,cts,mts,tsx}"] as const;
 /** Vue 3 单文件组件。 */
 export const GLOB_VUE = "**/*.vue";
 
+/** UniApp 原生渲染页面使用的 Vue 单文件组件。 */
+export const GLOB_NVUE = "**/*.nvue";
+
 /** Angular 组件、指令、服务等框架源码；Angular CLI 项目以 `.ts` 为标准源码扩展名。 */
 export const GLOB_ANGULAR_TYPESCRIPT = "**/*.ts";
 
@@ -32,6 +35,39 @@ export const GLOB_JSON5 = "**/*.json5";
 
 /** Markdown 文档。 */
 export const GLOB_MARKDOWN = "**/*.md";
+
+/** UniApp 项目允许使用注释的应用清单和页面路由配置。 */
+export const GLOBS_UNIAPP_JSON = ["**/manifest.json", "**/pages.json"] as const;
+
+/** UniApp 跨端运行时提供的公共全局变量。 */
+export const UNIAPP_GLOBALS = {
+	getApp: "readonly",
+	getCurrentPages: "readonly",
+	getCurrentSubNVue: "readonly",
+	uni: "readonly",
+	uniCloud: "readonly",
+} as const;
+
+/**
+ * UniApp 条件编译分支中可能由目标平台注入的全局变量。
+ *
+ * @remarks
+ * ESLint 不执行 `#ifdef`/`#endif` 预处理，因此启用 UniApp 后统一声明这些对象。它们只解决
+ * 静态 `no-undef`，不会验证当前发行目标是否真的提供对应 API。
+ */
+export const UNIAPP_CONDITIONAL_GLOBALS = {
+	dd: "readonly",
+	jd: "readonly",
+	ks: "readonly",
+	my: "readonly",
+	plus: "readonly",
+	qh: "readonly",
+	qq: "readonly",
+	swan: "readonly",
+	tt: "readonly",
+	weex: "readonly",
+	wx: "readonly",
+} as const;
 
 /** 默认由 JavaScript、TypeScript 和 Vue 规则处理的全部代码文件。 */
 export const GLOBS_CODE = [...GLOBS_JAVASCRIPT, ...GLOBS_TYPESCRIPT, GLOB_VUE] as const;

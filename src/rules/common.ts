@@ -4,8 +4,8 @@ import type { RuleOptions } from "../typegen";
  * 跨 JavaScript、TypeScript 与 Vue 脚本生效的公共规则。
  *
  * @remarks
- * 维护约定：每条本地覆写都要说明启用原因；可能造成大面积改动、采用成本或
- * 行为变化的规则使用 `[高影响]` 标记，并同步维护 `docs/rules-risk.zh.md`。
+ * 默认规则面向 SDK、OA、Admin 与客户端项目使用同一套质量标准。这里只保留
+ * 跨语言且误报较少的规则；纯格式和语法偏好交给 Prettier 或项目自行覆盖。
  */
 export const commonRules = {
 	// 要求数组回调在所有可到达分支返回值，避免 map/filter 等调用静默产生 undefined。
@@ -27,12 +27,11 @@ export const commonRules = {
 	],
 	// 要求严格相等；保留 `value == null` 同时判断 null/undefined 的常用写法。
 	eqeqeq: ["error", "always", { null: "ignore" }],
-	// 幂运算统一使用 **，减少 Math.pow 嵌套并保持现代语法风格。
+	// 使用幂运算符代替 Math.pow，使数学表达式更直接。
 	"prefer-exponentiation-operator": "error",
-	// 使用 Object.hasOwn，避免对象覆盖或缺少 hasOwnProperty 时产生异常。
+	// 强制使用不会受原型覆盖影响的 Object.hasOwn。
 	"prefer-object-has-own": "error",
-
-	// [可自动修复] 声明间顺序交给 import-x；这里只排序同一 import 的成员。
+	// import 声明顺序交给 import-x；这里只排序同一 import 声明中的成员。
 	"sort-imports": [
 		"warn",
 		{

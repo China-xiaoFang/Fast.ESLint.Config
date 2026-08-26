@@ -4,12 +4,15 @@ import type { RuleOptions } from "../typegen";
  * TypeScript 本地覆写规则。
  *
  * @remarks
- * 这里补充 typescript-eslint 预置；高影响规则需同步维护风险文档。
+ * 公共模块边界要求显式类型，业务内部函数保留 TypeScript 返回类型推断；默认的
+ * recommendedTypeChecked 预置负责补充类型语义检查。
  */
 export const typescriptRules = {
+	// 导出函数和类的公共方法必须显式声明参数与返回类型，公共 API 不允许 any 参数。
+	"@typescript-eslint/explicit-module-boundary-types": ["error", { allowArgumentsExplicitlyTypedAsAny: false }],
 	// 使用 TypeScript 版本避免核心规则误判声明合并、类型和值的同名声明。
 	"@typescript-eslint/no-redeclare": "error",
-	// [高影响][可自动修复] 未使用符号视为错误；以下划线开头可显式表示参数或变量被有意忽略。
+	// 未使用符号视为错误；以下划线开头可显式表示参数、异常或变量被有意忽略。
 	"@typescript-eslint/no-unused-vars": [
 		"error",
 		{
@@ -23,10 +26,12 @@ export const typescriptRules = {
 	],
 	// [默认关闭] 声明文件、全局扩展和部分 SDK 仍需要 namespace。
 	"@typescript-eslint/no-namespace": "off",
-	// any 会绕过类型检查，但在第三方边界和渐进式类型完善中有合理用途，因此只警告。
+	// any 会绕过类型检查，但第三方边界和渐进迁移仍可能需要，因此只警告。
 	"@typescript-eslint/no-explicit-any": "warn",
-	// [高影响] 默认要求 ESM import；CommonJS、动态加载或工具链互操作代码可能需要按文件关闭。
+	// TypeScript 源码统一使用 ESM import；Node 工具文件由末尾覆写单独放开。
 	"@typescript-eslint/no-require-imports": "error",
+	// 禁止无意义空函数，但允许依赖注入构造器和明确的空重写实现。
+	"@typescript-eslint/no-empty-function": ["error", { allow: ["constructors", "overrideMethods"] }],
 	// 使用 TS 版本识别类型断言等语法；允许常见的短路和三元表达式调用模式。
 	"@typescript-eslint/no-unused-expressions": [
 		"error",
@@ -35,13 +40,13 @@ export const typescriptRules = {
 			allowTernary: true,
 		},
 	],
-	// [可自动修复] 删除可由 TypeScript 明确推断的原始值类型标注，减少重复信息。
+	// 删除可由 TypeScript 明确推断的原始值类型标注。
 	"@typescript-eslint/no-inferrable-types": "error",
-	// 非空断言可能隐藏空值缺陷；以警告提示逐步消除，避免一次性产生大量阻断错误。
-	"@typescript-eslint/no-non-null-assertion": "warn",
+	// 禁止非空断言，要求显式处理空值边界。
+	"@typescript-eslint/no-non-null-assertion": "error",
 	// 可选链之后再做非空断言逻辑矛盾，通常表示边界条件设计有误。
 	"@typescript-eslint/no-non-null-asserted-optional-chain": "error",
-	// [高影响][可自动修复] 类型依赖改用内联 type import；需复核仅靠 import 触发的模块副作用。
+	// 纯类型依赖必须标记为 type import。
 	"@typescript-eslint/consistent-type-imports": [
 		"error",
 		{
@@ -54,6 +59,8 @@ export const typescriptRules = {
 
 /** 仅在启用 Project Service 后应用的 TypeScript 类型感知规则覆写。 */
 export const typescriptTypeCheckedRules = {
+	// Promise 返回路径必须采用一致的 await 语义。
+	"@typescript-eslint/return-await": "error",
 	// 允许透明转发外部 Promise 的未知拒绝原因；静态可知的 string、number 等仍会被报告。
 	"@typescript-eslint/prefer-promise-reject-errors": ["error", { allowThrowingUnknown: true }],
 } satisfies RuleOptions;

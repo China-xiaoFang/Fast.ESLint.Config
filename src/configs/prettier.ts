@@ -1,6 +1,10 @@
 import { defineConfig } from "eslint/config";
 import eslintConfigPrettierFlat from "eslint-config-prettier/flat";
 
+// Vue 闭合括号换行约定与 Prettier 输出一致，无需由兼容层关闭。
+const prettierRules = { ...eslintConfigPrettierFlat.rules };
+delete prettierRules["vue/html-closing-bracket-newline"];
+
 /**
  * 创建 Prettier 兼容层。
  *
@@ -10,10 +14,11 @@ import eslintConfigPrettierFlat from "eslint-config-prettier/flat";
  *
  * @returns 包含命名后的 `eslint-config-prettier` Flat Config 数组。
  */
-export const createPrettierConfigs = () =>
+export const createPrettierConfigs = (): ReturnType<typeof defineConfig> =>
 	defineConfig([
 		{
 			...eslintConfigPrettierFlat,
 			name: "@fast-china/prettier",
+			rules: prettierRules,
 		},
 	]);

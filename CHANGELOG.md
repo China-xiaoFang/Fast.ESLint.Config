@@ -6,6 +6,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.1.0 - 2026-08-26
+
+### Added
+
+- Added built-in UniApp support for `.nvue`, cross-platform and conditional-platform runtime globals, comment-compatible `pages.json` and `manifest.json`, and generated `unpackage` output ignores.
+- Added a trailing Node.js tooling override that permits logging and CommonJS interoperability in config, script, test, and CLI files.
+- Added root-exported `createBaseConfigs()` as a fixed, framework-neutral composition for React, Angular, Node.js, and SDK projects.
+
+### Changed
+
+- Replaced project-type strictness with one shared rule set for SDKs, OA systems, administration apps, Vue web apps, and clients.
+- Changed the root entry to a fixed Vue 3, type-aware TypeScript, and UniApp preset; `fastConfig()` now retains only the runtime `environment` option and trailing Flat Config overrides.
+- Changed TypeScript, Vue, and React TypeScript to always use `recommendedTypeChecked` and Project Service.
+- Required explicit parameter and return types at exported TypeScript module boundaries without forcing return annotations on internal functions and callbacks.
+- Changed Vue to inherit `flat/recommended`, enforce kebab-case template attributes, warn on `v-html`, and reject `v-text`/`v-html` on components.
+- Replaced the full RegExp recommended preset with an explicit correctness and safety rule set.
+- Restored JavaScript conventions including camelCase, declaration order, arrow callbacks, logical assignment, object spread, object shorthand, rest/spread, and template literals.
+- Restored `sort-imports`; import ordering is an error again and includes side-effect imports.
+- Enabled the official React Hooks Recommended preset and aligned Angular TypeScript, template, and accessibility rules with the Angular ESLint recommended presets.
+- Enabled `package.json` and `tsconfig*.json` sorting in the fixed root and base compositions; Markdown remains explicitly composed.
+- Corrected the built-in dependency ignore glob so both `.pnpm-store` and `node_modules` are matched without relying on `.gitignore`.
+
+### Removed
+
+- Removed `defaultConfigOptions`, root language/framework/plugin switches, factory-level rules/globals/ignores, `typeChecked`, and `tsconfigRootDir`. Native trailing Flat Config and focused factories replace these wrapper options.
+
 ## 2.0.10 - 2026-08-19
 
 ### Changed
