@@ -106,16 +106,27 @@ test("runtime environment and trailing overrides apply in declaration order", as
 	assert.ok(!allowedResult.messages.some((message) => message.ruleId === "no-console"));
 });
 
-test("VS Code settings use the JSONC comment exception only in the JSON configuration domain", async () => {
+test("VS Code settings and extension recommendations allow JSONC comments", async () => {
 	const linter = createLinter(fastConfig());
-	const [settingsResult] = await linter.lintText('{\n\t// Workspace editor setting.\n\t"editor.formatOnSave": true\n}\n', {
-		filePath: "fixtures/.vscode/settings.json",
-	});
-	const calculated = await linter.calculateConfigForFile("fixtures/.vscode/settings.json");
+	const fixtures = [
+		{
+			code: '{\n\t// Workspace editor setting.\n\t"editor.formatOnSave": true\n}\n',
+			filePath: "fixtures/.vscode/settings.json",
+		},
+		{
+			code: '{\n\t// Workspace extension recommendation.\n\t"recommendations": ["dbaeumer.vscode-eslint"]\n}\n',
+			filePath: "fixtures/.vscode/extensions.json",
+		},
+	];
 
-	assert.equal(settingsResult.fatalErrorCount, 0);
-	assert.ok(!settingsResult.messages.some((message) => message.ruleId === "jsonc/no-comments"));
-	assert.equal(calculated.rules["jsonc/no-comments"][0], 0);
+	for (const fixture of fixtures) {
+		const [result] = await linter.lintText(fixture.code, { filePath: fixture.filePath });
+		const calculated = await linter.calculateConfigForFile(fixture.filePath);
+
+		assert.equal(result.fatalErrorCount, 0);
+		assert.ok(!result.messages.some((message) => message.ruleId === "jsonc/no-comments"));
+		assert.equal(calculated.rules["jsonc/no-comments"][0], 0);
+	}
 });
 
 test("Lodash config fragment rejects mixed static imports", async () => {

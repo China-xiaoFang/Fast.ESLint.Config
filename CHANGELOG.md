@@ -27,6 +27,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Enabled the official React Hooks Recommended preset and aligned Angular TypeScript, template, and accessibility rules with the Angular ESLint recommended presets.
 - Enabled `package.json` and `tsconfig*.json` sorting in the fixed root and base compositions; Markdown remains explicitly composed.
 - Corrected the built-in dependency ignore glob so both `.pnpm-store` and `node_modules` are matched without relying on `.gitignore`.
+- Allowed JSONC comments in both VS Code `.vscode/settings.json` and `.vscode/extensions.json`.
 
 ### Removed
 

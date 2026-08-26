@@ -50,7 +50,7 @@ export default fastChina;
 - 浏览器运行环境和 Node.js 工程文件 globals。
 - JavaScript、类型感知 TypeScript、Vue 3 与 `.nvue`。
 - `uni`、`uniCloud`、页面 API 以及 `wx`、`plus`、`my`、`tt` 等条件编译平台 globals。
-- JSON、JSONC、JSON5，以及允许注释的 `pages.json`、`manifest.json` 和 VS Code `settings.json`。
+- JSON、JSONC、JSON5，以及允许注释的 `pages.json`、`manifest.json` 和 VS Code `settings.json`、`extensions.json`。
 - Import、RegExp、`package.json`/`tsconfig*.json` 排序、`.gitignore` 和 Prettier 冲突关闭层。
 
 ESLint 不执行 UniApp 的 `#ifdef`/`#endif`，因此只能识别平台对象，不能验证对象是否位于正确的平台分支。当前不处理需要专用解析器的 `.uvue` 与 `.uts`。

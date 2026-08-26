@@ -50,7 +50,7 @@ The default entry includes:
 - Browser globals plus dedicated Node.js globals for tooling files.
 - JavaScript, type-aware TypeScript, Vue 3, and `.nvue`.
 - `uni`, `uniCloud`, page APIs, and conditional-platform globals such as `wx`, `plus`, `my`, and `tt`.
-- JSON, JSONC, JSON5, comment-compatible `pages.json`, `manifest.json`, and VS Code `settings.json`.
+- JSON, JSONC, JSON5, comment-compatible `pages.json`, `manifest.json`, and VS Code `settings.json` and `extensions.json`.
 - Import, RegExp, `package.json`/`tsconfig*.json` sorting, `.gitignore`, and Prettier conflict handling.
 
 ESLint does not execute UniApp `#ifdef`/`#endif` directives. It recognizes platform objects but cannot verify that they are used in the correct platform branch. `.uvue` and `.uts`, which require dedicated parsers, are not handled.
