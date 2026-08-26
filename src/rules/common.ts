@@ -29,9 +29,10 @@ export const commonRules = {
 	eqeqeq: ["error", "always", { null: "ignore" }],
 	// 使用幂运算符代替 Math.pow，使数学表达式更直接。
 	"prefer-exponentiation-operator": "error",
-	// 强制使用不会受原型覆盖影响的 Object.hasOwn。
+	// 使用 Object.hasOwn 代替 obj.hasOwnProperty，兼容无原型对象以及同名方法被覆盖的对象。
 	"prefer-object-has-own": "error",
-	// import 声明顺序交给 import-x；这里只排序同一 import 声明中的成员。
+	// 仅排序同一 import 声明中的导入成员；声明之间的分组和顺序交给 import-x/order。
+	// 该规则无法自动修复成员顺序，使用 warn 避免历史代码因纯排序问题被立即阻断。
 	"sort-imports": [
 		"warn",
 		{

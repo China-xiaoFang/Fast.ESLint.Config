@@ -8,7 +8,7 @@ import type { RuleOptions } from "../typegen";
  * recommendedTypeChecked 预置负责补充类型语义检查。
  */
 export const typescriptRules = {
-	// 导出函数和类的公共方法必须显式声明参数与返回类型，公共 API 不允许 any 参数。
+	// 导出函数和类的公共方法必须显式声明参数与返回类型，使公共 API 不依赖实现细节推断；参数不允许显式 any。
 	"@typescript-eslint/explicit-module-boundary-types": ["error", { allowArgumentsExplicitlyTypedAsAny: false }],
 	// 使用 TypeScript 版本避免核心规则误判声明合并、类型和值的同名声明。
 	"@typescript-eslint/no-redeclare": "error",
@@ -30,7 +30,7 @@ export const typescriptRules = {
 	"@typescript-eslint/no-explicit-any": "warn",
 	// TypeScript 源码统一使用 ESM import；Node 工具文件由末尾覆写单独放开。
 	"@typescript-eslint/no-require-imports": "error",
-	// 禁止无意义空函数，但允许依赖注入构造器和明确的空重写实现。
+	// 禁止普通空函数，避免遗漏实现；仅允许无函数体逻辑的构造器和有意留空的重写方法。
 	"@typescript-eslint/no-empty-function": ["error", { allow: ["constructors", "overrideMethods"] }],
 	// 使用 TS 版本识别类型断言等语法；允许常见的短路和三元表达式调用模式。
 	"@typescript-eslint/no-unused-expressions": [
@@ -46,7 +46,7 @@ export const typescriptRules = {
 	"@typescript-eslint/no-non-null-assertion": "error",
 	// 可选链之后再做非空断言逻辑矛盾，通常表示边界条件设计有误。
 	"@typescript-eslint/no-non-null-asserted-optional-chain": "error",
-	// 纯类型依赖必须标记为 type import。
+	// 纯类型依赖必须标记为 type import，并在混合导入中修复为 `import { type Foo, value }`，避免生成无用运行时导入。
 	"@typescript-eslint/consistent-type-imports": [
 		"error",
 		{
@@ -57,9 +57,9 @@ export const typescriptRules = {
 	],
 } satisfies RuleOptions;
 
-/** 仅在启用 Project Service 后应用的 TypeScript 类型感知规则覆写。 */
+/** 仅在 Project Service 提供完整类型信息后应用的 TypeScript 类型感知规则覆写。 */
 export const typescriptTypeCheckedRules = {
-	// Promise 返回路径必须采用一致的 await 语义。
+	// 默认 in-try-catch 模式：try/catch/finally 内要求 return await，让本地错误处理捕获 Promise 拒绝；其他位置避免多余 await。
 	"@typescript-eslint/return-await": "error",
 	// 允许透明转发外部 Promise 的未知拒绝原因；静态可知的 string、number 等仍会被报告。
 	"@typescript-eslint/prefer-promise-reject-errors": ["error", { allowThrowingUnknown: true }],

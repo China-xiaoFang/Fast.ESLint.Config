@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+### Changed
+
+- Expanded the inline documentation for local ESLint rules and scoped overrides, including their purpose, important exceptions, and ownership of duplicate React checks.
+
 ## 2.1.0 - 2026-08-26
 
 ### Added

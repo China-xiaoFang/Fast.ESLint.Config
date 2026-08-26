@@ -119,7 +119,9 @@ export const createNodeToolingConfigs = (nodeFiles: readonly string[] = GLOBS_JA
 			name: "@fast-china/node-tooling",
 			files,
 			rules: {
+				// Node.js 配置和脚本可能需要加载 CommonJS 包，只在工具文件范围关闭 ESM import 限制。
 				"@typescript-eslint/no-require-imports": "off",
+				// 构建、测试和 CLI 脚本允许把执行进度与诊断信息输出到终端。
 				"no-console": "off",
 			},
 		},

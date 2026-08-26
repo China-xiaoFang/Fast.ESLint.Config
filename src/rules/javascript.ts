@@ -53,18 +53,18 @@ export const javascriptRules = {
 			avoidQuotes: true,
 		},
 	],
-	// 回调优先使用箭头函数，同时允许依赖动态 this 的普通函数。
+	// 不依赖动态 this 的回调使用箭头函数；允许确实需要调用方绑定 this 的普通函数。
 	"prefer-arrow-callback": ["error", { allowNamedFunctions: false, allowUnboundThis: true }],
-	// 使用 ||=、&&=、??= 统一表达逻辑赋值，并检查可等价改写的条件语句。
+	// 将可等价改写的逻辑赋值统一为 ||=、&&=、??=，并覆盖对应的 if 赋值写法。
 	"logical-assignment-operators": ["error", "always", { enforceForIfStatements: true }],
-	// 创建新对象时优先使用对象展开语法代替 Object.assign。
+	// 创建新对象时用对象展开代替 Object.assign({}, source)，不改写会修改既有目标对象的调用。
 	"prefer-object-spread": "error",
-	// 使用 rest 参数代替 arguments。
+	// 使用具名 rest 参数代替 arguments，使参数范围明确并获得真实数组和类型推断能力。
 	"prefer-rest-params": "error",
-	// 使用 spread 代替 Function.prototype.apply。
+	// 参数数组展开调用时使用 fn(...args) 代替 fn.apply(thisArg, args)，使调用目标和参数更直观。
 	"prefer-spread": "error",
-	// 使用模板字符串代替字符串拼接。
+	// 字符串中包含变量时使用模板字符串，减少多段 + 拼接和隐式类型转换造成的歧义。
 	"prefer-template": "error",
-	// 同一作用域禁止重复声明。
+	// 同一作用域禁止重复声明变量、函数或类，避免前一声明被覆盖；TS 文件由对应扩展规则处理。
 	"no-redeclare": "error",
 } satisfies RuleOptions;

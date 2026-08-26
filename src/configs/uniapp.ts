@@ -28,6 +28,7 @@ export const createUniAppConfigs = (files: readonly string[] = GLOBS_CODE): Retu
 			name: "@fast-china/uniapp/json",
 			files: [...GLOBS_UNIAPP_JSON],
 			rules: {
+				// UniApp 的 pages.json 和 manifest.json 使用允许注释的 JSONC 方言。
 				"jsonc/no-comments": "off",
 			},
 		},
