@@ -1,6 +1,6 @@
 # 默认规则与风险指南
 
-本文说明 2.1.0 当前配置模型、主要规则和迁移风险。规则源码注释只解释现行意图；历史差异统一记录在 `CHANGELOG.md`。
+本文说明 2.1.1 当前配置模型、主要规则和迁移风险。规则源码注释只解释现行意图；历史差异统一记录在 `CHANGELOG.md`。
 
 ## 配置模型
 
@@ -43,7 +43,8 @@ SDK、OA、Admin、Vue Web 与 UniApp 客户端共享同一套 JavaScript、Type
 - `prefer-arrow-callback`、`logical-assignment-operators`、`prefer-object-spread` 为 `error`。
 - `prefer-exponentiation-operator`、`prefer-object-has-own` 为 `error`。
 - `sort-imports` 为 `warn`，只排序同一 import 的成员。
-- `import-x/order` 为 `error`，并设置 `warnOnUnassignedImports: true`。
+- `import-x/order` 为 `error`，并设置 `warnOnUnassignedImports: true`；它继续检查普通副作用导入，但样式导入不参与该规则。
+- `import-x/style-imports-last` 为 `error`；CSS、SCSS、LESS 等样式必须形成最后一个连续导入分组，组内顺序保持不变且不自动修复。
 
 ### TypeScript
 

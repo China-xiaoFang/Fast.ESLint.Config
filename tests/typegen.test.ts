@@ -17,6 +17,7 @@ const projectRules = defineRules({
 	"@eslint-react/dom-no-missing-button-type": "error",
 	"@typescript-eslint/no-unused-vars": ["error", { args: "after-used", argsIgnorePattern: "^_" }],
 	"import-x/order": ["error", { "newlines-between": "always" }],
+	"import-x/style-imports-last": "error",
 	"no-console": ["warn", { allow: ["warn", "error"] }],
 	"react-hooks/exhaustive-deps": "warn",
 	"vue/attributes-order": ["error", { order: ["DEFINITION", "EVENTS", "CONTENT"] }],

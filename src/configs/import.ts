@@ -1,7 +1,17 @@
 import { defineConfig } from "eslint/config";
 import eslintPluginImportX from "eslint-plugin-import-x";
 import { GLOBS_CODE } from "../constants";
+import { styleAwareImportXPlugin } from "../plugins/import";
 import { importRules } from "../rules";
+import type { ESLint } from "eslint";
+
+const importXRecommended = {
+	...eslintPluginImportX.flatConfigs.recommended,
+	plugins: {
+		// import-x 当前发布类型仍基于旧版 RuleContext；运行时接口与 ESLint 10 Flat Config 兼容。
+		"import-x": styleAwareImportXPlugin as unknown as ESLint.Plugin,
+	},
+};
 
 /**
  * 创建模块导入规则配置。
@@ -18,7 +28,11 @@ export const createImportConfigs = (files: readonly string[] = GLOBS_CODE): Retu
 		{
 			name: "@fast-china/import",
 			files: [...files],
-			extends: [eslintPluginImportX.flatConfigs.recommended],
-			rules: importRules,
+			extends: [importXRecommended],
+			rules: {
+				...importRules,
+				// 样式导入必须形成最后一个连续分组；规则不提供修复，避免改变 CSS 层叠顺序。
+				"import-x/style-imports-last": "error",
+			},
 		},
 	]);

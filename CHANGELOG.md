@@ -6,9 +6,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.1.1 - 2026-08-29
+
+### Added
+
+- Added `import-x/style-imports-last` to require one final, stable stylesheet import group without automatic reordering.
+
 ### Changed
 
 - Expanded the inline documentation for local ESLint rules and scoped overrides, including their purpose, important exceptions, and ownership of duplicate React checks.
+- Excluded stylesheet imports from `import-x/order` while preserving its grouping, alphabetizing, and `warnOnUnassignedImports` checks for all other imports.
 
 ## 2.1.0 - 2026-08-26
 

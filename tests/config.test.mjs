@@ -5,6 +5,7 @@ import {
 	DEFAULT_IGNORE_PATTERNS,
 	createAngularConfigs,
 	createGlobalIgnores,
+	createImportConfigs,
 	createLodashConfigs,
 	createMarkdownConfigs,
 	createReactConfigs,
@@ -153,6 +154,30 @@ test("Lodash config fragment rejects mixed static imports", async () => {
 	assert.equal(preferLodashUnifiedRules["no-restricted-imports"]?.[0], "error");
 });
 
+test("style imports form a final stable group while other imports retain import-x ordering", async () => {
+	const linter = createLinter(createImportConfigs());
+	const [validResult] = await linter.lintText(
+		'import vue from "vue";\nimport App from "./App.vue";\nimport "./z.scss";\nimport "vue-json-pretty/lib/styles.css";\nimport styles from "./a.module.scss?inline";\nvoid vue;\nvoid App;\nvoid styles;\n',
+		{ filePath: "fixtures/style-imports-valid.js" }
+	);
+	const [misplacedStyleResult] = await linter.lintText('import "./theme.scss";\nimport App from "./App.vue";\nvoid App;\n', {
+		filePath: "fixtures/style-imports-invalid.js",
+	});
+	const [sideEffectResult] = await linter.lintText('import App from "./App.vue";\nimport "reflect-metadata";\nvoid App;\n', {
+		filePath: "fixtures/side-effect-imports-invalid.js",
+	});
+	const [alphabetizeResult] = await linter.lintText('import z from "z";\nimport a from "a";\nvoid z;\nvoid a;\n', {
+		filePath: "fixtures/alphabetize-imports-invalid.js",
+	});
+
+	assert.equal(validResult.errorCount, 0, validResult.messages.map((message) => message.message).join(", "));
+	assert.equal(misplacedStyleResult.messages.filter((message) => message.ruleId === "import-x/style-imports-last").length, 1);
+	assert.ok(!misplacedStyleResult.messages.some((message) => message.ruleId === "import-x/order"));
+	assert.equal(misplacedStyleResult.messages.find((message) => message.ruleId === "import-x/style-imports-last")?.fix, undefined);
+	assert.ok(sideEffectResult.messages.some((message) => message.ruleId === "import-x/order"));
+	assert.ok(alphabetizeResult.messages.some((message) => message.ruleId === "import-x/order"));
+});
+
 test("TypeScript always uses recommendedTypeChecked and Project Service", async () => {
 	const linter = createLinter(createBaseConfigs({ environment: "node" }));
 	const [result] = await linter.lintFiles(["src/index.ts"]);
@@ -257,6 +282,7 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(javaScriptConfig.rules["prefer-object-spread"][0], 2);
 	assert.equal(javaScriptConfig.rules["import-x/order"][0], 2);
 	assert.equal(javaScriptConfig.rules["import-x/order"][1].warnOnUnassignedImports, true);
+	assert.equal(javaScriptConfig.rules["import-x/style-imports-last"][0], 2);
 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unused-vars"][1].argsIgnorePattern, "^_");
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-module-boundary-types"][1].allowArgumentsExplicitlyTypedAsAny, false);

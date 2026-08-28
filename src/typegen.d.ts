@@ -2340,6 +2340,10 @@ export interface RuleOptions {
    */
   'import-x/prefer-namespace-import'?: Linter.RuleEntry<ImportXPreferNamespaceImport>
   /**
+   * Require stylesheet imports to form the final contiguous import group without sorting them.
+   */
+  'import-x/style-imports-last'?: Linter.RuleEntry<[]>
+  /**
    * Forbid potentially ambiguous parse goal (`script` vs. `module`).
    * @see https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/unambiguous.md
    */
