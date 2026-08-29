@@ -289,7 +289,7 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-function-return-type"]?.[0] ?? 0, 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-explicit-any"][0], 1);
 	assert.deepEqual(typeScriptConfig.rules["@typescript-eslint/no-empty-function"][1].allow, ["constructors", "overrideMethods"]);
-	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-imports"][1].fixStyle, "inline-type-imports");
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-imports"][1].fixStyle, "separate-type-imports");
 	assert.equal(typeScriptConfig.languageOptions.parserOptions.projectService, true);
 
 	assert.equal(vueConfig.rules["vue/attribute-hyphenation"][1], "always");

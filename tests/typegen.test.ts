@@ -44,7 +44,7 @@ fastConfig({ environment: "universal" });
 const ruleOptions = {
 	"@typescript-eslint/consistent-type-imports": [
 		"error",
-		{ disallowTypeAnnotations: false, fixStyle: "inline-type-imports", prefer: "type-imports" },
+		{ disallowTypeAnnotations: false, fixStyle: "separate-type-imports", prefer: "type-imports" },
 	],
 	"@typescript-eslint/no-empty-function": ["error", { allow: ["constructors", "overrideMethods"] }],
 	"@typescript-eslint/no-unused-vars": [

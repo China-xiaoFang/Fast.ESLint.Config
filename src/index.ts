@@ -5,9 +5,9 @@
  *
  * @packageDocumentation
  */
-import { type Config, defineConfig } from "eslint/config";
+import { defineConfig } from "eslint/config";
 import { createCommonConfigs } from "./configs/common";
-import { type RuntimeEnvironment, createEnvironmentConfigs, createNodeToolingConfigs } from "./configs/environment";
+import { createEnvironmentConfigs, createNodeToolingConfigs } from "./configs/environment";
 import { createGitignoreConfigs, createGlobalIgnores } from "./configs/ignores";
 import { createImportConfigs } from "./configs/import";
 import { createJavaScriptConfigs } from "./configs/javascript";
@@ -20,8 +20,10 @@ import { createTypeScriptConfigs } from "./configs/typescript";
 import { createUniAppConfigs } from "./configs/uniapp";
 import { createVueConfigs } from "./configs/vue";
 import { GLOBS_CODE, GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT, GLOB_NVUE } from "./constants";
+import type { RuntimeEnvironment } from "./configs/environment";
 import type { RuleOptions } from "./typegen";
 import type { Linter } from "eslint";
+import type { Config } from "eslint/config";
 
 type RejectUnknownRuleNames<Rules extends RuleOptions> = Rules & Record<Exclude<keyof Rules, keyof RuleOptions>, never>;
 

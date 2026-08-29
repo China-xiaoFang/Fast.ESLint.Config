@@ -1,6 +1,6 @@
 # 默认规则与风险指南
 
-本文说明 2.1.1 当前配置模型、主要规则和迁移风险。规则源码注释只解释现行意图；历史差异统一记录在 `CHANGELOG.md`。
+本文说明 2.1.2 当前配置模型、主要规则和迁移风险。规则源码注释只解释现行意图；历史差异统一记录在 `CHANGELOG.md`。
 
 ## 配置模型
 
@@ -54,7 +54,7 @@ SDK、OA、Admin、Vue Web 与 UniApp 客户端共享同一套 JavaScript、Type
 - `no-explicit-any` 为 `warn`。
 - `no-unused-vars` 为 `error`；`_` 前缀表示有意忽略，rest siblings 不误报。
 - `no-empty-function` 仅允许空构造函数和空覆写方法。
-- `consistent-type-imports` 使用行内 `type` 修复形式。
+- `consistent-type-imports` 使用独立 `import type` 修复形式。
 - `no-non-null-assertion` 为 `error`。
 
 ### Vue
@@ -83,7 +83,7 @@ ESLint 不执行条件编译，因此 `wx`、`plus` 等对象在根入口处理�
 重点审查以下自动修复：
 
 - Import 分组、成员顺序和副作用导入位置。
-- TypeScript 行内 `type` 导入。
+- TypeScript 独立 `import type` 声明。
 - Vue 属性命名与排序。
 - `package.json` 和 `tsconfig*.json` 字段顺序。
 

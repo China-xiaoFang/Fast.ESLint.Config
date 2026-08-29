@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.1.2 - 2026-08-29
+
+### Changed
+
+- Changed `@typescript-eslint/consistent-type-imports` fixes from inline type specifiers to separate `import type` declarations.
+
 ## 2.1.1 - 2026-08-29
 
 ### Added

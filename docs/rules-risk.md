@@ -1,6 +1,6 @@
 # Default Rules and Risk Guide
 
-This document describes the current 2.1.1 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
+This document describes the current 2.1.2 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
 
 ## Configuration model
 
@@ -54,7 +54,7 @@ The root entry is a fixed Vue 3 + TypeScript + UniApp preset:
 - `no-explicit-any` warns.
 - `no-unused-vars` is an error; an `_` prefix marks intentional omissions and rest siblings are ignored.
 - `no-empty-function` only allows empty constructors and override methods.
-- `consistent-type-imports` uses inline `type` fixes.
+- `consistent-type-imports` fixes type-only dependencies as separate `import type` declarations.
 - `no-non-null-assertion` is an error.
 
 ### Vue
@@ -83,7 +83,7 @@ ESLint does not execute conditional compilation, so `wx`, `plus`, and similar ob
 Review these fixes carefully:
 
 - Import groups, member order, and side-effect import placement.
-- Inline TypeScript `type` imports.
+- Separate TypeScript `import type` declarations.
 - Vue attribute naming and ordering.
 - `package.json` and `tsconfig*.json` key order.
 
