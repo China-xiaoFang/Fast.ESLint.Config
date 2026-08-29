@@ -2,7 +2,7 @@
 
 审查日期：2026-08-29
 
-审查对象：`@fast-china/eslint-config` 2.1.2 工作区
+审查对象：`@fast-china/eslint-config` 2.1.3 工作区
 
 ## 结论
 

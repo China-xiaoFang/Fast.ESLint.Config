@@ -20,10 +20,10 @@ import { createTypeScriptConfigs } from "./configs/typescript";
 import { createUniAppConfigs } from "./configs/uniapp";
 import { createVueConfigs } from "./configs/vue";
 import { GLOBS_CODE, GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT, GLOB_NVUE } from "./constants";
-import type { RuntimeEnvironment } from "./configs/environment";
-import type { RuleOptions } from "./typegen";
 import type { Linter } from "eslint";
 import type { Config } from "eslint/config";
+import type { RuntimeEnvironment } from "./configs/environment";
+import type { RuleOptions } from "./typegen";
 
 type RejectUnknownRuleNames<Rules extends RuleOptions> = Rules & Record<Exclude<keyof Rules, keyof RuleOptions>, never>;
 

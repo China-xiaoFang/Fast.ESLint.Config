@@ -282,6 +282,7 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(javaScriptConfig.rules["prefer-object-spread"][0], 2);
 	assert.equal(javaScriptConfig.rules["import-x/order"][0], 2);
 	assert.equal(javaScriptConfig.rules["import-x/order"][1].warnOnUnassignedImports, true);
+	assert.equal(javaScriptConfig.rules["import-x/order"][1].sortTypesGroup, true);
 	assert.equal(javaScriptConfig.rules["import-x/style-imports-last"][0], 2);
 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unused-vars"][1].argsIgnorePattern, "^_");

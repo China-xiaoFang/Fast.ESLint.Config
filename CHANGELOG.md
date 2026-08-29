@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.1.3 - 2026-08-29
+
+### Changed
+
+- Enabled `import-x/order` `sortTypesGroup` so separate type imports retain the final type group while sorting by their original source category within it.
+
 ## 2.1.2 - 2026-08-29
 
 ### Changed
