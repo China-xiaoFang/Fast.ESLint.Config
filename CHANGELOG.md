@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.1.4 - 2026-08-30
+
+### Changed
+
+- Classified `@/**` root aliases as leading internal imports and moved the `type` group after every other non-style import group, while styles remain in their final stable group.
+
 ## 2.1.3 - 2026-08-29
 
 ### Changed

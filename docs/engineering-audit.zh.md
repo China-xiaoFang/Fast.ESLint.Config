@@ -1,8 +1,8 @@
 # 工程质量审查报告
 
-审查日期：2026-08-29
+审查日期：2026-08-30
 
-审查对象：`@fast-china/eslint-config` 2.1.3 工作区
+审查对象：`@fast-china/eslint-config` 2.1.4 工作区
 
 ## 结论
 
@@ -11,6 +11,7 @@
 ## 当前规则模型
 
 - JavaScript、TypeScript、Import 和 RegExp 只有一套共享规则。
+- `@/**` 根别名归入 internal；类型导入位于所有其他非样式导入之后，并在 type 总分组内按来源层级排序。
 - 样式导入由独立规则约束为最后一个连续分组，不参与普通 import 字母排序，也不提供自动修复。
 - TypeScript、Vue 和 React TypeScript 始终使用 `recommendedTypeChecked` 与 Project Service。
 - Vue 使用 `flat/recommended`，并叠加事件声明、kebab-case 属性、闭合标签和排序规则。

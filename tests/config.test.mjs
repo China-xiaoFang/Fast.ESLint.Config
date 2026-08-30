@@ -14,6 +14,7 @@ import {
 import { preferLodashRules, preferLodashUnifiedRules } from "@fast-china/eslint-config/rules";
 import { ESLint } from "eslint";
 import { defineConfig } from "eslint/config";
+import tseslint from "typescript-eslint";
 
 const { createBaseConfigs, fastConfig } = publicApi;
 
@@ -178,6 +179,20 @@ test("style imports form a final stable group while other imports retain import-
 	assert.ok(alphabetizeResult.messages.some((message) => message.ruleId === "import-x/order"));
 });
 
+test("root aliases precede the final type group and stylesheet group", async () => {
+	const linter = createLinter([{ files: ["**/*.ts"], languageOptions: { parser: tseslint.parser } }, ...createImportConfigs(["**/*.ts"])], {
+		fix: true,
+	});
+	const source =
+		'import type { Config } from "eslint";\nimport app from "@/app";\nimport "./app.css";\nconst config = {} as Config;\nvoid app;\nvoid config;\n';
+	const [result] = await linter.lintText(source, { filePath: "fixtures/alias-import-order.ts" });
+
+	assert.equal(
+		result.output,
+		'import app from "@/app";\nimport type { Config } from "eslint";\nimport "./app.css";\nconst config = {} as Config;\nvoid app;\nvoid config;\n'
+	);
+});
+
 test("TypeScript always uses recommendedTypeChecked and Project Service", async () => {
 	const linter = createLinter(createBaseConfigs({ environment: "node" }));
 	const [result] = await linter.lintFiles(["src/index.ts"]);
@@ -283,6 +298,11 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(javaScriptConfig.rules["import-x/order"][0], 2);
 	assert.equal(javaScriptConfig.rules["import-x/order"][1].warnOnUnassignedImports, true);
 	assert.equal(javaScriptConfig.rules["import-x/order"][1].sortTypesGroup, true);
+	assert.equal(javaScriptConfig.rules["import-x/order"][1].groups.at(-1), "type");
+	assert.deepEqual(
+		javaScriptConfig.rules["import-x/order"][1].pathGroups.find((group) => group.pattern === "@/**"),
+		{ pattern: "@/**", group: "internal", position: "before" }
+	);
 	assert.equal(javaScriptConfig.rules["import-x/style-imports-last"][0], 2);
 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unused-vars"][1].argsIgnorePattern, "^_");

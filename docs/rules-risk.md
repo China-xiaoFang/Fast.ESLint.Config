@@ -1,6 +1,6 @@
 # Default Rules and Risk Guide
 
-This document describes the current 2.1.3 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
+This document describes the current 2.1.4 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
 
 ## Configuration model
 
@@ -43,7 +43,7 @@ The root entry is a fixed Vue 3 + TypeScript + UniApp preset:
 - `prefer-arrow-callback`, `logical-assignment-operators`, and `prefer-object-spread` are errors.
 - `prefer-exponentiation-operator` and `prefer-object-has-own` are errors.
 - `sort-imports` warns and only sorts members within one import.
-- `import-x/order` is an error with `warnOnUnassignedImports: true` and `sortTypesGroup: true`; ordinary side-effect imports remain checked, type imports are ordered by source category inside the final type group, and stylesheet imports do not participate in this rule.
+- `import-x/order` is an error with `warnOnUnassignedImports: true` and `sortTypesGroup: true`; `@/**` belongs to `internal`, type imports follow every non-style import and retain source-category ordering inside the final type group, and stylesheet imports do not participate in this rule.
 - `import-x/style-imports-last` is an error; CSS, SCSS, LESS, and related styles must form the final contiguous import group, with their internal order preserved and no automatic fix.
 
 ### TypeScript
