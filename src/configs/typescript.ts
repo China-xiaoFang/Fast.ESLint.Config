@@ -23,9 +23,16 @@ export const getTypeScriptPresetConfigs = (): Linter.Config[] =>
 /**
  * 创建 TypeScript 解析器的 Project Service 选项。
  *
- * @returns 始终启用 `projectService` 的解析器选项。
+ * @remarks
+ * TypeScript、TSX、Vue 与 NVue 必须使用完全一致的 `extraFileExtensions`。否则混合检查文件时，
+ * TypeScript Server 会因扩展名集合变化而反复重载整个项目。
+ *
+ * @returns 始终启用 `projectService`，并统一声明 Vue 扩展名的解析器选项。
  */
-export const createTypeScriptParserOptions = (): Linter.ParserOptions => ({ projectService: true });
+export const createTypeScriptParserOptions = (): Linter.ParserOptions => ({
+	projectService: true,
+	extraFileExtensions: [".vue", ".nvue"],
+});
 
 /**
  * 创建 TypeScript 配置。

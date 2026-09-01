@@ -113,10 +113,11 @@ Trailing configs have the highest precedence. `defineRules()` leaves the object 
 ```js
 parserOptions: {
 	projectService: true,
+	extraFileExtensions: [".vue", ".nvue"],
 }
 ```
 
-Linted files must belong to a discoverable `tsconfig.json`. The `typeChecked` and `tsconfigRootDir` wrapper options have been removed. Complex monorepos can override `languageOptions.parserOptions` in a trailing Flat Config when necessary.
+Linted files must belong to a discoverable `tsconfig.json`. The same `extraFileExtensions` list is applied to TypeScript, TSX, Vue, and NVue files so Project Service does not reload the project while linting mixed file types. The `typeChecked` and `tsconfigRootDir` wrapper options have been removed. Complex monorepos can override `languageOptions.parserOptions` in a trailing Flat Config when necessary, but every type-aware file override in the same project must keep `extraFileExtensions` identical.
 
 ## React
 

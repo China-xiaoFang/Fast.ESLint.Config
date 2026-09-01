@@ -1,6 +1,6 @@
 # 默认规则与风险指南
 
-本文说明 2.1.4 当前配置模型、主要规则和迁移风险。规则源码注释只解释现行意图；历史差异统一记录在 `CHANGELOG.md`。
+本文说明 2.1.5 当前配置模型、主要规则和迁移风险。规则源码注释只解释现行意图；历史差异统一记录在 `CHANGELOG.md`。
 
 ## 配置模型
 
@@ -48,7 +48,7 @@ SDK、OA、Admin、Vue Web 与 UniApp 客户端共享同一套 JavaScript、Type
 
 ### TypeScript
 
-- 始终启用 `recommendedTypeChecked` 与 `projectService: true`。
+- 始终启用 `recommendedTypeChecked` 与 `projectService: true`；TypeScript、TSX、Vue 与 NVue 统一使用 `extraFileExtensions: [".vue", ".nvue"]`，避免混合检查时 Project Service 重载项目。
 - `explicit-module-boundary-types` 为 `error`，模块导出边界必须显式声明类型，不允许用显式 `any` 参数规避。
 - `explicit-function-return-type` 不额外启用，内部函数和回调可以依赖推断。
 - `no-explicit-any` 为 `warn`。

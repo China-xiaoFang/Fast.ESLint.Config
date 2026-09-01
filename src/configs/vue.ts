@@ -26,7 +26,6 @@ export const createVueConfigs = (): ReturnType<typeof defineConfig> =>
 				parser: vueEslintParser,
 				parserOptions: {
 					parser: tseslint.parser,
-					extraFileExtensions: [".vue", ".nvue"],
 					ecmaFeatures: {
 						jsx: true,
 					},

@@ -201,6 +201,7 @@ test("TypeScript always uses recommendedTypeChecked and Project Service", async 
 
 	assert.equal(result.fatalErrorCount, 0, result.messages.map((message) => message.message).join(", "));
 	assert.equal(calculated.languageOptions.parserOptions.projectService, true);
+	assert.deepEqual(calculated.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
 	assert.equal(calculated.rules["@typescript-eslint/prefer-promise-reject-errors"][1].allowThrowingUnknown, true);
 	assert.ok(presets.some((item) => item.name === "typescript-eslint/recommended-type-checked"));
 });
@@ -312,10 +313,13 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.deepEqual(typeScriptConfig.rules["@typescript-eslint/no-empty-function"][1].allow, ["constructors", "overrideMethods"]);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-imports"][1].fixStyle, "separate-type-imports");
 	assert.equal(typeScriptConfig.languageOptions.parserOptions.projectService, true);
+	assert.deepEqual(typeScriptConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
 
 	assert.equal(vueConfig.rules["vue/attribute-hyphenation"][1], "always");
 	assert.equal(vueConfig.rules["vue/no-v-html"][0], 1);
 	assert.equal(vueConfig.rules["vue/no-v-text-v-html-on-component"][0], 2);
+	assert.deepEqual(vueConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
+	assert.deepEqual(typeScriptConfig.languageOptions.parserOptions.extraFileExtensions, vueConfig.languageOptions.parserOptions.extraFileExtensions);
 });
 
 test("manifest sorting is enabled and preserves semantic exports condition order", async () => {

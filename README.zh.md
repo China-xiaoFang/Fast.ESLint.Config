@@ -115,10 +115,11 @@ export default fastConfig(
 ```js
 parserOptions: {
 	projectService: true,
+	extraFileExtensions: [".vue", ".nvue"],
 }
 ```
 
-被检查文件必须属于可发现的 `tsconfig.json`。不再提供 `typeChecked` 和 `tsconfigRootDir` 包装选项；复杂 monorepo 如需指定根目录，可在后置 Flat Config 中直接覆盖 `languageOptions.parserOptions`。
+被检查文件必须属于可发现的 `tsconfig.json`。TypeScript、TSX、Vue 与 NVue 统一使用相同的 `extraFileExtensions`，避免混合检查文件时 Project Service 重载项目。不再提供 `typeChecked` 和 `tsconfigRootDir` 包装选项；复杂 monorepo 如需指定根目录，可在后置 Flat Config 中直接覆盖 `languageOptions.parserOptions`，但同一项目中所有类型感知文件覆盖必须保持 `extraFileExtensions` 完全一致。
 
 ## React
 

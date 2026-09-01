@@ -1,6 +1,6 @@
 # Default Rules and Risk Guide
 
-This document describes the current 2.1.4 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
+This document describes the current 2.1.5 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
 
 ## Configuration model
 
@@ -48,7 +48,7 @@ The root entry is a fixed Vue 3 + TypeScript + UniApp preset:
 
 ### TypeScript
 
-- `recommendedTypeChecked` and `projectService: true` are always enabled.
+- `recommendedTypeChecked` and `projectService: true` are always enabled; TypeScript, TSX, Vue, and NVue share `extraFileExtensions: [".vue", ".nvue"]` to prevent Project Service reloads during mixed-file linting.
 - `explicit-module-boundary-types` is an error and does not allow explicitly typed `any` arguments as an escape hatch.
 - `explicit-function-return-type` is not additionally enabled, so internal functions and callbacks can rely on inference.
 - `no-explicit-any` warns.
