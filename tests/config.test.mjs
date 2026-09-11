@@ -384,6 +384,7 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	const linter = createLinter(fastConfig());
 	const javaScriptConfig = await linter.calculateConfigForFile("fixtures/example.js");
 	const typeScriptConfig = await linter.calculateConfigForFile("src/example.ts");
+	const tsxConfig = await linter.calculateConfigForFile("src/example.tsx");
 	const vueConfig = await linter.calculateConfigForFile("src/App.vue");
 
 	assert.equal(javaScriptConfig.rules["sort-imports"][0], 1);
@@ -398,6 +399,9 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(javaScriptConfig.rules["no-empty"][0], 2);
 	assert.equal(javaScriptConfig.rules["no-empty"][1].allowEmptyCatch, true);
 	assert.equal(javaScriptConfig.rules["no-eval"][0], 2);
+	assert.equal(javaScriptConfig.rules["no-implied-eval"][0], 2);
+	assert.equal(javaScriptConfig.rules["no-new-func"][0], 2);
+	assert.equal(javaScriptConfig.rules["no-promise-executor-return"][0], 2);
 	assert.deepEqual(javaScriptConfig.rules.curly, [2, "multi-line", "consistent"]);
 	assert.equal(javaScriptConfig.rules["default-case-last"][0], 2);
 	assert.equal(javaScriptConfig.rules["no-void"][0], 2);
@@ -418,10 +422,16 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-explicit-any"][0], 1);
 	assert.deepEqual(typeScriptConfig.rules["@typescript-eslint/no-empty-function"][1].allow, ["constructors", "overrideMethods"]);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-imports"][1].fixStyle, "separate-type-imports");
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-import-type-side-effects"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-implied-eval"][0], 2);
+	assert.equal(typeScriptConfig.rules["no-implied-eval"][0], 0);
+	assert.equal(typeScriptConfig.rules["no-new-func"][0], 2);
 	assert.equal(typeScriptConfig.languageOptions.parserOptions.projectService, true);
 	assert.deepEqual(typeScriptConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-floating-promises"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-misused-promises"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-misused-promises"][1], undefined);
+	assert.equal(tsxConfig.rules["@typescript-eslint/no-misused-promises"][1].checksVoidReturn.attributes, false);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/await-thenable"][0], 2);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/require-await"][0], 2);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unsafe-argument"][0], 2);
@@ -454,6 +464,9 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.deepEqual(vueConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
 	assert.equal(vueConfig.rules["@typescript-eslint/explicit-function-return-type"][0], 0);
 	assert.equal(vueConfig.rules["@typescript-eslint/explicit-module-boundary-types"][0], 0);
+	assert.equal(vueConfig.rules["@typescript-eslint/no-misused-promises"][1].checksVoidReturn.attributes, false);
+	assert.equal(vueConfig.rules["vue/no-setup-props-reactivity-loss"][0], 2);
+	assert.equal(vueConfig.rules["vue/no-ref-object-reactivity-loss"][0], 2);
 	assert.equal(vueConfig.rules["@typescript-eslint/no-unused-vars"][1].args, "none");
 	assert.equal(vueConfig.rules["@typescript-eslint/no-unused-vars"][1].caughtErrors, "none");
 	assert.deepEqual(typeScriptConfig.languageOptions.parserOptions.extraFileExtensions, vueConfig.languageOptions.parserOptions.extraFileExtensions);

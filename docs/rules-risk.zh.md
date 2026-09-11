@@ -1,6 +1,6 @@
 # 默认规则与风险指南
 
-本文说明 2.1.6 当前配置模型、主要规则和迁移风险。规则源码注释只解释现行意图；历史差异统一记录在 `CHANGELOG.md`。
+本文说明 2.1.7 当前配置模型、主要规则和迁移风险。规则源码注释只解释现行意图；历史差异统一记录在 `CHANGELOG.md`。
 
 ## 配置模型
 
@@ -51,18 +51,19 @@ SDK、OA、Admin、Vue Web 与 UniApp 客户端共享同一套 JavaScript、Type
 ### TypeScript
 
 - 始终启用 `strictTypeChecked`、`stylisticTypeChecked` 与 `projectService: true`；TypeScript、TSX、Vue 与 NVue 统一使用 `extraFileExtensions: [".vue", ".nvue"]`，避免混合检查时 Project Service 重载项目。
-- `no-floating-promises` 与 `strict-void-return` 关闭，Promise 是否等待由业务语义决定；`no-void` 禁止用 `void promise` 规避检查。`no-misused-promises`、`await-thenable`、`require-await` 和 unsafe 类型规则保持严格。
+- `no-floating-promises` 与 `strict-void-return` 关闭，Promise 是否等待由业务语义决定；`no-void` 禁止用 `void promise` 规避检查。`no-misused-promises`、`await-thenable`、`require-await` 和 unsafe 类型规则保持严格，但 Vue 模板与 TSX 属性允许 Promise 返回的事件处理函数。
 - TypeScript 与 TSX 的命名函数要求显式返回类型，内联回调和已有函数类型约束的表达式除外；模块导出边界仍要求显式类型。
 - Vue/NVue SFC 关闭函数返回类型与模块边界类型要求，并关闭形参和 catch 形参的未使用检查；普通未使用变量和导入仍报错。模板不会反向推断独立处理函数的参数类型，这类参数仍需显式标注。
 - `explicit-module-boundary-types` 为 `error`，模块导出边界必须显式声明类型，不允许用显式 `any` 参数规避。
 - `no-explicit-any` 为 `warn`。
 - 普通 TS/TSX 的未使用参数和异常可用 `_` 前缀明确忽略；未使用普通变量不能用该前缀规避。
 - `no-empty-function` 仅允许空构造函数和空覆写方法。
-- `consistent-type-imports` 使用独立 `import type` 修复形式。
+- `consistent-type-imports` 使用独立 `import type` 修复形式，`no-import-type-side-effects` 禁止仅含内联类型说明符的运行时导入。
 - `no-non-null-assertion` 为 `error`。
 - `switch-exhaustiveness-check` 为 `error`；`no-deprecated` 与 `no-unnecessary-condition` 为 `warn`。
 - 模板字符串允许数字插值，箭头简写允许直接返回 void；动态对象字段删除和纯静态工具类不强制改写。
 - `consistent-type-exports` 与 `prefer-readonly` 为 `error`；原始类型不强制将 `||` 改成 `??`。
+- `no-eval`、`no-implied-eval` 与 `no-new-func` 禁止直接或间接动态执行字符串代码；`no-promise-executor-return` 禁止误用 Promise executor 返回值；Vue setup props 和 ref 禁止以丢失响应性的方式使用。
 - `unified-signatures` 保留参数名不同或具有独立 JSDoc 的公共重载；`no-meaningless-void-operator` 由更严格的核心 `no-void` 替代。
 - `consistent-type-definitions`、`consistent-indexed-object-style`、`class-literal-property-style`、`prefer-regexp-exec` 关闭，避免纯语法偏好阻断构建。
 

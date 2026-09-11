@@ -1,6 +1,6 @@
 # Default Rules and Risk Guide
 
-This document describes the current 2.1.6 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
+This document describes the current 2.1.7 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
 
 ## Configuration model
 
@@ -51,18 +51,19 @@ The root entry is a fixed Vue 3 + TypeScript + UniApp preset:
 ### TypeScript
 
 - `strictTypeChecked`, `stylisticTypeChecked`, and `projectService: true` are always enabled; TypeScript, TSX, Vue, and NVue share `extraFileExtensions: [".vue", ".nvue"]` to prevent Project Service reloads during mixed-file linting.
-- `no-floating-promises` and `strict-void-return` are disabled so Promise waiting follows business semantics; `no-void` rejects `void promise` workarounds. `no-misused-promises`, `await-thenable`, `require-await`, and the unsafe-type rules remain strict.
+- `no-floating-promises` and `strict-void-return` are disabled so Promise waiting follows business semantics; `no-void` rejects `void promise` workarounds. `no-misused-promises`, `await-thenable`, `require-await`, and the unsafe-type rules remain strict, while Promise-returning handlers are allowed in Vue templates and TSX attributes.
 - Named TypeScript and TSX functions require explicit return types, except inline callbacks and already typed function expressions; exported module boundaries still require explicit types.
 - Vue/NVue SFCs disable function-return and module-boundary annotations and unused parameter checks, while unused variables and imports remain errors. Templates do not infer parameter types back into standalone script handlers, so those parameters still require explicit annotations.
 - `explicit-module-boundary-types` is an error and does not allow explicitly typed `any` arguments as an escape hatch.
 - `no-explicit-any` warns.
 - Regular TS/TSX parameters and caught errors can use an `_` prefix to mark intentional omissions; ordinary variables cannot use that prefix to evade the check.
 - `no-empty-function` only allows empty constructors and override methods.
-- `consistent-type-imports` fixes type-only dependencies as separate `import type` declarations.
+- `consistent-type-imports` fixes type-only dependencies as separate `import type` declarations, and `no-import-type-side-effects` rejects runtime imports containing only inline type specifiers.
 - `no-non-null-assertion` is an error.
 - `switch-exhaustiveness-check` is an error; `no-deprecated` and `no-unnecessary-condition` warn.
 - Numeric template interpolation and concise void arrow callbacks are allowed; dynamic object deletion and static-only utility classes are not forcibly rewritten.
 - `consistent-type-exports` and `prefer-readonly` are errors; primitive values are not forced from `||` to `??`.
+- `no-eval`, `no-implied-eval`, and `no-new-func` reject direct or indirect dynamic string execution; `no-promise-executor-return` rejects ignored executor returns, and Vue setup props or refs cannot be used in ways that lose reactivity.
 - `unified-signatures` preserves public overloads with different parameter names or standalone JSDoc; the stricter core `no-void` replaces `no-meaningless-void-operator`.
 - `consistent-type-definitions`, `consistent-indexed-object-style`, `class-literal-property-style`, and `prefer-regexp-exec` are disabled as syntax-only preferences.
 

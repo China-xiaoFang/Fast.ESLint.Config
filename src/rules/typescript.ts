@@ -58,6 +58,8 @@ export const typescriptRules = {
 			prefer: "type-imports",
 		},
 	],
+	// 禁止 `import { type Foo }` 产生仅用于类型的运行时导入，统一提升为独立的 `import type`。
+	"@typescript-eslint/no-import-type-side-effects": "error",
 } satisfies RuleOptions;
 
 /** 仅在 Project Service 提供完整类型信息后应用的 TypeScript 类型感知规则覆写。 */

@@ -60,4 +60,13 @@ export const createTypeScriptConfigs = (files: readonly string[] = GLOBS_TYPESCR
 				...typescriptTypeCheckedRules,
 			},
 		},
+		{
+			name: "@fast-china/typescript/tsx-attributes",
+			// 与调用方传入的 TypeScript 范围取交集，避免独立组合时意外接管范围外的 TSX 文件。
+			files: [[...files, "**/*.tsx"]],
+			rules: {
+				// TSX 事件属性由框架接管异步结果，允许把 Promise 返回函数传给 void 回调属性；其他误用继续检查。
+				"@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: { attributes: false } }],
+			},
+		},
 	]);

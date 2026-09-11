@@ -25,6 +25,10 @@ export const vueRules = {
 	"vue/no-dupe-keys": "error",
 	// Props 属于父组件传入的只读数据，子组件应通过 emit 或本地状态更新，不能直接修改。
 	"vue/no-mutating-props": "error",
+	// setup 中直接解构 props 会丢失响应性，要求保留 props 引用或使用 toRefs 等响应式转换。
+	"vue/no-setup-props-reactivity-loss": "error",
+	// 禁止以会丢失响应性的方式解构或传递 ref 对象，确保后续更新仍能被 Vue 追踪。
+	"vue/no-ref-object-reactivity-loss": "error",
 	// 组件名不能占用 Vue 内置组件或平台保留名称，避免模板解析与运行时组件发生冲突。
 	"vue/no-reserved-component-names": "error",
 	// 禁止在组件节点使用 v-text/v-html，避免覆盖组件内容并模糊数据边界。
