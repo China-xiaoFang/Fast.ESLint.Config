@@ -193,7 +193,7 @@ test("root aliases precede the final type group and stylesheet group", async () 
 	);
 });
 
-test("TypeScript always uses recommendedTypeChecked and Project Service", async () => {
+test("TypeScript always uses strict type-aware presets and Project Service", async () => {
 	const linter = createLinter(createBaseConfigs({ environment: "node" }));
 	const [result] = await linter.lintFiles(["src/index.ts"]);
 	const calculated = await linter.calculateConfigForFile("src/index.ts");
@@ -203,7 +203,104 @@ test("TypeScript always uses recommendedTypeChecked and Project Service", async 
 	assert.equal(calculated.languageOptions.parserOptions.projectService, true);
 	assert.deepEqual(calculated.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
 	assert.equal(calculated.rules["@typescript-eslint/prefer-promise-reject-errors"][1].allowThrowingUnknown, true);
-	assert.ok(presets.some((item) => item.name === "typescript-eslint/recommended-type-checked"));
+	assert.ok(presets.some((item) => item.name === "typescript-eslint/strict-type-checked"));
+	assert.ok(presets.some((item) => item.name === "typescript-eslint/stylistic-type-checked"));
+	assert.ok(!presets.some((item) => item.name === "typescript-eslint/all"));
+});
+
+test("Promise waiting stays a business decision while misuse and void operators remain checked", async () => {
+	const linter = createLinter(createBaseConfigs({ environment: "node" }));
+	const validSource = `declare function nextTick(callback?: () => void): Promise<void>;
+declare function onMounted(hook: () => unknown): void;
+declare function requestApi(): Promise<void>;
+declare function notify(): void;
+
+function handlePlaceholderHeight(): void {
+	notify();
+}
+
+requestApi();
+
+onMounted(() => {
+	nextTick(() => {
+		handlePlaceholderHeight();
+	});
+});
+
+onMounted(async () => {
+	await nextTick();
+	handlePlaceholderHeight();
+});
+
+const handler: () => void = () => notify();
+handler();
+`;
+	const invalidSource = `declare function requestApi(): Promise<void>;
+declare function save(item: number): Promise<void>;
+
+[1, 2].forEach(async (item) => {
+	await save(item);
+});
+async function redundantAsync() {
+	return 1;
+}
+void requestApi();
+`;
+
+	for (const filePath of ["tests/fixtures/promise-safety.ts", "tests/fixtures/promise-safety-component.tsx"]) {
+		const [validResult] = await linter.lintText(validSource, { filePath });
+		const calculated = await linter.calculateConfigForFile(filePath);
+
+		assert.equal(validResult.errorCount, 0, validResult.messages.map((message) => `${message.ruleId}: ${message.message}`).join(", "));
+		assert.equal(calculated.rules["@typescript-eslint/no-floating-promises"][0], 0);
+		assert.equal(calculated.rules["@typescript-eslint/no-misused-promises"][0], 2);
+		assert.equal(calculated.rules["@typescript-eslint/require-await"][0], 2);
+		assert.deepEqual(calculated.rules["@typescript-eslint/return-await"], [2, "error-handling-correctness-only"]);
+		assert.equal(calculated.rules["@typescript-eslint/strict-void-return"][0], 0);
+		assert.equal(calculated.rules["no-void"][0], 2);
+		assert.equal(calculated.rules["@typescript-eslint/explicit-function-return-type"][0], 2);
+		assert.equal(calculated.rules["@typescript-eslint/explicit-module-boundary-types"][0], 2);
+	}
+
+	const vueLinter = createLinter(fastConfig());
+	const [vueResult] = await vueLinter.lintText(
+		`<script setup lang="ts">
+type ElSelectorOutput = string;
+
+declare function defineEmits<T extends Record<string, (...args: never[]) => boolean>>(
+	validators: T,
+): <K extends keyof T>(event: K, ...args: Parameters<T[K]>) => void;
+
+const emit = defineEmits({
+	change: (value: ElSelectorOutput) => true,
+});
+
+const handleChange = (data: ElSelectorOutput) => {
+	emit("change", data);
+};
+</script>
+
+<template>
+	<ElSelector @change="handleChange" />
+</template>
+`,
+		{ filePath: "tests/fixtures/PromiseSafety.vue" }
+	);
+	assert.equal(vueResult.errorCount, 0, vueResult.messages.map((message) => `${message.ruleId}: ${message.message}`).join(", "));
+	const [vueInvalidResult] = await vueLinter.lintText(
+		`<script setup lang="ts">
+const unusedValue = 1;
+</script>
+`,
+		{ filePath: "tests/fixtures/PromiseSafety.vue" }
+	);
+	assert.ok(vueInvalidResult.messages.some((message) => message.ruleId === "@typescript-eslint/no-unused-vars"));
+
+	const [invalidResult] = await linter.lintText(invalidSource, { filePath: "tests/fixtures/promise-safety.ts" });
+	assert.ok(invalidResult.messages.some((message) => message.ruleId === "@typescript-eslint/no-misused-promises"));
+	assert.ok(invalidResult.messages.some((message) => message.ruleId === "@typescript-eslint/require-await"));
+	assert.ok(invalidResult.messages.some((message) => message.ruleId === "@typescript-eslint/explicit-function-return-type"));
+	assert.ok(invalidResult.messages.some((message) => message.ruleId === "no-void"));
 });
 
 test("root Vue configuration includes UniApp globals, nvue parsing, manifest comments, and output ignores", async () => {
@@ -296,6 +393,14 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(javaScriptConfig.rules["no-use-before-define"][1].functions, false);
 	assert.equal(javaScriptConfig.rules["logical-assignment-operators"][0], 2);
 	assert.equal(javaScriptConfig.rules["prefer-object-spread"][0], 2);
+	assert.equal(javaScriptConfig.rules.camelcase[0], 2);
+	assert.equal(javaScriptConfig.rules.camelcase[1].properties, "never");
+	assert.equal(javaScriptConfig.rules["no-empty"][0], 2);
+	assert.equal(javaScriptConfig.rules["no-empty"][1].allowEmptyCatch, true);
+	assert.equal(javaScriptConfig.rules["no-eval"][0], 2);
+	assert.deepEqual(javaScriptConfig.rules.curly, [2, "multi-line", "consistent"]);
+	assert.equal(javaScriptConfig.rules["default-case-last"][0], 2);
+	assert.equal(javaScriptConfig.rules["no-void"][0], 2);
 	assert.equal(javaScriptConfig.rules["import-x/order"][0], 2);
 	assert.equal(javaScriptConfig.rules["import-x/order"][1].warnOnUnassignedImports, true);
 	assert.equal(javaScriptConfig.rules["import-x/order"][1].sortTypesGroup, true);
@@ -307,19 +412,65 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(javaScriptConfig.rules["import-x/style-imports-last"][0], 2);
 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unused-vars"][1].argsIgnorePattern, "^_");
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unused-vars"][1].varsIgnorePattern, undefined);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-module-boundary-types"][1].allowArgumentsExplicitlyTypedAsAny, false);
-	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-function-return-type"]?.[0] ?? 0, 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-function-return-type"][0], 2);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-explicit-any"][0], 1);
 	assert.deepEqual(typeScriptConfig.rules["@typescript-eslint/no-empty-function"][1].allow, ["constructors", "overrideMethods"]);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-imports"][1].fixStyle, "separate-type-imports");
 	assert.equal(typeScriptConfig.languageOptions.parserOptions.projectService, true);
 	assert.deepEqual(typeScriptConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-floating-promises"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-misused-promises"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/await-thenable"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/require-await"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unsafe-argument"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unsafe-assignment"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unsafe-call"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unsafe-member-access"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unsafe-return"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/strict-void-return"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-meaningless-void-operator"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-confusing-void-expression"][1].ignoreArrowShorthand, true);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/restrict-template-expressions"][1].allowNumber, true);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-dynamic-delete"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-extraneous-class"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-deprecated"][0], 1);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unnecessary-condition"][0], 1);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/switch-exhaustiveness-check"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-definitions"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-indexed-object-style"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/class-literal-property-style"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/prefer-regexp-exec"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-exports"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/prefer-readonly"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/prefer-nullish-coalescing"][1].ignorePrimitives, true);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/unified-signatures"][1].ignoreDifferentlyNamedParameters, true);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/unified-signatures"][1].ignoreOverloadsWithDifferentJSDoc, true);
 
 	assert.equal(vueConfig.rules["vue/attribute-hyphenation"][1], "always");
 	assert.equal(vueConfig.rules["vue/no-v-html"][0], 1);
 	assert.equal(vueConfig.rules["vue/no-v-text-v-html-on-component"][0], 2);
 	assert.deepEqual(vueConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
+	assert.equal(vueConfig.rules["@typescript-eslint/explicit-function-return-type"][0], 0);
+	assert.equal(vueConfig.rules["@typescript-eslint/explicit-module-boundary-types"][0], 0);
+	assert.equal(vueConfig.rules["@typescript-eslint/no-unused-vars"][1].args, "none");
+	assert.equal(vueConfig.rules["@typescript-eslint/no-unused-vars"][1].caughtErrors, "none");
 	assert.deepEqual(typeScriptConfig.languageOptions.parserOptions.extraFileExtensions, vueConfig.languageOptions.parserOptions.extraFileExtensions);
+	for (const ruleName of [
+		"@typescript-eslint/no-misused-promises",
+		"@typescript-eslint/await-thenable",
+		"@typescript-eslint/require-await",
+		"@typescript-eslint/no-unsafe-argument",
+		"@typescript-eslint/no-unsafe-assignment",
+		"@typescript-eslint/no-unsafe-call",
+		"@typescript-eslint/no-unsafe-member-access",
+		"@typescript-eslint/no-unsafe-return",
+	]) {
+		assert.equal(vueConfig.rules[ruleName][0], 2, `${ruleName} must remain enabled for Vue files`);
+	}
+	assert.equal(vueConfig.rules["@typescript-eslint/no-floating-promises"][0], 0);
+	assert.equal(vueConfig.rules["@typescript-eslint/strict-void-return"][0], 0);
 });
 
 test("manifest sorting is enabled and preserves semantic exports condition order", async () => {

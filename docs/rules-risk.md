@@ -1,6 +1,6 @@
 # Default Rules and Risk Guide
 
-This document describes the current 2.1.5 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
+This document describes the current 2.1.6 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
 
 ## Configuration model
 
@@ -21,23 +21,25 @@ The root entry is a fixed Vue 3 + TypeScript + UniApp preset:
 
 ## Preset sources
 
-| Domain     | Preset or implementation                                                   |
-| ---------- | -------------------------------------------------------------------------- |
-| JavaScript | `@eslint/js` recommended plus local rules                                  |
-| TypeScript | typescript-eslint `recommendedTypeChecked` plus Project Service            |
-| Vue        | `eslint-plugin-vue` `flat/recommended` plus type-aware TypeScript          |
-| React      | `@eslint-react` recommended/type-checked plus React Hooks Flat Recommended |
-| Angular    | Angular ESLint TypeScript, template, and accessibility recommended presets |
-| JSON       | `eslint-plugin-jsonc` recommended presets for three dialects               |
-| Import     | `eslint-plugin-import-x` recommended plus a fixed ordering policy          |
-| RegExp     | Explicit correctness, safety, and super-linear backtracking rules          |
-| Prettier   | `eslint-config-prettier` conflict disabling                                |
+| Domain     | Preset or implementation                                                      |
+| ---------- | ----------------------------------------------------------------------------- |
+| JavaScript | `@eslint/js` recommended plus local rules                                     |
+| TypeScript | typescript-eslint strict and stylistic type-checked presets + Project Service |
+| Vue        | `eslint-plugin-vue` `flat/recommended` plus type-aware TypeScript             |
+| React      | `@eslint-react` recommended/type-checked plus React Hooks Flat Recommended    |
+| Angular    | Angular ESLint TypeScript, template, and accessibility recommended presets    |
+| JSON       | `eslint-plugin-jsonc` recommended presets for three dialects                  |
+| Import     | `eslint-plugin-import-x` recommended plus a fixed ordering policy             |
+| RegExp     | Explicit correctness, safety, and super-linear backtracking rules             |
+| Prettier   | `eslint-config-prettier` conflict disabling                                   |
 
 ## Major rules
 
 ### JavaScript
 
-- `camelcase: ["error", { properties: "never" }]`
+- `camelcase: ["error", { properties: "never" }]` requires camelCase variables and types while preserving external protocol property names.
+- `no-empty` allows intentionally empty catches and still reports other empty blocks.
+- `no-eval` and `no-void` are errors; `curly: ["error", "multi-line", "consistent"]` applies, and an existing `default` branch must come last.
 - `no-debugger: "error"`
 - `no-use-before-define` warns; classes and variables must be declared first while function declarations may be hoisted.
 - `prefer-arrow-callback`, `logical-assignment-operators`, and `prefer-object-spread` are errors.
@@ -48,14 +50,21 @@ The root entry is a fixed Vue 3 + TypeScript + UniApp preset:
 
 ### TypeScript
 
-- `recommendedTypeChecked` and `projectService: true` are always enabled; TypeScript, TSX, Vue, and NVue share `extraFileExtensions: [".vue", ".nvue"]` to prevent Project Service reloads during mixed-file linting.
+- `strictTypeChecked`, `stylisticTypeChecked`, and `projectService: true` are always enabled; TypeScript, TSX, Vue, and NVue share `extraFileExtensions: [".vue", ".nvue"]` to prevent Project Service reloads during mixed-file linting.
+- `no-floating-promises` and `strict-void-return` are disabled so Promise waiting follows business semantics; `no-void` rejects `void promise` workarounds. `no-misused-promises`, `await-thenable`, `require-await`, and the unsafe-type rules remain strict.
+- Named TypeScript and TSX functions require explicit return types, except inline callbacks and already typed function expressions; exported module boundaries still require explicit types.
+- Vue/NVue SFCs disable function-return and module-boundary annotations and unused parameter checks, while unused variables and imports remain errors. Templates do not infer parameter types back into standalone script handlers, so those parameters still require explicit annotations.
 - `explicit-module-boundary-types` is an error and does not allow explicitly typed `any` arguments as an escape hatch.
-- `explicit-function-return-type` is not additionally enabled, so internal functions and callbacks can rely on inference.
 - `no-explicit-any` warns.
-- `no-unused-vars` is an error; an `_` prefix marks intentional omissions and rest siblings are ignored.
+- Regular TS/TSX parameters and caught errors can use an `_` prefix to mark intentional omissions; ordinary variables cannot use that prefix to evade the check.
 - `no-empty-function` only allows empty constructors and override methods.
 - `consistent-type-imports` fixes type-only dependencies as separate `import type` declarations.
 - `no-non-null-assertion` is an error.
+- `switch-exhaustiveness-check` is an error; `no-deprecated` and `no-unnecessary-condition` warn.
+- Numeric template interpolation and concise void arrow callbacks are allowed; dynamic object deletion and static-only utility classes are not forcibly rewritten.
+- `consistent-type-exports` and `prefer-readonly` are errors; primitive values are not forced from `||` to `??`.
+- `unified-signatures` preserves public overloads with different parameter names or standalone JSDoc; the stricter core `no-void` replaces `no-meaningless-void-operator`.
+- `consistent-type-definitions`, `consistent-indexed-object-style`, `class-literal-property-style`, and `prefer-regexp-exec` are disabled as syntax-only preferences.
 
 ### Vue
 

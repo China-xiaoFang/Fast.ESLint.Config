@@ -110,7 +110,7 @@ const createVueProjectConfigs = ({ environment = "browser" }: FastConfigOptions 
  *
  * @remarks
  * 除运行环境外，根入口不提供能力启停开关。TypeScript 和 Vue 始终使用
- * `recommendedTypeChecked` 与 Project Service；被检查文件必须属于可发现的 tsconfig。
+ * `strictTypeChecked`、`stylisticTypeChecked` 与 Project Service；被检查文件必须属于可发现的 tsconfig。
  * 额外配置会放在全部内置片段之后，因此可以覆盖项目规则、globals、ignores 或解析器选项。
  *
  * @param options - 应用代码的运行环境。

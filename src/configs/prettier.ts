@@ -1,8 +1,9 @@
 import { defineConfig } from "eslint/config";
 import eslintConfigPrettierFlat from "eslint-config-prettier/flat";
 
-// Vue 闭合括号换行约定与 Prettier 输出一致，无需由兼容层关闭。
+// 这些规则与 Prettier 输出兼容，并承载项目约定，无需由兼容层关闭。
 const prettierRules = { ...eslintConfigPrettierFlat.rules };
+delete prettierRules.curly;
 delete prettierRules["vue/html-closing-bracket-newline"];
 
 /**

@@ -6,6 +6,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.1.6 - 2026-09-11
+
+### Added
+
+- Added exhaustive switch checks, type-only export enforcement, readonly private-member detection, direct `eval` rejection, multiline brace consistency, and final-position `default` branches.
+- Added runtime coverage for TypeScript, TSX, Vue, and NVue rule precedence, concise Vue `defineEmits` validators, Promise waiting policy, and retained Promise misuse checks.
+
+### Changed
+
+- Replaced `recommendedTypeChecked` with the official `strictTypeChecked` and `stylisticTypeChecked` baselines without enabling the mechanical `all` preset.
+- Required return types for named TypeScript and TSX functions while preserving contextual inference for inline callbacks; Vue and NVue SFCs no longer require function-return or module-boundary annotations and may keep declarative callback parameters without underscore prefixes.
+- Made Promise waiting, ordering, and error handling an application decision by disabling `no-floating-promises` and `strict-void-return`, while retaining `no-misused-promises`, `await-thenable`, `require-await`, correctness-only `return-await`, and unsafe-type checks.
+- Rejected `void promise` workarounds, allowed concise void-returning arrow callbacks and numeric template interpolation, preserved primitive `||` semantics, and retained distinct public overloads with meaningful parameter names or JSDoc.
+- Reduced syntax-only enforcement for type declarations, indexed objects, literal class properties, RegExp calls, dynamic object deletion, and static utility classes; deprecated APIs and apparently unnecessary runtime guards now warn instead of blocking builds.
+- Updated runtime and development dependencies to their latest compatible releases while retaining TypeScript 6, tsdown 0.22, and the existing peer compatibility ranges.
+
 ## 2.1.5 - 2026-09-01
 
 ### Changed

@@ -13,7 +13,7 @@
 - JavaScript、TypeScript、Import 和 RegExp 只有一套共享规则。
 - `@/**` 根别名归入 internal；类型导入位于所有其他非样式导入之后，并在 type 总分组内按来源层级排序。
 - 样式导入由独立规则约束为最后一个连续分组，不参与普通 import 字母排序，也不提供自动修复。
-- TypeScript、Vue 和 React TypeScript 始终使用 `recommendedTypeChecked` 与 Project Service。
+- TypeScript、Vue 和 React TypeScript 始终使用 `strictTypeChecked`、`stylisticTypeChecked` 与 Project Service。
 - Vue 使用 `flat/recommended`，并叠加事件声明、kebab-case 属性、闭合标签和排序规则。
 - RegExp 使用显式审查过的正确性与安全规则，不继承完整偏好型推荐集合。
 - React 使用 `@eslint-react` 推荐预置和 React 官方 Hooks Recommended，并关闭重复实现。
@@ -38,7 +38,7 @@
 | ------------- | ---- | -------------------------------------------------- |
 | 公共 API      | 通过 | 根入口固定、其他能力由独立子路径组合               |
 | JavaScript    | 通过 | 核心 recommended + 统一现代语法规则                |
-| TypeScript    | 通过 | 固定 `recommendedTypeChecked` 与 Project Service   |
+| TypeScript    | 通过 | 固定严格、风格类型感知预置与 Project Service       |
 | Vue 3         | 通过 | `vue-eslint-parser` + `flat/recommended`           |
 | UniApp        | 通过 | 默认 `.nvue`、globals、清单注释和 `unpackage` 忽略 |
 | React         | 通过 | 显式组合 JSX/TSX、Hooks Recommended 与 DOM 安全    |

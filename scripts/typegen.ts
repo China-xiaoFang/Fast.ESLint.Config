@@ -13,6 +13,8 @@ const outputUrl = new URL("../src/typegen.d.ts", import.meta.url);
 const checkOnly = process.argv.includes("--check");
 
 const corePlugin: ESLint.Plugin = {
+	// ESLint 暂无公开 API 可枚举核心规则，类型生成需要集中读取该完整 schema。
+	// eslint-disable-next-line @typescript-eslint/no-deprecated
 	rules: Object.fromEntries(builtinRules.entries()),
 };
 

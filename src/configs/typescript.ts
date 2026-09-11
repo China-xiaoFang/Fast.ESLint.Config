@@ -6,7 +6,7 @@ import { javascriptRules, typescriptRules, typescriptTypeCheckedRules } from "..
 import type { Linter } from "eslint";
 
 /**
- * 返回 typescript-eslint 推荐预置。
+ * 返回 typescript-eslint 严格且类型感知的官方预置。
  *
  * @returns ESLint 核心推荐规则与对应的 typescript-eslint 推荐预置。
  */
@@ -17,7 +17,8 @@ export const getTypeScriptPresetConfigs = (): Linter.Config[] =>
 			name: "@fast-china/typescript/javascript-rules",
 			rules: javascriptRules,
 		},
-		...tseslint.configs.recommendedTypeChecked,
+		...tseslint.configs.strictTypeChecked,
+		...tseslint.configs.stylisticTypeChecked,
 	] as Linter.Config[];
 
 /**
@@ -38,7 +39,7 @@ export const createTypeScriptParserOptions = (): Linter.ParserOptions => ({
  * 创建 TypeScript 配置。
  *
  * @remarks
- * 始终采用 ESLint 与 typescript-eslint 的 `recommendedTypeChecked` 预置并启动 Project Service。
+ * 始终采用 ESLint 与 typescript-eslint 的 `strictTypeChecked`、`stylisticTypeChecked` 预置并启动 Project Service。
  * 被检查文件必须属于可发现的 tsconfig。特殊项目可在后置 Flat Config 中覆盖解析器选项。
  *
  * @param files - 应用 TypeScript 配置的 ESLint glob 列表。

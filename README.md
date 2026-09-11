@@ -108,7 +108,7 @@ Trailing configs have the highest precedence. `defineRules()` leaves the object 
 
 ## TypeScript
 
-`createTypeScriptConfigs()`, Vue SFCs, and React TSX always use `recommendedTypeChecked` with:
+`createTypeScriptConfigs()`, Vue SFCs, and React TSX always use `strictTypeChecked` plus `stylisticTypeChecked` with:
 
 ```js
 parserOptions: {
@@ -118,6 +118,14 @@ parserOptions: {
 ```
 
 Linted files must belong to a discoverable `tsconfig.json`. The same `extraFileExtensions` list is applied to TypeScript, TSX, Vue, and NVue files so Project Service does not reload the project while linting mixed file types. The `typeChecked` and `tsconfigRootDir` wrapper options have been removed. Complex monorepos can override `languageOptions.parserOptions` in a trailing Flat Config when necessary, but every type-aware file override in the same project must keep `extraFileExtensions` identical.
+
+Developers decide whether a Promise must be awaited, returned, or handled from the required ordering and error semantics. Therefore, `no-floating-promises` and `strict-void-return` are disabled, framework allowlists are unnecessary, and `void promise` is rejected. `no-misused-promises`, `await-thenable`, `require-await`, and the unsafe type rules remain strict, so invalid async callbacks, invalid `await` expressions, and `async` functions without asynchronous behavior are still reported.
+
+`return-await` keeps the strict preset's `error-handling-correctness-only` mode instead of forcing stylistic `await` expressions.
+
+Named TypeScript and TSX functions and module boundaries require explicit types, while inline callbacks and already typed function expressions keep contextual inference. Vue/NVue SFCs disable function-return and module-boundary annotations and allow unused parameters in declarative callbacks such as `defineEmits` validators; unused variables and imports are still reported. Standalone SFC handler parameters that cannot be inferred back from templates still require explicit types.
+
+Type-only exports use `export type`, and private members assigned only during construction use `readonly`. Primitive values retain the semantic choice between `||` and `??`, while public overloads with different parameter names or standalone JSDoc are preserved. Shared JavaScript rules reject `eval` and the `void` operator, require consistent braces for multiline branches, and place an existing `default` branch last.
 
 ## React
 

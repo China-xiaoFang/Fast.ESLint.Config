@@ -55,7 +55,6 @@ const ruleOptions = {
 			caughtErrors: "all",
 			caughtErrorsIgnorePattern: "^_",
 			ignoreRestSiblings: true,
-			varsIgnorePattern: "^_",
 		},
 	],
 	"logical-assignment-operators": ["error", "always", { enforceForIfStatements: true }],
@@ -64,7 +63,7 @@ const ruleOptions = {
 	"vue/attribute-hyphenation": ["error", "always"],
 } satisfies RuleOptions;
 
-void ruleOptions;
+defineRules(ruleOptions);
 
 const baseOptions: FastConfigOptions = { environment: "node" };
 defineConfig(createBaseConfigs(baseOptions));
@@ -76,8 +75,7 @@ defineConfig([...createBaseConfigs(), ...createReactConfigs(reactOptions)]);
 
 const lodashPreference: LodashPreference = "lodash";
 defineConfig(createLodashConfigs(lodashPreference));
-void lodashPreference;
-void (undefined as unknown as RootAngularConfigOptions);
+export type { RootAngularConfigOptions };
 
 // @ts-expect-error -- Unknown rule names must be rejected.
 defineRules({ "vue/not-a-real-rule": "error" });

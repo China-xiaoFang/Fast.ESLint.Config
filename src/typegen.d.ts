@@ -56,7 +56,7 @@ export interface RuleOptions {
    * Requires inject() calls to be declared at the top of the class, before any other member
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/inject-at-top.md
    */
-  '@angular-eslint/inject-at-top'?: Linter.RuleEntry<[]>
+  '@angular-eslint/inject-at-top'?: Linter.RuleEntry<AngularEslintInjectAtTop>
   /**
    * Angular Lifecycle methods should not be async. Angular does not wait for async lifecycle but the code incorrectly suggests it does.
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/no-async-lifecycle-method.md
@@ -171,7 +171,7 @@ export interface RuleOptions {
    * Ensures components do not opt out of the default `ChangeDetectionStrategy.OnPush` change detection strategy
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/prefer-on-push-component-change-detection.md
    */
-  '@angular-eslint/prefer-on-push-component-change-detection'?: Linter.RuleEntry<[]>
+  '@angular-eslint/prefer-on-push-component-change-detection'?: Linter.RuleEntry<AngularEslintPreferOnPushComponentChangeDetection>
   /**
    * Use `OutputEmitterRef` instead of `@Output()`
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/prefer-output-emitter-ref.md
@@ -191,7 +191,7 @@ export interface RuleOptions {
    * Use `model` instead of `input` and `output` for two-way bindings
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/prefer-signal-model.md
    */
-  '@angular-eslint/prefer-signal-model'?: Linter.RuleEntry<[]>
+  '@angular-eslint/prefer-signal-model'?: Linter.RuleEntry<AngularEslintPreferSignalModel>
   /**
    * Use readonly signals instead of `@Input()`, `@ViewChild()` and other legacy decorators
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/prefer-signals.md
@@ -202,6 +202,11 @@ export interface RuleOptions {
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/prefer-standalone.md
    */
   '@angular-eslint/prefer-standalone'?: Linter.RuleEntry<[]>
+  /**
+   * Ensures that reactive contexts such as computed(), linkedSignal() and effect() read at least one reactive value (a signal). A reactive context with no reactive dependencies never re-runs, which is almost always a mistake.
+   * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/reactive-context-must-read-signal.md
+   */
+  '@angular-eslint/reactive-context-must-read-signal'?: Linter.RuleEntry<AngularEslintReactiveContextMustReadSignal>
   /**
    * The ./ and ../ prefix is standard syntax for relative URLs; don't depend on Angular's current ability to do without that prefix.
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/relative-url-prefix.md
@@ -223,7 +228,7 @@ export interface RuleOptions {
    */
   '@angular-eslint/runtime-localize'?: Linter.RuleEntry<[]>
   /**
-   * Ensures that keys in type decorators (Component, Directive, NgModule, Pipe) are sorted in a consistent order
+   * Ensures that keys in type decorators (Component, Directive, Injectable, NgModule, Pipe) are sorted in a consistent order
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin/docs/rules/sort-keys-in-type-decorator.md
    */
   '@angular-eslint/sort-keys-in-type-decorator'?: Linter.RuleEntry<AngularEslintSortKeysInTypeDecorator>
@@ -408,6 +413,11 @@ export interface RuleOptions {
    */
   '@angular-eslint/template/prefer-static-string-properties'?: Linter.RuleEntry<AngularEslintTemplatePreferStaticStringProperties>
   /**
+   * Suggests using [style] bindings over ngStyle where applicable
+   * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin-template/docs/rules/prefer-style-binding.md
+   */
+  '@angular-eslint/template/prefer-style-binding'?: Linter.RuleEntry<[]>
+  /**
    * Ensure that template literals are used instead of concatenating strings or expressions.
    * @see https://github.com/angular-eslint/angular-eslint/blob/main/packages/eslint-plugin-template/docs/rules/prefer-template-literal.md
    */
@@ -558,7 +568,7 @@ export interface RuleOptions {
    */
   '@eslint-react/globals'?: Linter.RuleEntry<[]>
   /**
-   * Validates against passing functions that mutate captured local variables into frozen contexts such as JSX props, hook arguments, and hook return values.
+   * Validates against mutating props, state, and other immutable values, including through functions passed into frozen contexts such as JSX props, hook arguments, and hook return values.
    * @see https://eslint-react.xyz/docs/rules/immutability
    */
   '@eslint-react/immutability'?: Linter.RuleEntry<[]>
@@ -913,7 +923,7 @@ export interface RuleOptions {
    */
   '@eslint-react/x-globals'?: Linter.RuleEntry<[]>
   /**
-   * Validates against passing functions that mutate captured local variables into frozen contexts such as JSX props, hook arguments, and hook return values.
+   * Validates against mutating props, state, and other immutable values, including through functions passed into frozen contexts such as JSX props, hook arguments, and hook return values.
    * @see https://eslint-react.xyz/docs/rules/immutability
    */
   '@eslint-react/x-immutability'?: Linter.RuleEntry<[]>
@@ -1373,6 +1383,11 @@ export interface RuleOptions {
    * @see https://typescript-eslint.io/rules/no-for-in-array
    */
   '@typescript-eslint/no-for-in-array'?: Linter.RuleEntry<[]>
+  /**
+   * Disallow type operations that resolve to the "empty object" type
+   * @see https://typescript-eslint.io/rules/no-generated-empty-object-type
+   */
+  '@typescript-eslint/no-generated-empty-object-type'?: Linter.RuleEntry<[]>
   /**
    * Disallow the use of `eval()`-like functions
    * @see https://typescript-eslint.io/rules/no-implied-eval
@@ -3505,7 +3520,7 @@ export interface RuleOptions {
    * Disallow unmodified loop conditions
    * @see https://eslint.org/docs/latest/rules/no-unmodified-loop-condition
    */
-  'no-unmodified-loop-condition'?: Linter.RuleEntry<[]>
+  'no-unmodified-loop-condition'?: Linter.RuleEntry<NoUnmodifiedLoopCondition>
   /**
    * Disallow ternary operators when simpler alternatives exist
    * @see https://eslint.org/docs/latest/rules/no-unneeded-ternary
@@ -5157,6 +5172,11 @@ export interface RuleOptions {
    */
   'vue/no-setup-props-reactivity-loss'?: Linter.RuleEntry<[]>
   /**
+   * disallow the use of event names that collide with native web event names
+   * @see https://eslint.vuejs.org/rules/no-shadow-native-events.html
+   */
+  'vue/no-shadow-native-events'?: Linter.RuleEntry<[]>
+  /**
    * enforce component's data property to be a function
    * @see https://eslint.vuejs.org/rules/no-shared-component-data.html
    */
@@ -5833,6 +5853,11 @@ type AngularEslintDirectiveSelector = []|[({
   prefix?: (string | unknown[])
   style: ("camelCase" | "kebab-case")
 }])]
+// ----- @angular-eslint/inject-at-top -----
+type AngularEslintInjectAtTop = []|[{
+
+  additionalInjectFunctions?: string[]
+}]
 // ----- @angular-eslint/no-input-prefix -----
 type AngularEslintNoInputPrefix = []|[{
   prefixes?: string[]
@@ -5846,6 +5871,15 @@ type AngularEslintNoInputRename = []|[{
 type AngularEslintPipePrefix = []|[{
   prefixes?: string[]
 }]
+// ----- @angular-eslint/prefer-on-push-component-change-detection -----
+type AngularEslintPreferOnPushComponentChangeDetection = []|[{
+
+  allowExplicitOnPush?: boolean
+}]
+// ----- @angular-eslint/prefer-signal-model -----
+type AngularEslintPreferSignalModel = []|[{
+  useTypeChecking?: boolean
+}]
 // ----- @angular-eslint/prefer-signals -----
 type AngularEslintPreferSignals = []|[{
   preferReadonlySignalProperties?: boolean
@@ -5853,6 +5887,11 @@ type AngularEslintPreferSignals = []|[{
   preferQuerySignals?: boolean
   useTypeChecking?: boolean
   additionalSignalCreationFunctions?: string[]
+}]
+// ----- @angular-eslint/reactive-context-must-read-signal -----
+type AngularEslintReactiveContextMustReadSignal = []|[{
+
+  checkResources?: boolean
 }]
 // ----- @angular-eslint/require-localize-metadata -----
 type AngularEslintRequireLocalizeMetadata = []|[{
@@ -5864,8 +5903,10 @@ type AngularEslintRequireLocalizeMetadata = []|[{
 type AngularEslintSortKeysInTypeDecorator = []|[{
   Component?: string[]
   Directive?: string[]
+  Injectable?: string[]
   NgModule?: string[]
   Pipe?: string[]
+  allowUnconfiguredProperties?: boolean
 }]
 // ----- @angular-eslint/template/attributes-order -----
 type AngularEslintTemplateAttributesOrder = []|[{
@@ -5875,11 +5916,17 @@ type AngularEslintTemplateAttributesOrder = []|[{
 }]
 // ----- @angular-eslint/template/button-has-type -----
 type AngularEslintTemplateButtonHasType = []|[{
+
   ignoreWithDirectives?: string[]
 }]
 // ----- @angular-eslint/template/click-events-have-key-events -----
 type AngularEslintTemplateClickEventsHaveKeyEvents = []|[{
+
   ignoreWithDirectives?: string[]
+
+  requireKeyCode?: boolean
+
+  allowedKeyCodes?: string[]
 }]
 // ----- @angular-eslint/template/conditional-complexity -----
 type AngularEslintTemplateConditionalComplexity = []|[{
@@ -5941,8 +5988,10 @@ type AngularEslintTemplateNoDuplicateAttributes = []|[{
 }]
 // ----- @angular-eslint/template/no-inline-styles -----
 type AngularEslintTemplateNoInlineStyles = []|[{
-  allowNgStyle?: boolean
-  allowBindToStyle?: boolean
+
+  allowNgStyle?: (boolean | "dynamic")
+
+  allowBindToStyle?: (boolean | "dynamic")
 }]
 // ----- @angular-eslint/template/no-interpolation-in-attributes -----
 type AngularEslintTemplateNoInterpolationInAttributes = []|[{
@@ -5985,6 +6034,7 @@ type AngularEslintTemplateUseTrackByFunction = []|[{
 // ----- @angular-eslint/use-injectable-provided-in -----
 type AngularEslintUseInjectableProvidedIn = []|[{
   ignoreClassNamePattern?: string
+  allowProvidedInNull?: boolean
 }]
 // ----- @eslint-react/dom-no-unknown-property -----
 type EslintReactDomNoUnknownProperty = []|[{
@@ -6705,7 +6755,10 @@ type TypescriptEslintNoMeaninglessVoidOperator = []|[{
 // ----- @typescript-eslint/no-misused-promises -----
 type TypescriptEslintNoMisusedPromises = []|[{
 
-  checksConditionals?: boolean
+  checksConditionals?: (boolean | {
+
+    flagUnions?: ("all" | "strict" | "none")
+  })
 
   checksSpreads?: boolean
 
@@ -8039,15 +8092,19 @@ type JsoncSortKeys = ([{
   hasProperties?: string[]
   order: ((string | {
     keyPattern?: string
-    order?: {
+    order?: ({
       type?: ("asc" | "desc")
       caseSensitive?: boolean
       natural?: boolean
-    }
+    } | {
+      type: "ignore"
+    })
   })[] | {
     type?: ("asc" | "desc")
     caseSensitive?: boolean
     natural?: boolean
+  } | {
+    type: "ignore"
   })
   minKeys?: number
   allowLineSeparatedGroups?: boolean
@@ -8056,15 +8113,19 @@ type JsoncSortKeys = ([{
   hasProperties?: string[]
   order: ((string | {
     keyPattern?: string
-    order?: {
+    order?: ({
       type?: ("asc" | "desc")
       caseSensitive?: boolean
       natural?: boolean
-    }
+    } | {
+      type: "ignore"
+    })
   })[] | {
     type?: ("asc" | "desc")
     caseSensitive?: boolean
     natural?: boolean
+  } | {
+    type: "ignore"
   })
   minKeys?: number
   allowLineSeparatedGroups?: boolean
@@ -8995,6 +9056,10 @@ type NoUnderscoreDangle = []|[{
   enforceInClassFields?: boolean
   allowInArrayDestructuring?: boolean
   allowInObjectDestructuring?: boolean
+}]
+// ----- no-unmodified-loop-condition -----
+type NoUnmodifiedLoopCondition = []|[{
+  checkConditionalExpressions?: boolean
 }]
 // ----- no-unneeded-ternary -----
 type NoUnneededTernary = []|[{
@@ -10318,7 +10383,7 @@ type VueNoDeprecatedSlotAttribute = []|[{
 }]
 // ----- vue/no-dupe-keys -----
 type VueNoDupeKeys = []|[{
-  groups?: unknown[]
+  groups?: string[]
 }]
 // ----- vue/no-duplicate-attr-inheritance -----
 type VueNoDuplicateAttrInheritance = []|[{
@@ -10443,8 +10508,8 @@ type VueNoReservedComponentNames = []|[{
 }]
 // ----- vue/no-reserved-keys -----
 type VueNoReservedKeys = []|[{
-  reserved?: unknown[]
-  groups?: unknown[]
+  reserved?: string[]
+  groups?: string[]
 }]
 // ----- vue/no-reserved-props -----
 type VueNoReservedProps = []|[{
@@ -10533,7 +10598,7 @@ type VueNoTemplateTargetBlank = []|[{
 }]
 // ----- vue/no-undef-components -----
 type VueNoUndefComponents = []|[{
-  ignorePatterns?: unknown[]
+  ignorePatterns?: string[]
 }]
 // ----- vue/no-undef-directives -----
 type VueNoUndefDirectives = []|[{
@@ -10640,7 +10705,7 @@ type VueOperatorLinebreak = []|[("after" | "before" | "none" | null)]|[("after" 
 }]
 // ----- vue/order-in-components -----
 type VueOrderInComponents = []|[{
-  order?: unknown[]
+  order?: (string | string[])[]
 }]
 // ----- vue/padding-line-between-blocks -----
 type VuePaddingLineBetweenBlocks = []|[("never" | "always")]
@@ -10729,8 +10794,8 @@ type VueSlotNameCasing = []|[("camelCase" | "kebab-case" | "singleword")]
 // ----- vue/sort-keys -----
 type VueSortKeys = []|[("asc" | "desc")]|[("asc" | "desc"), {
   caseSensitive?: boolean
-  ignoreChildrenOf?: unknown[]
-  ignoreGrandchildrenOf?: unknown[]
+  ignoreChildrenOf?: string[]
+  ignoreGrandchildrenOf?: string[]
   minKeys?: number
   natural?: boolean
   allowLineSeparatedGroups?: boolean
@@ -10789,7 +10854,7 @@ type VueValidVFor = []|[{
 }]
 // ----- vue/valid-v-on -----
 type VueValidVOn = []|[{
-  modifiers?: unknown[]
+  modifiers?: string[]
 }]
 // ----- vue/valid-v-slot -----
 type VueValidVSlot = []|[{

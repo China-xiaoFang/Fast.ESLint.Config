@@ -46,9 +46,11 @@ test("published source maps are self-contained", () => {
 	const visit = (directory) => {
 		for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
 			const filePath = new URL(`../${directory}/${entry.name}`, import.meta.url);
-			if (entry.isDirectory()) visit(`${directory}/${entry.name}`);
-			else if (entry.name.endsWith(".d.mts.map")) assert.fail(`unexpected declaration map: ${filePath.pathname}`);
-			else if (entry.name.endsWith(".mjs.map")) {
+			if (entry.isDirectory()) {
+				visit(`${directory}/${entry.name}`);
+			} else if (entry.name.endsWith(".d.mts.map")) {
+				assert.fail(`unexpected declaration map: ${filePath.pathname}`);
+			} else if (entry.name.endsWith(".mjs.map")) {
 				const sourceMap = JSON.parse(fs.readFileSync(filePath, "utf8"));
 				assert.equal(sourceMap.sources.length, sourceMap.sourcesContent?.length, filePath.pathname);
 			}

@@ -6,3 +6,6 @@ storeDir: .pnpm-store
 allowBuilds:
     esbuild: true
     unrs-resolver: true
+
+minimumReleaseAgeExclude:
+    - "@eslint/config-inspector@3.4.1"

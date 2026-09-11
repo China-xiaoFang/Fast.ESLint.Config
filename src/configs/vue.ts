@@ -34,12 +34,15 @@ export const createVueConfigs = (): ReturnType<typeof defineConfig> =>
 				},
 			},
 			rules: {
+				// Vue SFC 需要显式接管 TypeScript 预置中的核心规则替换，再由本地策略做最终覆写。
+				...(tseslint.configs.strictTypeChecked[1]?.rules ?? {}),
 				...typescriptRules,
 				...typescriptTypeCheckedRules,
-				// Vue SFC 继承的 TypeScript 预置保留自身 files 范围，因此显式关闭容易误判 TS AST 的核心规则。
-				...(tseslint.configs.recommendedTypeChecked[1]?.rules ?? {}),
-				// SFC 内部函数依赖上下文推断返回类型，只要求模块导出边界显式声明。
+				// SFC 以模板上下文和快速迭代为主，不强制补写函数返回类型或模块边界类型。
 				"@typescript-eslint/explicit-function-return-type": "off",
+				"@typescript-eslint/explicit-module-boundary-types": "off",
+				// defineEmits 校验器和框架回调的形参可用于声明契约而不读取；普通未使用变量和导入仍然报错。
+				"@typescript-eslint/no-unused-vars": ["error", { args: "none", caughtErrors: "none", ignoreRestSiblings: true }],
 				...vueRules,
 			},
 		},

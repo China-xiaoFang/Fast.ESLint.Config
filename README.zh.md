@@ -110,7 +110,7 @@ export default fastConfig(
 
 ## TypeScript
 
-`createTypeScriptConfigs()`、Vue SFC 和 React TSX 始终使用 `recommendedTypeChecked` 与：
+`createTypeScriptConfigs()`、Vue SFC 和 React TSX 始终使用 `strictTypeChecked`、`stylisticTypeChecked` 与：
 
 ```js
 parserOptions: {
@@ -120,6 +120,14 @@ parserOptions: {
 ```
 
 被检查文件必须属于可发现的 `tsconfig.json`。TypeScript、TSX、Vue 与 NVue 统一使用相同的 `extraFileExtensions`，避免混合检查文件时 Project Service 重载项目。不再提供 `typeChecked` 和 `tsconfigRootDir` 包装选项；复杂 monorepo 如需指定根目录，可在后置 Flat Config 中直接覆盖 `languageOptions.parserOptions`，但同一项目中所有类型感知文件覆盖必须保持 `extraFileExtensions` 完全一致。
+
+Promise 是否需要等待、返回或处理异常由开发者根据业务顺序和异常语义决定，因此 `no-floating-promises` 与 `strict-void-return` 默认关闭，不维护框架 API 白名单，也不使用 `void promise` 规避检查。`no-misused-promises`、`await-thenable`、`require-await` 及 unsafe 类型规则继续严格启用，异步回调误用、错误的 `await` 和无异步语义的 `async` 仍会报错。
+
+`return-await` 保持严格预置的 `error-handling-correctness-only` 模式，不为了风格强制增加 `await`。
+
+普通 TypeScript 与 TSX 的命名函数和模块边界要求显式类型，内联回调和已有函数类型约束的表达式继续使用上下文推断。Vue/NVue SFC 关闭函数返回类型与模块边界类型要求，并允许 `defineEmits` 校验器等声明型回调保留未使用形参；普通未使用变量和导入仍会报错。SFC 中无法从模板反向推断的独立处理函数参数仍应显式标注类型。
+
+纯类型导出使用 `export type`，只在构造阶段赋值的私有成员使用 `readonly`。原始类型保留 `||` 与 `??` 的业务语义选择；具有不同参数名或独立 JSDoc 的公共重载不强制合并。共享 JavaScript 规则禁止 `eval` 和 `void` 操作符，要求多行条件分支使用一致的花括号，并将已有的 `default` 分支放在最后。
 
 ## React
 
