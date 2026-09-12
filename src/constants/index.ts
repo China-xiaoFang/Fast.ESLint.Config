@@ -14,6 +14,12 @@ export const GLOBS_JAVASCRIPT = ["**/*.{js,cjs,mjs,jsx}"] as const;
 /** TypeScript 与 TSX 文件；包含 TypeScript 的 ESM/CJS 专用扩展名。 */
 export const GLOBS_TYPESCRIPT = ["**/*.{ts,cts,mts,tsx}"] as const;
 
+/** 独立 JSX 文件；用于为 Vue 等 JSX 运行时叠加组件脚本语义规则。 */
+export const GLOB_JSX = "**/*.jsx";
+
+/** 独立 TSX 文件；用于在完整 TypeScript 范围内叠加 UI 组件专项规则。 */
+export const GLOB_TSX = "**/*.tsx";
+
 /** Vue 3 单文件组件。 */
 export const GLOB_VUE = "**/*.vue";
 

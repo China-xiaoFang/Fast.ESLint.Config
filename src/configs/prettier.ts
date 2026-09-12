@@ -1,10 +1,9 @@
 import { defineConfig } from "eslint/config";
 import eslintConfigPrettierFlat from "eslint-config-prettier/flat";
 
-// 这些规则与 Prettier 输出兼容，并承载项目约定，无需由兼容层关闭。
+/** 与 Prettier 输出兼容且承载项目约定、无需由兼容层关闭的最终规则记录。 */
 const prettierRules = { ...eslintConfigPrettierFlat.rules };
 delete prettierRules.curly;
-delete prettierRules["vue/html-closing-bracket-newline"];
 
 /**
  * 创建 Prettier 兼容层。

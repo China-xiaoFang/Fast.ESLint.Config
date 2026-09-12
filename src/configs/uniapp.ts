@@ -1,4 +1,4 @@
-import { defineConfig } from "eslint/config";
+import { defineConfig, globalIgnores } from "eslint/config";
 import { GLOBS_CODE, GLOBS_UNIAPP_JSON, UNIAPP_CONDITIONAL_GLOBALS, UNIAPP_GLOBALS } from "../constants";
 
 /**
@@ -14,6 +14,7 @@ import { GLOBS_CODE, GLOBS_UNIAPP_JSON, UNIAPP_CONDITIONAL_GLOBALS, UNIAPP_GLOBA
  */
 export const createUniAppConfigs = (files: readonly string[] = GLOBS_CODE): ReturnType<typeof defineConfig> =>
 	defineConfig([
+		globalIgnores(["**/unpackage/**"], "@fast-china/uniapp/ignores"),
 		{
 			name: "@fast-china/uniapp/globals",
 			files: [...files],
@@ -28,7 +29,7 @@ export const createUniAppConfigs = (files: readonly string[] = GLOBS_CODE): Retu
 			name: "@fast-china/uniapp/json",
 			files: [...GLOBS_UNIAPP_JSON],
 			rules: {
-				// UniApp 的 pages.json 和 manifest.json 使用允许注释的 JSONC 方言。
+				/** UniApp 的 `pages.json` 和 `manifest.json` 使用允许注释的 JSONC 方言。 */
 				"jsonc/no-comments": "off",
 			},
 		},

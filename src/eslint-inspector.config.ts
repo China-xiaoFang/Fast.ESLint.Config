@@ -1,3 +1,3 @@
-import fastChina from "./index";
+import { vueConfig } from "./index";
 
-export default fastChina;
+export default vueConfig;

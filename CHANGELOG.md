@@ -6,6 +6,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## Unreleased
 
+## 2.1.8 - 2026-09-12
+
+### Added
+
+- Added named `vueConfig`, `uniAppConfig`, `createVueProjectConfigs()`, and `createUniAppProjectConfigs()` exports to the root entry.
+- Added focused high-confidence TypeScript checks on top of `recommendedTypeChecked`, including optional-chain, mixed-enum, spread, redundant-conversion, getter/setter, and catch-callback safety rules.
+- Added explicitly reviewed incorrect and correct code examples for every rule recorded in the generated 474-rule reference.
+
+### Changed
+
+- Rebased the rule policy on common ecosystem conventions and concise readability, followed by real bugs and type safety, consistency, and finally Fast project preferences.
+- Treated exported `.ts`, `.mts`, and `.cts` module boundaries as SDK APIs requiring explicit types while allowing internal function return inference and preserving explicit parameter/property annotations.
+- Treated `.tsx` as a type-aware UI component format shared by Vue and other JSX runtimes, preserving inferred component return types and fixing TSX overrides for custom multi-pattern file scopes.
+- Applied Vue component-script semantics such as explicit emits, duplicate keys, readonly props, reactivity preservation, and reserved names to Vue JSX/TSX while keeping template-only casing, ordering, and directive rules scoped to `.vue`/`.nvue`.
+- Ordered every generated rule category with repository-explicit rules first and third-party preset rules last; generation now rejects missing, identical, or comment-only examples.
+- Kept empty catches valid, `no-void` and `require-await` strict, and `camelcase` strict with external object properties excluded.
+- Replaced the complete strict and stylistic type-aware presets with `recommendedTypeChecked`; allowed standard non-null assertions and defensive runtime conditions while retaining focused contradiction and unsafe-type checks.
+- Kept import ordering, stylesheet-last placement, explicit Vue emits, kebab-case attributes, Vue correctness rules, and Vue attribute ordering strict; added common React, Angular, and Vite path groups and made import-member ordering an error.
+- Kept package and tsconfig key sorting in every complete project configuration.
+
+### Removed
+
+- Removed the 2.x default export, `fastConfig()`, and `FastConfigOptions`; consumers now select the Vue or UniApp named configuration explicitly.
+- Removed Vue-to-UniApp capability leakage from the new Vue-only entry and removed `prefer-object-has-own` from the defaults.
+
 ## 2.1.7 - 2026-09-11
 
 ### Added

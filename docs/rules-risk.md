@@ -1,119 +1,113 @@
 # Default Rules and Risk Guide
 
-This document describes the current 2.1.7 configuration model, major rules, and migration risks. Source comments explain current intent only; historical changes belong in `CHANGELOG.md`.
+This guide describes the current configuration model, major rules, and auto-fix risks. Source comments explain current intent; historical differences belong in `CHANGELOG.md`.
+
+## Policy
+
+Rules are selected in this order:
+
+1. Follow common JavaScript, TypeScript, and Vue conventions while keeping code concise and readable.
+2. Detect real bugs and type-safety problems.
+3. Preserve cross-project consistency.
+4. Apply Fast project style preferences last.
+
+Rules that only satisfy ESLint by changing valid semantics, adding boilerplate, or forcing uncommon forms do not belong in the defaults.
 
 ## Configuration model
 
-SDKs, OA systems, administration apps, Vue web apps, and UniApp clients share one JavaScript, TypeScript, Import, and RegExp rule set. There are no strictness tiers.
+Vue 3 and UniApp are separate named complete configurations from the root entry:
 
-The root entry is a fixed Vue 3 + TypeScript + UniApp preset:
+- `vueConfig` handles plain Vue projects only.
+- `uniAppConfig` adds `.nvue`, UniApp globals, manifest behavior, and the `unpackage` ignore.
 
-- `environment: "browser"`
-- `.gitignore`
-- JavaScript and type-aware TypeScript
-- Vue 3, `.nvue`, UniApp globals, and manifest handling
-- Import, RegExp, JSON, JSONC, and JSON5
-- `package.json` and `tsconfig*.json` sorting
-- Prettier conflict handling
-- Node.js tooling globals and trailing rule overrides
+The root entry has no default export. It exposes `vueConfig`, `uniAppConfig`, `createVueProjectConfigs()`, `createUniAppProjectConfigs()`, `createBaseConfigs()`, `defineRules()`, and their types.
 
-`fastConfig()` retains only `environment`. React, Angular, Markdown, and Lodash compose from `./configs`; rules, globals, ignores, and special parser settings use trailing Flat Config objects.
+SDKs, Node.js, and other framework-neutral projects use `createBaseConfigs()`. React, Angular, Markdown, and Lodash compose explicitly from `./configs`; manifest sorting is part of every complete configuration.
 
 ## Preset sources
 
-| Domain     | Preset or implementation                                                      |
-| ---------- | ----------------------------------------------------------------------------- |
-| JavaScript | `@eslint/js` recommended plus local rules                                     |
-| TypeScript | typescript-eslint strict and stylistic type-checked presets + Project Service |
-| Vue        | `eslint-plugin-vue` `flat/recommended` plus type-aware TypeScript             |
-| React      | `@eslint-react` recommended/type-checked plus React Hooks Flat Recommended    |
-| Angular    | Angular ESLint TypeScript, template, and accessibility recommended presets    |
-| JSON       | `eslint-plugin-jsonc` recommended presets for three dialects                  |
-| Import     | `eslint-plugin-import-x` recommended plus a fixed ordering policy             |
-| RegExp     | Explicit correctness, safety, and super-linear backtracking rules             |
-| Prettier   | `eslint-config-prettier` conflict disabling                                   |
+| Domain     | Preset or implementation                                                   |
+| ---------- | -------------------------------------------------------------------------- |
+| JavaScript | `@eslint/js` recommended plus local high-confidence rules                  |
+| TypeScript | typescript-eslint `recommendedTypeChecked` plus Project Service            |
+| Vue        | `eslint-plugin-vue` `flat/recommended` plus type-aware TypeScript          |
+| React      | `@eslint-react` recommended/type-checked plus React Hooks Flat Recommended |
+| Angular    | Angular ESLint TypeScript, template, and accessibility recommended presets |
+| JSON       | `eslint-plugin-jsonc` recommended presets for three dialects               |
+| Import     | `eslint-plugin-import-x` recommended plus a general ordering warning       |
+| RegExp     | Explicit correctness, safety, and super-linear backtracking rules          |
+| Prettier   | `eslint-config-prettier` conflict disabling                                |
 
-## Major rules
+The complete `strictTypeChecked`, `stylisticTypeChecked`, and mechanical `all` presets are not enabled. Extra rules are limited to low-false-positive checks that directly improve correctness or readability.
 
-### JavaScript
+## JavaScript and Import
 
-- `camelcase: ["error", { properties: "never" }]` requires camelCase variables and types while preserving external protocol property names.
-- `no-empty` allows intentionally empty catches and still reports other empty blocks.
-- `no-eval` and `no-void` are errors; `curly: ["error", "multi-line", "consistent"]` applies, and an existing `default` branch must come last.
-- `no-debugger: "error"`
-- `no-use-before-define` warns; classes and variables must be declared first while function declarations may be hoisted.
-- `prefer-arrow-callback`, `logical-assignment-operators`, and `prefer-object-spread` are errors.
-- `prefer-exponentiation-operator` and `prefer-object-has-own` are errors.
-- `sort-imports` warns and only sorts members within one import.
-- `import-x/order` is an error with `warnOnUnassignedImports: true` and `sortTypesGroup: true`; `@/**` belongs to `internal`, type imports follow every non-style import and retain source-category ordering inside the final type group, and stylesheet imports do not participate in this rule.
-- `import-x/style-imports-last` is an error; CSS, SCSS, LESS, and related styles must form the final contiguous import group, with their internal order preserved and no automatic fix.
+- `camelcase: ["error", { properties: "never" }]` applies to variables and types while external protocol properties retain their original names.
+- `no-empty` permits a completely empty `catch` and reports other empty blocks.
+- `no-void` is an error; `void` is not used to hide a Promise or express an ignored return value.
+- Real-risk rules such as `no-eval`, `no-implied-eval`, `no-new-func`, `no-promise-executor-return`, and `no-debugger` are errors.
+- `curly` requires consistent braces only for multiline branches and does not force braces on every single-line branch.
+- `import-x/first` and `import-x/no-duplicates` are errors.
+- `import-x/order` is an error and fixes declaration order; common framework, tool, and `@/**` path groups extend the general groups.
+- `pathGroupsExcludedImportTypes: ["type"]` keeps type imports in the final type group.
+- Non-style side-effect imports participate in ordering. `style-imports-last` requires a final contiguous stylesheet group without sorting within it, preserving CSS cascade order.
+- `sort-imports` is an error and only normalizes members inside one import declaration; `prefer-object-has-own` is not enabled.
 
-### TypeScript
+## TypeScript
 
-- `strictTypeChecked`, `stylisticTypeChecked`, and `projectService: true` are always enabled; TypeScript, TSX, Vue, and NVue share `extraFileExtensions: [".vue", ".nvue"]` to prevent Project Service reloads during mixed-file linting.
-- `no-floating-promises` and `strict-void-return` are disabled so Promise waiting follows business semantics; `no-void` rejects `void promise` workarounds. `no-misused-promises`, `await-thenable`, `require-await`, and the unsafe-type rules remain strict, while Promise-returning handlers are allowed in Vue templates and TSX attributes.
-- Named TypeScript and TSX functions require explicit return types, except inline callbacks and already typed function expressions; exported module boundaries still require explicit types.
-- Vue/NVue SFCs disable function-return and module-boundary annotations and unused parameter checks, while unused variables and imports remain errors. Templates do not infer parameter types back into standalone script handlers, so those parameters still require explicit annotations.
-- `explicit-module-boundary-types` is an error and does not allow explicitly typed `any` arguments as an escape hatch.
-- `no-explicit-any` warns.
-- Regular TS/TSX parameters and caught errors can use an `_` prefix to mark intentional omissions; ordinary variables cannot use that prefix to evade the check.
-- `no-empty-function` only allows empty constructors and override methods.
-- `consistent-type-imports` fixes type-only dependencies as separate `import type` declarations, and `no-import-type-side-effects` rejects runtime imports containing only inline type specifiers.
-- `no-non-null-assertion` is an error.
-- `switch-exhaustiveness-check` is an error; `no-deprecated` and `no-unnecessary-condition` warn.
-- Numeric template interpolation and concise void arrow callbacks are allowed; dynamic object deletion and static-only utility classes are not forcibly rewritten.
-- `consistent-type-exports` and `prefer-readonly` are errors; primitive values are not forced from `||` to `??`.
-- `no-eval`, `no-implied-eval`, and `no-new-func` reject direct or indirect dynamic string execution; `no-promise-executor-return` rejects ignored executor returns, and Vue setup props or refs cannot be used in ways that lose reactivity.
-- `unified-signatures` preserves public overloads with different parameter names or standalone JSDoc; the stricter core `no-void` replaces `no-meaningless-void-operator`.
-- `consistent-type-definitions`, `consistent-indexed-object-style`, `class-literal-property-style`, and `prefer-regexp-exec` are disabled as syntax-only preferences.
+TypeScript always uses Project Service and `recommendedTypeChecked`. Linted files must belong to a discoverable `tsconfig.json`.
 
-### Vue
+- `.ts`, `.mts`, and `.cts` files are SDK-like module boundaries: `explicit-module-boundary-types` is an error, so exported functions and public boundaries of exported classes require explicit types.
+- `.tsx` files are UI component files: type-aware correctness rules remain enabled, but module-boundary annotations are not required for inferable JSX return types.
+- `explicit-function-return-type` is disabled, leaving internal functions, local handlers, and callbacks to TypeScript inference.
+- `no-inferrable-types` preserves explicit parameter and property types and only removes annotations without contract value, such as obvious local-variable types.
+- Vue/NVue SFCs and standalone TSX components disable module-boundary and function-return requirements to preserve common concise component forms.
+- `no-floating-promises` is disabled because waiting, returning, or handling a Promise depends on business semantics.
+- `require-await` is an error; an `async` function without `await` changes return and exception semantics and should lose `async`.
+- `no-misused-promises`, `await-thenable`, unsafe-type rules, exhaustive switches, getter/setter compatibility, and other high-confidence checks are errors.
+- `return-await` requires `await` only when needed for correct error handling.
+- Standard non-null assertions are permitted, while contradictory optional-chain or nullish-coalescing combinations remain errors.
+- `no-explicit-any` and `no-deprecated` warn.
+- `no-unnecessary-condition`, `unified-signatures`, and syntax-only preferences are disabled to preserve runtime guards and public overloads.
+- Template strings allow numbers and booleans; dynamic property deletion and static utility classes are not forcibly rewritten.
+- `prefer-nullish-coalescing` does not force primitive values from `||` to `??`; `prefer-optional-chain` applies only when the type explicitly contains null or undefined.
 
-- Uses `flat/recommended`.
-- `attribute-hyphenation: ["error", "always"]`.
-- `no-v-html` warns.
-- `no-v-text-v-html-on-component` is an error.
-- `require-explicit-emits`, `attributes-order`, and `no-mutating-props` are errors.
-- `.vue` and `.nvue` share the TypeScript parser and Project Service.
+## Vue
 
-## Type-aware requirements
-
-TypeScript, Vue, and React TSX always require type information. Linted files must belong to a discoverable `tsconfig.json`, or Project Service reports a configuration error.
-
-The `typeChecked` and `tsconfigRootDir` wrapper options no longer exist. Complex monorepos can override `languageOptions.parserOptions` in trailing Flat Config, but should not disable type checking to hide project-boundary problems.
+- The official `flat/recommended` preset is the general Vue baseline.
+- `no-v-html` warns so XSS risk is visible while sanitized content remains possible.
+- `require-explicit-emits`, `no-dupe-keys`, `no-mutating-props`, `no-setup-props-reactivity-loss`, `no-ref-object-reactivity-loss`, and `no-reserved-component-names` are errors for Vue SFC and Vue JSX/TSX component scripts.
+- `attribute-hyphenation`, `no-v-text-v-html-on-component`, and `attributes-order` remain limited to `.vue/.nvue` templates; `attributes-order` sorts definition, list-rendering, conditional, render-modifier, unique, global, ordinary, event, and content attributes.
+- JSX attributes retain JavaScript camelCase conventions and do not inherit the template kebab-case rule.
+- Setup props/ref reactivity loss and invalid custom-event names remain errors.
 
 ## UniApp boundary
 
-The root entry declares `uni`, `uniCloud`, page APIs, and conditional-platform objects, and permits comments in `pages.json` and `manifest.json`.
+Only the UniApp entry declares `uni`, `uniCloud`, page APIs, and conditional-platform objects such as `wx`, `plus`, `my`, and `tt`. The plain Vue entry neither receives these globals nor ignores `unpackage`.
 
-ESLint does not execute conditional compilation, so `wx`, `plus`, and similar objects are visible in every code file handled by the root entry. This prevents `no-undef` inside platform branches but cannot verify that objects occur under the correct `#ifdef`. Plain Vue projects that do not want these globals should compose focused fragments instead of using the root entry.
+ESLint does not execute conditional compilation. It can avoid `no-undef` inside platform branches but cannot prove that an object occurs under the correct `#ifdef`.
 
-## Auto-fix risks
+## Manifest sorting and auto-fix
+
+`package.json` and `tsconfig*.json` sorting is enabled by default in `createBaseConfigs()`, `vueConfig`, and `uniAppConfig`. The individual factories remain available for custom composition.
 
 Review these fixes carefully:
 
-- Import groups, type-source categories, member order, and side-effect import placement.
-- Separate TypeScript `import type` declarations.
-- Vue attribute naming and ordering.
-- `package.json` and `tsconfig*.json` key order.
+- Import groups, path groups, type-import placement, and non-style side-effect import order.
+- Stylesheet imports are only checked for final placement and are not moved or reordered automatically.
+- Separate TypeScript `import type` and `export type` declarations.
+- Default manifest key ordering.
 
-`package.json` sorting does not enter conditional `exports` objects whose order has runtime meaning.
-
-Run a check first:
+Check before fixing:
 
 ```sh
 pnpm exec eslint .
-```
-
-Then apply fixes after reviewing the scope:
-
-```sh
 pnpm exec eslint . --fix
 ```
 
 ## Maintenance policy
 
-1. Rule comments explain current behavior, risk, and exceptions without referring to historical versions.
-2. After upgrading recommended presets, inspect the final effective rules to prevent silent severity changes.
-3. New frameworks add parsers, file scopes, and framework semantics without creating another language-rule tier.
-4. New public factories, parsers, or auto-fix behavior require type and runtime tests.
+1. Inspect effective rules after recommended preset upgrades so upstream changes do not silently alter severity.
+2. Every new rule must explain the real problem it catches, its false-positive boundary, and whether it auto-fixes.
+3. Frameworks add parsers, file scopes, and framework semantics without creating another language strictness tier.
+4. Public entries, parser scopes, or auto-fix changes require matching type, runtime, and package tests.

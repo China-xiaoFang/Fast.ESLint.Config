@@ -8,7 +8,7 @@ import type { RuleOptions } from "../typegen";
  * `import()` 或 CommonJS `require()`。选择此策略的项目应自行安装 `lodash-unified`。
  */
 export const preferLodashUnifiedRules = {
-	// [高影响][按需启用] 禁止混用 lodash 与 lodash-es，避免同一项目维护多套等价依赖入口。
+	/** [高影响][按需启用] 禁止混用 `lodash` 与 `lodash-es`，避免同一项目维护多套等价依赖入口。 */
 	"no-restricted-imports": [
 		"error",
 		{
@@ -40,7 +40,7 @@ export const preferLodashUnifiedRules = {
  * `lodash-unified` 混用，不替项目决定整包导入或按方法导入。
  */
 export const preferLodashRules = {
-	// [高影响][按需启用] 禁止混用 lodash-es 与 lodash-unified，保持运行时和类型来源一致。
+	/** [高影响][按需启用] 禁止混用 `lodash-es` 与 `lodash-unified`，保持运行时和类型来源一致。 */
 	"no-restricted-imports": [
 		"error",
 		{

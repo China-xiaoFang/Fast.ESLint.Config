@@ -1,4 +1,13 @@
-import fastChina, { type FastConfigOptions, type RuleOptions, createBaseConfigs, defineRules, fastConfig } from "@fast-china/eslint-config";
+import {
+	type ProjectConfigOptions,
+	type RuleOptions,
+	createBaseConfigs,
+	createUniAppProjectConfigs,
+	createVueProjectConfigs,
+	defineRules,
+	uniAppConfig,
+	vueConfig,
+} from "@fast-china/eslint-config";
 import {
 	type AngularConfigOptions,
 	type LodashPreference,
@@ -11,6 +20,15 @@ import { defineConfig } from "eslint/config";
 
 // @ts-expect-error -- 配置片段类型只从独立的 configs 子路径导出。
 type RootAngularConfigOptions = import("@fast-china/eslint-config").AngularConfigOptions;
+
+// @ts-expect-error -- 根入口不再提供 2.x 默认导出。
+type LegacyDefaultExport = (typeof import("@fast-china/eslint-config"))["default"];
+
+// @ts-expect-error -- 根入口不再提供 fastConfig() 兼容别名。
+type LegacyFastConfig = (typeof import("@fast-china/eslint-config"))["fastConfig"];
+
+// @ts-expect-error -- 根入口不再提供 FastConfigOptions 兼容类型。
+type LegacyFastConfigOptions = import("@fast-china/eslint-config").FastConfigOptions;
 
 const projectRules = defineRules({
 	"@angular-eslint/template/alt-text": "error",
@@ -25,21 +43,21 @@ const projectRules = defineRules({
 
 const options = {
 	environment: "browser",
-} satisfies FastConfigOptions;
+} satisfies ProjectConfigOptions;
 
-defineConfig([fastChina]);
-defineConfig([...fastChina]);
+defineConfig([...vueConfig]);
+defineConfig([...uniAppConfig]);
 
-const config = fastConfig(options, {
+const config = createVueProjectConfigs(options, {
 	files: ["**/*.generated.ts"],
 	name: "typegen/generated-files",
 	rules: projectRules,
 });
 
 defineConfig(config);
-fastConfig(options);
-fastConfig({ environment: "node" });
-fastConfig({ environment: "universal" });
+createVueProjectConfigs(options);
+createUniAppProjectConfigs({ environment: "node" });
+createBaseConfigs({ environment: "universal" });
 
 const ruleOptions = {
 	"@typescript-eslint/consistent-type-imports": [
@@ -65,7 +83,7 @@ const ruleOptions = {
 
 defineRules(ruleOptions);
 
-const baseOptions: FastConfigOptions = { environment: "node" };
+const baseOptions: ProjectConfigOptions = { environment: "node" };
 defineConfig(createBaseConfigs(baseOptions));
 
 const angularOptions: AngularConfigOptions = { inlineTemplates: false, templateAccessibility: false };
@@ -75,7 +93,7 @@ defineConfig([...createBaseConfigs(), ...createReactConfigs(reactOptions)]);
 
 const lodashPreference: LodashPreference = "lodash";
 defineConfig(createLodashConfigs(lodashPreference));
-export type { RootAngularConfigOptions };
+export type { LegacyDefaultExport, LegacyFastConfig, LegacyFastConfigOptions, RootAngularConfigOptions };
 
 // @ts-expect-error -- Unknown rule names must be rejected.
 defineRules({ "vue/not-a-real-rule": "error" });
@@ -87,22 +105,22 @@ defineRules({ "@typescript-eslint/no-unused-vars": ["error", { args: "sometimes"
 defineRules({ "no-console": ["warn", { allowedMethods: ["warn"] }] });
 
 // @ts-expect-error -- Environment only accepts the documented runtime values.
-fastConfig({ environment: "worker" });
+createVueProjectConfigs({ environment: "worker" });
 
 // @ts-expect-error -- Frameworks are composed through the configs subpath.
-fastConfig({ react: true });
+createVueProjectConfigs({ react: true });
 
-// @ts-expect-error -- UniApp is built into the root preset and is not a switch.
-fastConfig({ uniapp: true });
+// @ts-expect-error -- Vue and UniApp use separate factories instead of a framework switch.
+createVueProjectConfigs({ uniapp: true });
 
 // @ts-expect-error -- Type-aware TypeScript is fixed and is not a switch.
-fastConfig({ typeChecked: false });
+createVueProjectConfigs({ typeChecked: false });
 
 // @ts-expect-error -- tsconfigRootDir is no longer a factory option.
-fastConfig({ tsconfigRootDir: import.meta.dirname });
+createVueProjectConfigs({ tsconfigRootDir: import.meta.dirname });
 
 // @ts-expect-error -- Unknown factory options must be rejected.
-fastConfig({ unknownOption: true });
+createVueProjectConfigs({ unknownOption: true });
 
 // @ts-expect-error -- Factory-level rules are supplied as trailing Flat Config.
-fastConfig({ rules: { "no-console": "off" } });
+createVueProjectConfigs({ rules: { "no-console": "off" } });

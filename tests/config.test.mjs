@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import fastChina, * as publicApi from "@fast-china/eslint-config";
+import * as publicApi from "@fast-china/eslint-config";
 import {
 	DEFAULT_IGNORE_PATTERNS,
 	createAngularConfigs,
+	createEnvironmentConfigs,
 	createGlobalIgnores,
 	createImportConfigs,
 	createLodashConfigs,
 	createMarkdownConfigs,
 	createReactConfigs,
+	createTypeScriptConfigs,
 	getTypeScriptPresetConfigs,
 } from "@fast-china/eslint-config/configs";
 import { preferLodashRules, preferLodashUnifiedRules } from "@fast-china/eslint-config/rules";
@@ -16,7 +18,7 @@ import { ESLint } from "eslint";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
-const { createBaseConfigs, fastConfig } = publicApi;
+const { createBaseConfigs, createUniAppProjectConfigs, createVueProjectConfigs, uniAppConfig, vueConfig } = publicApi;
 
 const createLinter = (config, options = {}) =>
 	new ESLint({
@@ -27,20 +29,25 @@ const createLinter = (config, options = {}) =>
 		...options,
 	});
 
-test("package exports the fixed default configuration, environment factory, and typed rule helper", () => {
-	assert.ok(Array.isArray(fastChina));
-	assert.ok(Array.isArray(publicApi.fastConfig()));
+test("root package exports independent named configurations without legacy aliases", () => {
+	assert.ok(Array.isArray(vueConfig));
+	assert.ok(Array.isArray(uniAppConfig));
+	assert.equal("default" in publicApi, false);
+	assert.equal("fastConfig" in publicApi, false);
 	assert.deepEqual(
-		fastChina.map((config) => config.name),
-		publicApi.fastConfig().map((config) => config.name)
+		vueConfig.map((config) => config.name),
+		createVueProjectConfigs().map((config) => config.name)
 	);
-	assert.equal("defaultConfigOptions" in publicApi, false);
+	assert.deepEqual(
+		uniAppConfig.map((config) => config.name),
+		createUniAppProjectConfigs().map((config) => config.name)
+	);
 	assert.deepEqual(publicApi.defineRules({ "no-console": "warn" }), { "no-console": "warn" });
 });
 
-test("default configuration can be used directly or spread into defineConfig", async () => {
-	const directLinter = createLinter(defineConfig([fastChina]));
-	const spreadLinter = createLinter(defineConfig([...fastChina]));
+test("named framework configurations can be used directly or spread into defineConfig", async () => {
+	const directLinter = createLinter(defineConfig([vueConfig]));
+	const spreadLinter = createLinter(defineConfig([...uniAppConfig]));
 
 	assert.ok(await directLinter.calculateConfigForFile("src/index.ts"));
 	assert.ok(await spreadLinter.calculateConfigForFile("src/index.ts"));
@@ -54,23 +61,28 @@ test("configuration fragment factories consistently return arrays", () => {
 	assert.equal(globalIgnoreConfigs[0].name, "@fast-china/ignores/global");
 	assert.ok(DEFAULT_IGNORE_PATTERNS.includes("**/{.pnpm-store,node_modules}/**"));
 	assert.ok(Array.isArray(createBaseConfigs()));
+	assert.equal(createEnvironmentConfigs({ files: ["fixtures/**/*.js"], nodeFiles: [] }).length, 1);
 });
 
-test("root entry always enables the fixed Vue, UniApp, language, sorting, and compatibility capabilities", () => {
-	const names = fastConfig().map((config) => config.name ?? "");
+test("Vue and UniApp project configurations keep framework capabilities isolated", () => {
+	const vueNames = createVueProjectConfigs().map((config) => config.name ?? "");
+	const uniAppNames = createUniAppProjectConfigs().map((config) => config.name ?? "");
 
-	assert.ok(names.some((name) => name.includes("ignores/git")));
-	assert.ok(names.some((name) => name.includes("javascript")));
-	assert.ok(names.some((name) => name.includes("typescript/type-checked")));
-	assert.ok(names.some((name) => name.includes("vue/type-checked")));
-	assert.ok(names.some((name) => name.includes("uniapp/globals")));
-	assert.ok(names.some((name) => name.includes("json/json")));
-	assert.ok(names.some((name) => name.includes("sort/package-json")));
-	assert.ok(names.some((name) => name.includes("sort/tsconfig")));
-	assert.ok(names.some((name) => name.includes("prettier")));
-	assert.ok(!names.some((name) => name.includes("markdown")));
-	assert.ok(!names.some((name) => name.includes("react/")));
-	assert.ok(!names.some((name) => name.includes("angular/")));
+	for (const names of [vueNames, uniAppNames]) {
+		assert.ok(names.some((name) => name.includes("ignores/git")));
+		assert.ok(names.some((name) => name.includes("javascript")));
+		assert.ok(names.some((name) => name.includes("typescript/type-checked")));
+		assert.ok(names.some((name) => name.includes("vue/type-checked")));
+		assert.ok(names.some((name) => name.includes("vue/jsx")));
+		assert.ok(names.some((name) => name.includes("vue/tsx-type-checked")));
+		assert.ok(names.some((name) => name.includes("json/json")));
+		assert.ok(names.some((name) => name.includes("prettier")));
+		assert.ok(names.some((name) => name.includes("sort/package-json")));
+		assert.ok(names.some((name) => name.includes("sort/tsconfig")));
+	}
+	assert.ok(!vueNames.some((name) => name.includes("uniapp/")));
+	assert.ok(uniAppNames.some((name) => name.includes("uniapp/globals")));
+	assert.ok(uniAppNames.some((name) => name.includes("uniapp/ignores")));
 });
 
 test("base composition remains framework-neutral", () => {
@@ -78,6 +90,7 @@ test("base composition remains framework-neutral", () => {
 
 	assert.ok(names.some((name) => name.includes("typescript/type-checked")));
 	assert.ok(names.some((name) => name.includes("sort/package-json")));
+	assert.ok(names.some((name) => name.includes("sort/tsconfig")));
 	assert.ok(!names.some((name) => name.includes("vue/")));
 	assert.ok(!names.some((name) => name.includes("uniapp/")));
 	assert.ok(!names.some((name) => name.includes("react/")));
@@ -85,7 +98,7 @@ test("base composition remains framework-neutral", () => {
 });
 
 test("runtime environment and trailing overrides apply in declaration order", async () => {
-	const config = fastConfig(
+	const config = createVueProjectConfigs(
 		{ environment: "node" },
 		{
 			files: ["**/*.js"],
@@ -109,7 +122,7 @@ test("runtime environment and trailing overrides apply in declaration order", as
 });
 
 test("VS Code settings and extension recommendations allow JSONC comments", async () => {
-	const linter = createLinter(fastConfig());
+	const linter = createLinter(createVueProjectConfigs());
 	const fixtures = [
 		{
 			code: '{\n\t// Workspace editor setting.\n\t"editor.formatOnSave": true\n}\n',
@@ -179,7 +192,7 @@ test("style imports form a final stable group while other imports retain import-
 	assert.ok(alphabetizeResult.messages.some((message) => message.ruleId === "import-x/order"));
 });
 
-test("root aliases precede the final type group and stylesheet group", async () => {
+test("root aliases precede the final type and stylesheet groups", async () => {
 	const linter = createLinter([{ files: ["**/*.ts"], languageOptions: { parser: tseslint.parser } }, ...createImportConfigs(["**/*.ts"])], {
 		fix: true,
 	});
@@ -193,7 +206,7 @@ test("root aliases precede the final type group and stylesheet group", async () 
 	);
 });
 
-test("TypeScript always uses strict type-aware presets and Project Service", async () => {
+test("TypeScript uses the recommended type-aware preset and Project Service", async () => {
 	const linter = createLinter(createBaseConfigs({ environment: "node" }));
 	const [result] = await linter.lintFiles(["src/index.ts"]);
 	const calculated = await linter.calculateConfigForFile("src/index.ts");
@@ -201,11 +214,11 @@ test("TypeScript always uses strict type-aware presets and Project Service", asy
 
 	assert.equal(result.fatalErrorCount, 0, result.messages.map((message) => message.message).join(", "));
 	assert.equal(calculated.languageOptions.parserOptions.projectService, true);
-	assert.deepEqual(calculated.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
+	assert.equal(calculated.languageOptions.parserOptions.extraFileExtensions, undefined);
 	assert.equal(calculated.rules["@typescript-eslint/prefer-promise-reject-errors"][1].allowThrowingUnknown, true);
-	assert.ok(presets.some((item) => item.name === "typescript-eslint/strict-type-checked"));
-	assert.ok(presets.some((item) => item.name === "typescript-eslint/stylistic-type-checked"));
-	assert.ok(!presets.some((item) => item.name === "typescript-eslint/all"));
+	assert.ok(presets.some((item) => item.name === "typescript-eslint/recommended-type-checked"));
+	assert.ok(!presets.some((item) => item.name === "typescript-eslint/strict-type-checked"));
+	assert.ok(!presets.some((item) => item.name === "typescript-eslint/stylistic-type-checked"));
 });
 
 test("Promise waiting stays a business decision while misuse and void operators remain checked", async () => {
@@ -258,11 +271,30 @@ void requestApi();
 		assert.deepEqual(calculated.rules["@typescript-eslint/return-await"], [2, "error-handling-correctness-only"]);
 		assert.equal(calculated.rules["@typescript-eslint/strict-void-return"][0], 0);
 		assert.equal(calculated.rules["no-void"][0], 2);
-		assert.equal(calculated.rules["@typescript-eslint/explicit-function-return-type"][0], 2);
-		assert.equal(calculated.rules["@typescript-eslint/explicit-module-boundary-types"][0], 2);
+		assert.equal(calculated.rules["@typescript-eslint/explicit-function-return-type"][0], 0);
+		assert.equal(calculated.rules["@typescript-eslint/explicit-module-boundary-types"][0], filePath.endsWith(".tsx") ? 0 : 2);
 	}
 
-	const vueLinter = createLinter(fastConfig());
+	const tsxComponentSource = `declare global {
+	namespace JSX {
+		interface Element { readonly type: string }
+		interface IntrinsicElements { button: { children?: unknown; onClick?: () => unknown } }
+	}
+}
+
+type Props = { label: string };
+declare function save(): Promise<void>;
+
+export function Button({ label }: Props) {
+	return <button onClick={async () => { await save(); }}>{label}</button>;
+}
+`;
+	const [tsxComponentResult] = await linter.lintText(tsxComponentSource, {
+		filePath: "tests/fixtures/promise-safety-component.tsx",
+	});
+	assert.equal(tsxComponentResult.errorCount, 0, tsxComponentResult.messages.map((message) => `${message.ruleId}: ${message.message}`).join(", "));
+
+	const vueLinter = createLinter(createVueProjectConfigs());
 	const [vueResult] = await vueLinter.lintText(
 		`<script setup lang="ts">
 type ElSelectorOutput = string;
@@ -287,6 +319,14 @@ const handleChange = (data: ElSelectorOutput) => {
 		{ filePath: "tests/fixtures/PromiseSafety.vue" }
 	);
 	assert.equal(vueResult.errorCount, 0, vueResult.messages.map((message) => `${message.ruleId}: ${message.message}`).join(", "));
+	const [vueJsxResult] = await vueLinter.lintText("export const Button = ({ label }) => <button>{label}</button>;\n", {
+		filePath: "fixtures/VueComponent.jsx",
+	});
+	const [vueTsxResult] = await vueLinter.lintText(tsxComponentSource, {
+		filePath: "tests/fixtures/promise-safety-component.tsx",
+	});
+	assert.equal(vueJsxResult.errorCount, 0, vueJsxResult.messages.map((message) => `${message.ruleId}: ${message.message}`).join(", "));
+	assert.equal(vueTsxResult.errorCount, 0, vueTsxResult.messages.map((message) => `${message.ruleId}: ${message.message}`).join(", "));
 	const [vueInvalidResult] = await vueLinter.lintText(
 		`<script setup lang="ts">
 const unusedValue = 1;
@@ -299,28 +339,135 @@ const unusedValue = 1;
 	const [invalidResult] = await linter.lintText(invalidSource, { filePath: "tests/fixtures/promise-safety.ts" });
 	assert.ok(invalidResult.messages.some((message) => message.ruleId === "@typescript-eslint/no-misused-promises"));
 	assert.ok(invalidResult.messages.some((message) => message.ruleId === "@typescript-eslint/require-await"));
-	assert.ok(invalidResult.messages.some((message) => message.ruleId === "@typescript-eslint/explicit-function-return-type"));
+	assert.ok(!invalidResult.messages.some((message) => message.ruleId === "@typescript-eslint/explicit-function-return-type"));
 	assert.ok(invalidResult.messages.some((message) => message.ruleId === "no-void"));
 });
 
-test("root Vue configuration includes UniApp globals, nvue parsing, manifest comments, and output ignores", async () => {
-	const linter = createLinter(fastConfig());
-	const [javaScriptResult] = await linter.lintText(
-		"uni.getSystemInfoSync();\ngetCurrentPages();\n// #ifdef MP-WEIXIN\nwx.request({});\n// #endif\n// #ifdef APP-PLUS\nplus.runtime.getProperty();\n// #endif\nunknownHostApi();\n",
-		{ filePath: "fixtures/uniapp.js" }
-	);
-	const [nvueResult] = await linter.lintFiles(["tests/fixtures/home.nvue"]);
-	const [pagesResult] = await linter.lintText('{\n\t// UniApp pages can contain comments.\n\t"pages": []\n}\n', {
+test("TSX keeps type safety without SDK return annotations and intersects every custom file pattern", async () => {
+	const configs = createTypeScriptConfigs(["src/**/*.ts", "src/**/*.tsx"]);
+	const linter = createLinter(configs);
+	const typeScriptConfig = await linter.calculateConfigForFile("src/example.ts");
+	const tsxConfig = await linter.calculateConfigForFile("src/example.tsx");
+
+	assert.deepEqual(configs.at(-1)?.files, [
+		["src/**/*.ts", "**/*.tsx"],
+		["src/**/*.tsx", "**/*.tsx"],
+	]);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-module-boundary-types"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-misused-promises"][1], undefined);
+	assert.equal(tsxConfig.rules["@typescript-eslint/explicit-module-boundary-types"][0], 0);
+	assert.equal(tsxConfig.rules["@typescript-eslint/no-misused-promises"][1].checksVoidReturn.attributes, false);
+	assert.equal(tsxConfig.rules["@typescript-eslint/no-unsafe-assignment"][0], 2);
+});
+
+test("Vue JSX and TSX share component semantics without inheriting template syntax rules", async () => {
+	const linter = createLinter(createVueProjectConfigs());
+	const jsxSource = `const defineComponent = (options) => options;
+
+export default defineComponent({
+	name: "div",
+	emits: [],
+	props: { count: Number },
+	data() {
+		return { count: 1 };
+	},
+	setup(props, { emit }) {
+		props.count += 1;
+		emit("save-item");
+		return () => <button aria-label="save">Save</button>;
+	},
+});
+`;
+	const tsxSource = `declare global {
+	namespace JSX {
+		interface Element { readonly type: string }
+		interface IntrinsicElements { button: { "aria-label"?: string; children?: unknown } }
+	}
+}
+
+type Options = {
+	name: string;
+	emits: string[];
+	props: { count: NumberConstructor };
+	data: () => { count: number };
+	setup: (props: { count: number }, context: { emit: (event: string) => void }) => () => JSX.Element;
+};
+
+const defineComponent = (options: Options): Options => options;
+
+export default defineComponent({
+	name: "div",
+	emits: [],
+	props: { count: Number },
+	data() {
+		return { count: 1 };
+	},
+	setup(props, { emit }) {
+		props.count += 1;
+		emit("save-item");
+		return () => <button aria-label="save">Save</button>;
+	},
+});
+`;
+	const cases = [
+		{ filePath: "fixtures/VueComponent.jsx", source: jsxSource },
+		{ filePath: "tests/fixtures/promise-safety-component.tsx", source: tsxSource },
+	];
+
+	for (const { filePath, source } of cases) {
+		const config = await linter.calculateConfigForFile(filePath);
+		const [result] = await linter.lintText(source, { filePath });
+		const ruleIds = new Set(result.messages.map((message) => message.ruleId));
+
+		for (const ruleName of [
+			"vue/require-explicit-emits",
+			"vue/no-dupe-keys",
+			"vue/no-mutating-props",
+			"vue/no-reserved-component-names",
+			"vue/no-setup-props-reactivity-loss",
+			"vue/no-ref-object-reactivity-loss",
+		]) {
+			assert.equal(config.rules[ruleName][0], 2, `${ruleName} must apply to ${filePath}`);
+		}
+		for (const ruleName of ["vue/attribute-hyphenation", "vue/attributes-order", "vue/no-v-text-v-html-on-component"]) {
+			assert.equal(config.rules[ruleName], undefined, `${ruleName} must remain template-only for ${filePath}`);
+		}
+		for (const ruleName of [
+			"vue/require-explicit-emits",
+			"vue/no-dupe-keys",
+			"vue/no-mutating-props",
+			"vue/no-reserved-component-names",
+			"vue/custom-event-name-casing",
+		]) {
+			assert.ok(ruleIds.has(ruleName), `${ruleName} must report the invalid ${filePath} fixture`);
+		}
+	}
+});
+
+test("Vue excludes UniApp capabilities while the UniApp entry enables them", async () => {
+	const vueLinter = createLinter(createVueProjectConfigs());
+	const uniAppLinter = createLinter(createUniAppProjectConfigs());
+	const source =
+		"uni.getSystemInfoSync();\ngetCurrentPages();\n// #ifdef MP-WEIXIN\nwx.request({});\n// #endif\n// #ifdef APP-PLUS\nplus.runtime.getProperty();\n// #endif\nunknownHostApi();\n";
+	const [vueJavaScriptResult] = await vueLinter.lintText(source, { filePath: "fixtures/uniapp.js" });
+	const [uniAppJavaScriptResult] = await uniAppLinter.lintText(source, { filePath: "fixtures/uniapp.js" });
+	const vueNvueConfig = await vueLinter.calculateConfigForFile("tests/fixtures/home.nvue");
+	const [nvueResult] = await uniAppLinter.lintFiles(["tests/fixtures/home.nvue"]);
+	const [pagesResult] = await uniAppLinter.lintText('{\n\t// UniApp pages can contain comments.\n\t"pages": []\n}\n', {
 		filePath: "fixtures/pages.json",
 	});
 
-	assert.ok(!javaScriptResult.messages.some((message) => message.message.includes("'uni' is not defined")));
-	assert.ok(!javaScriptResult.messages.some((message) => message.message.includes("'wx' is not defined")));
-	assert.ok(!javaScriptResult.messages.some((message) => message.message.includes("'plus' is not defined")));
-	assert.ok(javaScriptResult.messages.some((message) => message.message.includes("'unknownHostApi' is not defined")));
+	assert.ok(vueJavaScriptResult.messages.some((message) => message.message.includes("'uni' is not defined")));
+	assert.ok(vueJavaScriptResult.messages.some((message) => message.message.includes("'wx' is not defined")));
+	assert.ok(vueJavaScriptResult.messages.some((message) => message.message.includes("'plus' is not defined")));
+	assert.ok(!uniAppJavaScriptResult.messages.some((message) => message.message.includes("'uni' is not defined")));
+	assert.ok(!uniAppJavaScriptResult.messages.some((message) => message.message.includes("'wx' is not defined")));
+	assert.ok(!uniAppJavaScriptResult.messages.some((message) => message.message.includes("'plus' is not defined")));
+	assert.ok(uniAppJavaScriptResult.messages.some((message) => message.message.includes("'unknownHostApi' is not defined")));
+	assert.equal(vueNvueConfig, undefined);
 	assert.equal(nvueResult.fatalErrorCount, 0, nvueResult.messages.map((message) => message.message).join(", "));
 	assert.ok(!pagesResult.messages.some((message) => message.ruleId === "jsonc/no-comments"));
-	assert.ok(DEFAULT_IGNORE_PATTERNS.includes("**/unpackage/**"));
+	assert.ok(!DEFAULT_IGNORE_PATTERNS.includes("**/unpackage/**"));
 });
 
 test("React composes explicitly on the framework-neutral base", async () => {
@@ -374,22 +521,32 @@ test("Markdown remains an explicitly composed capability", async () => {
 	const config = defineConfig([...createBaseConfigs(), ...createMarkdownConfigs()]);
 	const linter = createLinter(config);
 	const [result] = await linter.lintText("# Example\n\nA valid Markdown document.\n", { filePath: "fixtures/example.md" });
+	const [tableResult] = await linter.lintText("| Name | Value |\n| --- | --- |\n| Fast | 1 | extra |\n", {
+		filePath: "fixtures/example.md",
+	});
 
 	assert.ok(!defaultNames.some((name) => name.includes("markdown")));
 	assert.ok(config.some((item) => item.name?.includes("markdown")));
 	assert.equal(result.fatalErrorCount, 0, result.messages.map((message) => message.message).join(", "));
+	assert.ok(tableResult.messages.some((message) => message.ruleId === "markdown/table-column-count"));
 });
 
 test("shared JavaScript, TypeScript, and Vue rule contract stays active", async () => {
-	const linter = createLinter(fastConfig());
+	const linter = createLinter(createVueProjectConfigs());
+	const uniAppLinter = createLinter(createUniAppProjectConfigs());
 	const javaScriptConfig = await linter.calculateConfigForFile("fixtures/example.js");
 	const typeScriptConfig = await linter.calculateConfigForFile("src/example.ts");
+	const jsxConfig = await linter.calculateConfigForFile("fixtures/VueComponent.jsx");
 	const tsxConfig = await linter.calculateConfigForFile("src/example.tsx");
 	const vueConfig = await linter.calculateConfigForFile("src/App.vue");
+	const uniAppTypeScriptConfig = await uniAppLinter.calculateConfigForFile("src/example.ts");
+	const nvueConfig = await uniAppLinter.calculateConfigForFile("src/App.nvue");
 
-	assert.equal(javaScriptConfig.rules["sort-imports"][0], 1);
+	assert.equal(javaScriptConfig.rules["sort-imports"][0], 2);
+	assert.equal(javaScriptConfig.rules["sort-imports"][1].ignoreDeclarationSort, true);
+	assert.equal(javaScriptConfig.rules["sort-imports"][1].ignoreMemberSort, false);
 	assert.equal(javaScriptConfig.rules["prefer-exponentiation-operator"][0], 2);
-	assert.equal(javaScriptConfig.rules["prefer-object-has-own"][0], 2);
+	assert.equal(javaScriptConfig.rules["prefer-object-has-own"], undefined);
 	assert.equal(javaScriptConfig.rules["prefer-arrow-callback"][0], 2);
 	assert.equal(javaScriptConfig.rules["no-use-before-define"][1].functions, false);
 	assert.equal(javaScriptConfig.rules["logical-assignment-operators"][0], 2);
@@ -401,6 +558,9 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(javaScriptConfig.rules["no-eval"][0], 2);
 	assert.equal(javaScriptConfig.rules["no-implied-eval"][0], 2);
 	assert.equal(javaScriptConfig.rules["no-new-func"][0], 2);
+	assert.equal(javaScriptConfig.rules["no-empty-character-class"][0], 2);
+	assert.equal(javaScriptConfig.rules["no-invalid-regexp"][0], 2);
+	assert.equal(javaScriptConfig.rules["no-useless-backreference"][0], 2);
 	assert.equal(javaScriptConfig.rules["no-promise-executor-return"][0], 2);
 	assert.deepEqual(javaScriptConfig.rules.curly, [2, "multi-line", "consistent"]);
 	assert.equal(javaScriptConfig.rules["default-case-last"][0], 2);
@@ -413,12 +573,16 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 		javaScriptConfig.rules["import-x/order"][1].pathGroups.find((group) => group.pattern === "@/**"),
 		{ pattern: "@/**", group: "internal", position: "before" }
 	);
+	assert.deepEqual(javaScriptConfig.rules["import-x/order"][1].pathGroupsExcludedImportTypes, ["type"]);
+	assert.ok(javaScriptConfig.rules["import-x/order"][1].pathGroups.some((group) => group.pattern.includes("react-dom")));
+	assert.ok(javaScriptConfig.rules["import-x/order"][1].pathGroups.some((group) => group.pattern.includes("@angular")));
+	assert.ok(javaScriptConfig.rules["import-x/order"][1].pathGroups.some((group) => group.pattern.includes("vite")));
 	assert.equal(javaScriptConfig.rules["import-x/style-imports-last"][0], 2);
 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unused-vars"][1].argsIgnorePattern, "^_");
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unused-vars"][1].varsIgnorePattern, undefined);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-module-boundary-types"][1].allowArgumentsExplicitlyTypedAsAny, false);
-	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-function-return-type"][0], 2);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/explicit-function-return-type"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-explicit-any"][0], 1);
 	assert.deepEqual(typeScriptConfig.rules["@typescript-eslint/no-empty-function"][1].allow, ["constructors", "overrideMethods"]);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-imports"][1].fixStyle, "separate-type-imports");
@@ -427,11 +591,24 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(typeScriptConfig.rules["no-implied-eval"][0], 0);
 	assert.equal(typeScriptConfig.rules["no-new-func"][0], 2);
 	assert.equal(typeScriptConfig.languageOptions.parserOptions.projectService, true);
-	assert.deepEqual(typeScriptConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
+	assert.deepEqual(typeScriptConfig.languageOptions.parserOptions.extraFileExtensions, [".vue"]);
+	assert.deepEqual(uniAppTypeScriptConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-floating-promises"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-misused-promises"][0], 2);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-misused-promises"][1], undefined);
 	assert.equal(tsxConfig.rules["@typescript-eslint/no-misused-promises"][1].checksVoidReturn.attributes, false);
+	assert.equal(typeScriptConfig.rules["no-redeclare"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-redeclare"][0], 2);
+	assert.equal(tsxConfig.rules["@typescript-eslint/no-unsafe-assignment"][0], 2);
+	for (const config of [jsxConfig, tsxConfig]) {
+		assert.equal(config.rules["vue/require-explicit-emits"][0], 2);
+		assert.equal(config.rules["vue/no-dupe-keys"][0], 2);
+		assert.equal(config.rules["vue/no-mutating-props"][0], 2);
+		assert.equal(config.rules["vue/no-reserved-component-names"][0], 2);
+		assert.equal(config.rules["vue/attribute-hyphenation"], undefined);
+		assert.equal(config.rules["vue/attributes-order"], undefined);
+		assert.equal(config.rules["vue/no-v-text-v-html-on-component"], undefined);
+	}
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/await-thenable"][0], 2);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/require-await"][0], 2);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unsafe-argument"][0], 2);
@@ -442,11 +619,13 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/strict-void-return"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-meaningless-void-operator"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-confusing-void-expression"][1].ignoreArrowShorthand, true);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/restrict-template-expressions"][1].allowBoolean, true);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/restrict-template-expressions"][1].allowNumber, true);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-dynamic-delete"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-extraneous-class"][0], 0);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-non-null-assertion"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-deprecated"][0], 1);
-	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unnecessary-condition"][0], 1);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unnecessary-condition"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/switch-exhaustiveness-check"][0], 2);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-definitions"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-indexed-object-style"][0], 0);
@@ -455,13 +634,30 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-exports"][0], 2);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/prefer-readonly"][0], 2);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/prefer-nullish-coalescing"][1].ignorePrimitives, true);
-	assert.equal(typeScriptConfig.rules["@typescript-eslint/unified-signatures"][1].ignoreDifferentlyNamedParameters, true);
-	assert.equal(typeScriptConfig.rules["@typescript-eslint/unified-signatures"][1].ignoreOverloadsWithDifferentJSDoc, true);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/prefer-optional-chain"][1].requireNullish, true);
+	assert.equal(typeScriptConfig.rules["@typescript-eslint/unified-signatures"][0], 0);
+	assert.deepEqual(typeScriptConfig.rules["@typescript-eslint/no-inferrable-types"], [2, { ignoreParameters: true, ignoreProperties: true }]);
 
-	assert.equal(vueConfig.rules["vue/attribute-hyphenation"][1], "always");
 	assert.equal(vueConfig.rules["vue/no-v-html"][0], 1);
+	assert.equal(vueConfig.rules["vue/require-explicit-emits"][0], 2);
+	assert.equal(vueConfig.rules["vue/attribute-hyphenation"][1], "always");
+	assert.equal(vueConfig.rules["vue/no-dupe-keys"][0], 2);
+	assert.equal(vueConfig.rules["vue/no-mutating-props"][0], 2);
+	assert.equal(vueConfig.rules["vue/no-reserved-component-names"][0], 2);
 	assert.equal(vueConfig.rules["vue/no-v-text-v-html-on-component"][0], 2);
-	assert.deepEqual(vueConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
+	assert.deepEqual(vueConfig.rules["vue/attributes-order"][1].order, [
+		"DEFINITION",
+		"LIST_RENDERING",
+		"CONDITIONALS",
+		"RENDER_MODIFIERS",
+		"UNIQUE",
+		"GLOBAL",
+		"OTHER_ATTR",
+		"EVENTS",
+		"CONTENT",
+	]);
+	assert.deepEqual(vueConfig.languageOptions.parserOptions.extraFileExtensions, [".vue"]);
+	assert.deepEqual(nvueConfig.languageOptions.parserOptions.extraFileExtensions, [".vue", ".nvue"]);
 	assert.equal(vueConfig.rules["@typescript-eslint/explicit-function-return-type"][0], 0);
 	assert.equal(vueConfig.rules["@typescript-eslint/explicit-module-boundary-types"][0], 0);
 	assert.equal(vueConfig.rules["@typescript-eslint/no-misused-promises"][1].checksVoidReturn.attributes, false);
@@ -486,7 +682,7 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(vueConfig.rules["@typescript-eslint/strict-void-return"][0], 0);
 });
 
-test("manifest sorting is enabled and preserves semantic exports condition order", async () => {
+test("manifest sorting is enabled by default and preserves semantic exports condition order", async () => {
 	const source = `{
 	"version": "1.0.0",
 	"name": "fixture",
@@ -499,7 +695,7 @@ test("manifest sorting is enabled and preserves semantic exports condition order
 	}
 }
 `;
-	const linter = createLinter(fastConfig(), { fix: true });
+	const linter = createLinter(createVueProjectConfigs(), { fix: true });
 	const [result] = await linter.lintText(source, { filePath: "fixtures/package.json" });
 	const fixed = result.output ?? source;
 

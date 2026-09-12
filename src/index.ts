@@ -1,5 +1,5 @@
 /**
- * 根入口提供面向 Vue 3、TypeScript 与 UniApp 浏览器项目的固定 ESLint 配置。
+ * 根入口提供彼此独立的 Vue 3 与 UniApp 完整 ESLint 配置。
  *
  * 配置片段、glob 常量与原始规则分别由 `./configs`、`./constants` 与 `./rules` 子路径提供。
  *
@@ -18,8 +18,8 @@ import { createPackageJsonSortConfigs } from "./configs/sort-package";
 import { createTsconfigSortConfigs } from "./configs/sort-tsconfig";
 import { createTypeScriptConfigs } from "./configs/typescript";
 import { createUniAppConfigs } from "./configs/uniapp";
-import { createVueConfigs } from "./configs/vue";
-import { GLOBS_CODE, GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT, GLOB_NVUE } from "./constants";
+import { createVueConfigs, createVueJsxConfigs } from "./configs/vue";
+import { GLOBS_CODE, GLOBS_JAVASCRIPT, GLOBS_TYPESCRIPT, GLOB_NVUE, GLOB_VUE } from "./constants";
 import type { Linter } from "eslint";
 import type { Config } from "eslint/config";
 import type { RuntimeEnvironment } from "./configs/environment";
@@ -28,46 +28,45 @@ import type { RuleOptions } from "./typegen";
 type RejectUnknownRuleNames<Rules extends RuleOptions> = Rules & Record<Exclude<keyof Rules, keyof RuleOptions>, never>;
 
 /**
- * 为项目规则提供精确的规则名、严重级别和规则选项自动补全。
+ * 定义带有完整规则名与选项类型检查的 ESLint 规则记录。
  *
  * @remarks
- * 该函数不会修改传入对象；它只在 TypeScript 编译阶段拒绝未知规则和无效选项。
+ * 该辅助函数只提供 TypeScript 类型约束，不会克隆、规范化或修改传入对象。规则记录可以
+ * 直接放入 Flat Config 的 `rules` 字段，也可以与本包导出的规则记录组合。
  *
- * @typeParam Rules - 调用方传入的规则记录类型；保留字面量键和值以提供精确推断。
- * @param rules - 需要进行规则名、严重级别和选项校验的 ESLint 规则记录。
- * @returns 原始规则记录。返回值同时兼容 ESLint 的通用 `RulesRecord` 类型。
+ * @typeParam Rules - 基于生成规则 schema 推断出的具体规则记录类型。
+ * @param rules - 需要验证的 ESLint 规则记录；未知规则名和无效规则选项会产生类型错误。
+ * @returns 原样返回传入的规则记录，并补充 ESLint `RulesRecord` 兼容类型。
+ *
+ * @example
+ * ```ts
+ * const rules = defineRules({
+ *   eqeqeq: ["error", "always"],
+ * });
+ * ```
  */
 export const defineRules = <const Rules extends RuleOptions>(rules: RejectUnknownRuleNames<Rules>): Rules & Linter.RulesRecord => rules;
 
 export type { RuleOptions } from "./typegen";
 
-/**
- * 根配置工厂唯一保留的项目选项。
- *
- * @remarks
- * 根入口固定启用 `.gitignore`、JavaScript、类型感知 TypeScript、Vue 3、UniApp、Import、
- * RegExp、JSON、清单排序和 Prettier 兼容层。项目级规则、globals 与 ignores 应通过
- * `fastConfig()` 的后置 Flat Config 参数声明。React、Angular、Markdown 与其他可选能力
- * 应从 `@fast-china/eslint-config/configs` 显式组合。
- */
-export interface FastConfigOptions {
+/** Vue、UniApp 与框架无关项目完整配置共享的运行环境选项。 */
+export interface ProjectConfigOptions {
 	/**
-	 * 应用代码实际运行的环境。
-	 *
-	 * - `"browser"`：提供浏览器全局变量。
-	 * - `"node"`：提供 Node.js 全局变量。
-	 * - `"universal"`：同时提供浏览器与 Node.js 全局变量。
-	 *
-	 * 配置文件、脚本、测试和 CLI 文件无论选择何种环境都会单独获得 Node.js globals。
+	 * 应用代码实际运行的环境。配置、脚本、测试和 CLI 文件始终单独获得 Node.js globals。
 	 * @defaultValue `"browser"`
 	 */
 	environment?: RuntimeEnvironment;
 }
 
 const SCRIPT_FILES = [...GLOBS_JAVASCRIPT, ...GLOBS_TYPESCRIPT];
-const VUE_PROJECT_FILES = [...GLOBS_CODE, GLOB_NVUE];
+const UNIAPP_PROJECT_FILES = [...GLOBS_CODE, GLOB_NVUE];
 
-const createProjectConfigs = (environment: RuntimeEnvironment, codeFiles: readonly string[], frameworkConfigs: readonly Config[] = []): Config[] =>
+const createProjectConfigs = (
+	environment: RuntimeEnvironment,
+	codeFiles: readonly string[],
+	extraFileExtensions: readonly string[] = [],
+	frameworkConfigs: readonly Config[] = []
+): Config[] =>
 	defineConfig([
 		...createGlobalIgnores(),
 		...createGitignoreConfigs(),
@@ -80,7 +79,7 @@ const createProjectConfigs = (environment: RuntimeEnvironment, codeFiles: readon
 		...createJavaScriptConfigs(),
 		...createImportConfigs(codeFiles),
 		...createRegexpConfigs(codeFiles),
-		...createTypeScriptConfigs(),
+		...createTypeScriptConfigs(GLOBS_TYPESCRIPT, extraFileExtensions),
 		...createJsonConfigs(),
 		...createPackageJsonSortConfigs(),
 		...createTsconfigSortConfigs(),
@@ -90,56 +89,55 @@ const createProjectConfigs = (environment: RuntimeEnvironment, codeFiles: readon
 	]);
 
 /**
- * 创建不绑定前端框架的固定基础配置。
+ * 创建不绑定前端框架的 JavaScript 与 TypeScript 完整配置。
  *
  * @remarks
- * 默认包含 `.gitignore`、JavaScript、类型感知 TypeScript、Import、RegExp、JSON、
- * `package.json`/`tsconfig*.json` 排序、Prettier 兼容层和 Node.js 工程文件覆写。
- * React、Angular、Markdown 与 Lodash 等能力由调用方从 `./configs` 子路径继续组合。
+ * TypeScript 模块的导出成员按 SDK 公共 API 检查，内部实现保留类型推断。
+ * React、Angular、Markdown 与 Lodash 等能力从 `./configs` 子路径按需组合。
  *
- * @param options - 应用代码的运行环境。
- * @returns 可作为 React、Angular、Node.js 或 SDK 项目基础的 Flat Config 数组。
+ * @param options - 应用源码的运行环境；默认仅注入浏览器全局变量。
+ * @returns 可直接传给 `eslint.config.*` 的 Flat Config 数组。
  */
-export const createBaseConfigs = ({ environment = "browser" }: FastConfigOptions = {}): Config[] => createProjectConfigs(environment, SCRIPT_FILES);
-
-const createVueProjectConfigs = ({ environment = "browser" }: FastConfigOptions = {}): Config[] =>
-	createProjectConfigs(environment, VUE_PROJECT_FILES, [...createVueConfigs(), ...createUniAppConfigs(VUE_PROJECT_FILES)]);
+export const createBaseConfigs = ({ environment = "browser" }: ProjectConfigOptions = {}): Config[] =>
+	createProjectConfigs(environment, SCRIPT_FILES);
 
 /**
- * 创建固定的 Vue 3、TypeScript 与 UniApp ESLint Flat Config。
+ * 创建处理 `.vue`、Vue JSX 与 Vue TSX，且不注入任何 UniApp 能力的 Vue 3 完整配置。
  *
- * @remarks
- * 除运行环境外，根入口不提供能力启停开关。TypeScript 和 Vue 始终使用
- * `strictTypeChecked`、`stylisticTypeChecked` 与 Project Service；被检查文件必须属于可发现的 tsconfig。
- * 额外配置会放在全部内置片段之后，因此可以覆盖项目规则、globals、ignores 或解析器选项。
- *
- * @param options - 应用代码的运行环境。
- * @param overrides - 追加到全部内置片段之后的 ESLint Flat Config。
- * @returns 可直接导出给 ESLint 的 Flat Config 数组。
- *
- * @example
- * ```ts
- * import { defineRules, fastConfig } from "@fast-china/eslint-config";
- *
- * export default fastConfig(
- *   { environment: "browser" },
- *   {
- *     files: ["src/generated/*.ts"],
- *     rules: defineRules({ "@typescript-eslint/no-unused-vars": "off" }),
- *   },
- * );
- * ```
+ * @param options - 应用源码的运行环境；默认仅注入浏览器全局变量。
+ * @param overrides - 追加在内置配置之后的项目级 Flat Config 覆写。
+ * @returns Vue 3 项目可直接使用的 Flat Config 数组。
  */
-export const fastConfig = ({ environment = "browser" }: FastConfigOptions = {}, ...overrides: Config[]): Config[] =>
-	defineConfig([...createVueProjectConfigs({ environment }), ...overrides]);
+export const createVueProjectConfigs = ({ environment = "browser" }: ProjectConfigOptions = {}, ...overrides: Config[]): Config[] =>
+	defineConfig([
+		...createProjectConfigs(environment, GLOBS_CODE, [".vue"], [...createVueConfigs([GLOB_VUE], [".vue"]), ...createVueJsxConfigs([".vue"])]),
+		...overrides,
+	]);
 
 /**
- * 可直接导出或展开的默认 ESLint Flat Config。
+ * 创建处理 `.vue`、`.nvue`、Vue JSX/TSX、UniApp globals 与应用清单的完整配置。
  *
- * @remarks
- * 默认使用浏览器环境。需要切换运行环境或追加项目覆写时，请使用具名导出的
- * {@link fastConfig} 工厂。
+ * @param options - 应用源码的运行环境；默认仅注入浏览器全局变量。
+ * @param overrides - 追加在内置配置之后的项目级 Flat Config 覆写。
+ * @returns UniApp 项目可直接使用的 Flat Config 数组。
  */
-const fastChina: Config[] = fastConfig();
+export const createUniAppProjectConfigs = ({ environment = "browser" }: ProjectConfigOptions = {}, ...overrides: Config[]): Config[] =>
+	defineConfig([
+		...createProjectConfigs(
+			environment,
+			UNIAPP_PROJECT_FILES,
+			[".vue", ".nvue"],
+			[
+				...createVueConfigs([GLOB_VUE, GLOB_NVUE], [".vue", ".nvue"]),
+				...createVueJsxConfigs([".vue", ".nvue"]),
+				...createUniAppConfigs(UNIAPP_PROJECT_FILES),
+			]
+		),
+		...overrides,
+	]);
 
-export default fastChina;
+/** 不带项目级覆写、可直接导入使用的 Vue 3 默认配置。 */
+export const vueConfig: Config[] = createVueProjectConfigs();
+
+/** 不带项目级覆写、可直接导入使用的 UniApp 默认配置。 */
+export const uniAppConfig: Config[] = createUniAppProjectConfigs();

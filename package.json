@@ -1,6 +1,6 @@
 {
 	"name": "@fast-china/eslint-config",
-	"version": "2.1.7",
+	"version": "2.1.8",
 	"description": "Practical, typed ESLint Flat Config for Vue 3, UniApp, React, Angular, Vite, TypeScript, JavaScript, and Node.js.",
 	"type": "module",
 	"keywords": [
@@ -72,6 +72,8 @@
 		"dev": "eslint-config-inspector --config src/eslint-inspector.config.ts",
 		"build": "pnpm run typegen:check && tsdown",
 		"build:inspector": "eslint-config-inspector build --config src/eslint-inspector.config.ts",
+		"docs:rules": "tsx scripts/rules-docs.ts",
+		"docs:rules:check": "tsx scripts/rules-docs.ts --check",
 		"typegen": "tsx scripts/typegen.ts",
 		"typegen:check": "tsx scripts/typegen.ts --check",
 		"typecheck": "tsc --noEmit",
@@ -83,7 +85,7 @@
 		"test:types": "tsc --noEmit --project tests/tsconfig.json",
 		"test:runtime": "node --test tests/config.test.mjs",
 		"test:package": "node --test tests/package.test.mjs",
-		"check": "pnpm run typecheck && pnpm run test && pnpm run lint && pnpm run format:check",
+		"check": "pnpm run typecheck && pnpm run docs:rules:check && pnpm run test && pnpm run lint && pnpm run format:check",
 		"prepack": "pnpm run check"
 	},
 	"peerDependencies": {

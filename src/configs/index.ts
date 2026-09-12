@@ -1,7 +1,7 @@
 /**
  * 可独立组合的 Flat Config 片段入口。
  *
- * 根入口不会重复导出这些成员；需要绕过 `fastConfig()` 自行组合时，请使用
+ * 根入口不会重复导出这些成员；需要在完整项目配置之外按需组合时，请使用
  * `@fast-china/eslint-config/configs`。
  *
  * @packageDocumentation

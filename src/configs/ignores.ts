@@ -12,7 +12,6 @@ import { GLOBS_LOCKFILES } from "../constants";
 export const DEFAULT_IGNORE_PATTERNS = Object.freeze([
 	"**/{.pnpm-store,node_modules}/**",
 	"**/{dist,build,coverage,output,temp,tmp}/**",
-	"**/unpackage/**",
 	"**/{.cache,.nuxt,.output,.vercel,.nitro}/**",
 	"**/{.vitepress/cache,.vite-inspect}/**",
 	"**/__snapshots__/**",

@@ -6,7 +6,7 @@ import { createAngularConfigs } from "../src/configs/angular";
 import { createLodashConfigs } from "../src/configs/lodash";
 import { createMarkdownConfigs } from "../src/configs/markdown";
 import { createReactConfigs } from "../src/configs/react";
-import { fastConfig } from "../src/index";
+import { createUniAppProjectConfigs } from "../src/index";
 import type { ESLint, Linter } from "eslint";
 
 const outputUrl = new URL("../src/typegen.d.ts", import.meta.url);
@@ -25,7 +25,7 @@ const configs: Linter.Config[] = [
 			"": corePlugin,
 		},
 	},
-	...fastConfig(),
+	...createUniAppProjectConfigs(),
 	...createReactConfigs(),
 	...createAngularConfigs(),
 	...createMarkdownConfigs(),

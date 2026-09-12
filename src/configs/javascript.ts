@@ -23,7 +23,7 @@ export const createJavaScriptConfigs = (files: readonly string[] = GLOBS_JAVASCR
 				ecmaVersion: "latest",
 				parserOptions: {
 					ecmaFeatures: {
-						// 普通 `.jsx` 文件需要显式开启 JSX 语法解析。
+						/** 普通 `.jsx` 文件需要显式开启 JSX 语法解析。 */
 						jsx: true,
 					},
 				},
