@@ -55,13 +55,18 @@ test("named framework configurations can be used directly or spread into defineC
 
 test("configuration fragment factories consistently return arrays", () => {
 	const globalIgnoreConfigs = createGlobalIgnores(["fixtures/generated/**"]);
+	const environmentConfigs = createEnvironmentConfigs({ files: ["fixtures/**/*.js"], nodeFiles: [] });
 
 	assert.ok(Array.isArray(globalIgnoreConfigs));
 	assert.equal(globalIgnoreConfigs.length, 1);
 	assert.equal(globalIgnoreConfigs[0].name, "@fast-china/ignores/global");
 	assert.ok(DEFAULT_IGNORE_PATTERNS.includes("**/{.pnpm-store,node_modules}/**"));
 	assert.ok(Array.isArray(createBaseConfigs()));
-	assert.equal(createEnvironmentConfigs({ files: ["fixtures/**/*.js"], nodeFiles: [] }).length, 1);
+	assert.equal(environmentConfigs.length, 2);
+	assert.deepEqual(
+		environmentConfigs.map((config) => config.name),
+		["@fast-china/globals/browser", "@fast-china/globals/node-tooling"]
+	);
 });
 
 test("Vue and UniApp project configurations keep framework capabilities isolated", () => {

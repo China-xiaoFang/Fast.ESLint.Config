@@ -64,8 +64,7 @@
 
 ### `vue/custom-event-name-casing`
 
-`emit`、`emits` 和事件处理引用中的自定义事件名称统一使用 camelCase；保留 Element Plus
-已发布的短横线事件名称，避免包装组件转发事件时改变第三方运行时契约。
+`emit`、`emits` 和事件处理引用中的自定义事件名称统一使用 camelCase，原生 DOM 事件不受影响。
 
 - 生效级别与范围：error: Vue SFC、Vue JSX、Vue TSX、UniApp NVue、UniApp TSX
 - 自动修复：不支持或上游未声明
