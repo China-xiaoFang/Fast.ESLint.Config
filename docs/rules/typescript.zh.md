@@ -1134,9 +1134,10 @@ const callback: () => void = () => { log(); };
 
 ### `@typescript-eslint/switch-exhaustiveness-check`
 
-联合类型和枚举新增成员时，`switch` 必须覆盖全部分支或显式提供 `default`。
+Vue SFC 允许按模板与运行时兜底处理未穷尽的联合类型或枚举。
 
-- 生效级别与范围：error: TypeScript 基础、框架无关 TSX、Vue SFC、Vue TSX、UniApp NVue、UniApp TSX、React TSX、Angular TypeScript
+- 生效级别与范围：error: TypeScript 基础、框架无关 TSX、Vue TSX、UniApp TSX、React TSX、Angular TypeScript
+- 关闭范围：Vue SFC、UniApp NVue
 - 自动修复：不支持或上游未声明
 - 规则来源：[官方文档](https://typescript-eslint.io/rules/switch-exhaustiveness-check)
 - 常见报告：`Add branches for missing cases.`；`The switch statement is exhaustive, so the default case is unnecessary.`；`Switch is not exhaustive. Cases not matched: {{missingBranches}}`

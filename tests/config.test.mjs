@@ -632,6 +632,7 @@ test("shared JavaScript, TypeScript, and Vue rule contract stays active", async 
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-deprecated"][0], 1);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/no-unnecessary-condition"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/switch-exhaustiveness-check"][0], 2);
+	assert.equal(vueConfig.rules["@typescript-eslint/switch-exhaustiveness-check"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-type-definitions"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/consistent-indexed-object-style"][0], 0);
 	assert.equal(typeScriptConfig.rules["@typescript-eslint/class-literal-property-style"][0], 0);
