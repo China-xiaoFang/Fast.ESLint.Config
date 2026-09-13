@@ -36,8 +36,17 @@ pnpm add -D eslint typescript @fast-china/eslint-config
 
 ```js
 import { vueConfig } from "@fast-china/eslint-config";
+import { defineConfig } from "eslint/config";
 
-export default vueConfig;
+export default defineConfig([
+	...vueConfig,
+	{
+		name: "project/custom",
+		rules: {
+			"no-console": "warn",
+		},
+	},
+]);
 ```
 
 该入口处理 JavaScript、类型感知 TypeScript、Vue SFC，以及 Vue 项目常用的独立 `.jsx`/`.tsx` 组件文件；Vue JSX/TSX 继续检查显式 emits、重复键、只读 props、响应性丢失和保留组件名，但不会套用模板专属的 kebab-case、模板属性排序或 `v-text`/`v-html` 规则。配置同时包含 JSON、Import、RegExp、`.gitignore` 和 Prettier 兼容规则，但不包含任何 UniApp 能力。
@@ -46,8 +55,18 @@ export default vueConfig;
 
 ```js
 import { uniAppConfig } from "@fast-china/eslint-config";
+import { defineConfig } from "eslint/config";
 
-export default uniAppConfig;
+export default defineConfig([
+	...uniAppConfig,
+	{
+		name: "project/custom",
+		ignores: ["src/generated/**"],
+		rules: {
+			"no-console": "warn",
+		},
+	},
+]);
 ```
 
 UniApp 入口在 Vue 完整能力之外增加 `.nvue`、`uni`、`uniCloud`、页面 API、条件编译平台 globals、`unpackage` 忽略，以及 `pages.json`、`manifest.json` 注释适配。
@@ -60,10 +79,12 @@ ESLint 不执行 `#ifdef`/`#endif`，因此只能识别平台对象，不能验�
 
 ```js
 import { createVueProjectConfigs, defineRules } from "@fast-china/eslint-config";
+import { defineConfig } from "eslint/config";
 
-export default createVueProjectConfigs(
-	{ environment: "universal" },
+export default defineConfig([
+	...createVueProjectConfigs({ environment: "universal" }),
 	{
+		name: "project/custom",
 		ignores: ["public/vendor/**"],
 		languageOptions: {
 			globals: {
@@ -73,8 +94,8 @@ export default createVueProjectConfigs(
 		rules: defineRules({
 			"no-console": "warn",
 		}),
-	}
-);
+	},
+]);
 ```
 
 可用工厂：
@@ -122,7 +143,14 @@ import { createBaseConfigs } from "@fast-china/eslint-config";
 import { createReactConfigs } from "@fast-china/eslint-config/configs";
 import { defineConfig } from "eslint/config";
 
-export default defineConfig([...createBaseConfigs(), ...createReactConfigs()]);
+export default defineConfig([
+	...createBaseConfigs(),
+	...createReactConfigs(),
+	{
+		name: "project/custom",
+		rules: { "no-console": "warn" },
+	},
+]);
 ```
 
 Angular 同理组合 `createAngularConfigs()`。基础配置不会加载 Vue 或 UniApp。
@@ -136,7 +164,14 @@ import { createBaseConfigs } from "@fast-china/eslint-config";
 import { createMarkdownConfigs } from "@fast-china/eslint-config/configs";
 import { defineConfig } from "eslint/config";
 
-export default defineConfig([...createBaseConfigs({ environment: "node" }), ...createMarkdownConfigs()]);
+export default defineConfig([
+	...createBaseConfigs({ environment: "node" }),
+	...createMarkdownConfigs(),
+	{
+		name: "project/custom",
+		rules: { "no-console": "warn" },
+	},
+]);
 ```
 
 `createBaseConfigs()`、`vueConfig` 和 `uniAppConfig` 都默认启用 `package.json` 与 `tsconfig*.json` 排序。`package.json` 排序不会进入顺序具有运行时语义的条件 `exports` 对象。

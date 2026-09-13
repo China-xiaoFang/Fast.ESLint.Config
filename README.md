@@ -36,8 +36,17 @@ pnpm add -D eslint typescript @fast-china/eslint-config
 
 ```js
 import { vueConfig } from "@fast-china/eslint-config";
+import { defineConfig } from "eslint/config";
 
-export default vueConfig;
+export default defineConfig([
+	...vueConfig,
+	{
+		name: "project/custom",
+		rules: {
+			"no-console": "warn",
+		},
+	},
+]);
 ```
 
 This entry covers JavaScript, type-aware TypeScript, Vue SFCs, and standalone `.jsx`/`.tsx` components used by Vue projects. Vue JSX/TSX keeps checks for explicit emits, duplicate keys, readonly props, reactivity loss, and reserved component names without inheriting template-only kebab-case, attribute-order, or `v-text`/`v-html` rules. The entry also includes JSON, Import, RegExp, `.gitignore`, and Prettier compatibility without loading UniApp capabilities.
@@ -46,8 +55,18 @@ This entry covers JavaScript, type-aware TypeScript, Vue SFCs, and standalone `.
 
 ```js
 import { uniAppConfig } from "@fast-china/eslint-config";
+import { defineConfig } from "eslint/config";
 
-export default uniAppConfig;
+export default defineConfig([
+	...uniAppConfig,
+	{
+		name: "project/custom",
+		ignores: ["src/generated/**"],
+		rules: {
+			"no-console": "warn",
+		},
+	},
+]);
 ```
 
 The UniApp entry adds `.nvue`, `uni`, `uniCloud`, page APIs, conditional-platform globals, the `unpackage` ignore, and comment handling for `pages.json` and `manifest.json`.
@@ -60,10 +79,12 @@ The root entry provides explicit named configurations and factories. Use a facto
 
 ```js
 import { createVueProjectConfigs, defineRules } from "@fast-china/eslint-config";
+import { defineConfig } from "eslint/config";
 
-export default createVueProjectConfigs(
-	{ environment: "universal" },
+export default defineConfig([
+	...createVueProjectConfigs({ environment: "universal" }),
 	{
+		name: "project/custom",
 		ignores: ["public/vendor/**"],
 		languageOptions: {
 			globals: {
@@ -73,8 +94,8 @@ export default createVueProjectConfigs(
 		rules: defineRules({
 			"no-console": "warn",
 		}),
-	}
-);
+	},
+]);
 ```
 
 Available factories:
@@ -122,7 +143,14 @@ import { createBaseConfigs } from "@fast-china/eslint-config";
 import { createReactConfigs } from "@fast-china/eslint-config/configs";
 import { defineConfig } from "eslint/config";
 
-export default defineConfig([...createBaseConfigs(), ...createReactConfigs()]);
+export default defineConfig([
+	...createBaseConfigs(),
+	...createReactConfigs(),
+	{
+		name: "project/custom",
+		rules: { "no-console": "warn" },
+	},
+]);
 ```
 
 Angular composes `createAngularConfigs()` in the same way. The base configuration loads neither Vue nor UniApp.
@@ -136,7 +164,14 @@ import { createBaseConfigs } from "@fast-china/eslint-config";
 import { createMarkdownConfigs } from "@fast-china/eslint-config/configs";
 import { defineConfig } from "eslint/config";
 
-export default defineConfig([...createBaseConfigs({ environment: "node" }), ...createMarkdownConfigs()]);
+export default defineConfig([
+	...createBaseConfigs({ environment: "node" }),
+	...createMarkdownConfigs(),
+	{
+		name: "project/custom",
+		rules: { "no-console": "warn" },
+	},
+]);
 ```
 
 `createBaseConfigs()`, `vueConfig`, and `uniAppConfig` all enable `package.json` and `tsconfig*.json` sorting by default. Package sorting does not enter conditional `exports` objects whose order has runtime meaning.
